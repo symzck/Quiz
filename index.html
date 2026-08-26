@@ -69,7 +69,7 @@
         <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-full max-w-sm px-4"></div>
 
         <!-- 0. HALAMAN LOGIN -->
-        <section id="auth-page" class="glass-card rounded-3xl p-8 sm:p-12 transition-all duration-300 max-w-md mx-auto w-full text-center">
+        <section id="auth-page" class="hidden glass-card rounded-3xl p-8 sm:p-12 transition-all duration-300 max-w-md mx-auto w-full text-center">
             <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-6">
                 <i class="fa-solid fa-user-lock"></i>
             </div>
@@ -105,13 +105,13 @@
                 <button onclick="window.toggleAuthMode()" id="auth-switch-btn" class="text-indigo-600 font-bold hover:underline transition">Daftar di sini</button>
             </div>
             
-            <button onclick="window.loginAnonim()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition text-sm">
-                Masuk sebagai Tamu (Guest)
+            <button onclick="window.loginAnonim()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-user-secret"></i> Masuk sebagai Tamu (Guest)
             </button>
         </section>
 
         <!-- Loading Global -->
-        <section id="global-loading" class="hidden glass-card rounded-3xl p-12 text-center max-w-sm mx-auto w-full">
+        <section id="global-loading" class="glass-card rounded-3xl p-12 text-center max-w-sm mx-auto w-full">
             <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full spinner mx-auto mb-4"></div>
             <h3 class="text-slate-900 font-bold">Memuat Sistem...</h3>
         </section>
@@ -306,7 +306,7 @@
     <!-- Firebase SDK & Logika Utama -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-        import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+        import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
         // Konfigurasi Firebase Asli Milikmu
@@ -325,6 +325,9 @@
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
 
+        // PAKSA FIREBASE MENYIMPAN SESI LOGIN DI BROWSER
+        setPersistence(auth, browserLocalPersistence);
+
         const appId = "quiz-tka-prod";
         const GROQ_API_KEY = "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";
         const ADMIN_PIN = "1234";
@@ -338,6 +341,7 @@
         let currentIndex = 0;
         let score = 0;
         let userSelectedAnswer = null;
+        let isGuestMode = false;
 
         const DEFAULT_QUESTIONS = [
             { id: "def_1", jenjang: "SD", mapel: "Literasi Membaca", tingkat: "Mudah", soal: "Budi memiliki 3 buah apel, lalu membeli lagi 5 buah. Berapa jumlah apel Budi sekarang?", pilihan: ["6", "7", "8", "9"], jawaban: 2, pembahasan: "3 + 5 = 8 buah apel." },
@@ -361,6 +365,7 @@
 
         async function handleAuthUser(user) {
             currentUser = user;
+            isGuestMode = false;
             const userId = user.uid;
             const userRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
             
@@ -378,8 +383,8 @@
                 } else {
                     userProfileData = {
                         uid: userId,
-                        displayName: user.displayName || user.email || 'Pengguna Tamu',
-                        email: user.email || 'tamu@app.local',
+                        displayName: user.displayName || user.email || 'Pengguna',
+                        email: user.email || 'user@app.local',
                         quizAttempts: 0,
                         lastAttemptDate: todayStr
                     };
@@ -404,20 +409,14 @@
         }
 
         // ==========================================
-        // PERBAIKAN LOGIN GOOGLE
+        // PERBAIKAN LOGIN GOOGLE & TAMU (GUEST)
         // ==========================================
         window.loginGoogle = async function() {
             try {
-                // Munculkan Loading
                 document.getElementById('global-loading').classList.remove('hidden');
                 document.getElementById('auth-page').classList.add('hidden');
-                
-                // Murni memanggil pop-up Google Auth
                 await signInWithPopup(auth, googleProvider);
-                
             } catch (err) {
-                // JIKA ERROR (diblokir, dicancel, domain salah): 
-                // KEMBALIKAN HALAMAN SEPERTI SEMULA dan beritahu errornya
                 document.getElementById('global-loading').classList.add('hidden');
                 document.getElementById('auth-page').classList.remove('hidden');
                 
@@ -477,25 +476,54 @@
             }
         };
 
-        window.loginAnonim = async function() {
-            try {
-                document.getElementById('global-loading').classList.remove('hidden');
-                document.getElementById('auth-page').classList.add('hidden');
-                await signInAnonymously(auth);
-            } catch(e) {
-                window.showToast("Gagal masuk tamu.", "error");
+        // MODE TAMU (GUEST) YANG BERFUNGSI SEPENUHNYA DENGAN LOCALSTORAGE
+        window.loginAnonim = function() {
+            document.getElementById('global-loading').classList.remove('hidden');
+            document.getElementById('auth-page').classList.add('hidden');
+
+            setTimeout(() => {
+                isGuestMode = true;
+                currentUser = { uid: "guest_local_user", displayName: "Tamu Pelajar", email: "guest@local" };
+                
+                const todayStr = new Date().toDateString();
+                let guestData = JSON.parse(localStorage.getItem('tka_guest_profile') || '{}');
+                
+                if (guestData.lastAttemptDate !== todayStr) {
+                    guestData = { quizAttempts: 0, lastAttemptDate: todayStr };
+                    localStorage.setItem('tka_guest_profile', JSON.stringify(guestData));
+                }
+
+                userProfileData = {
+                    uid: currentUser.uid,
+                    displayName: "Tamu Pelajar",
+                    email: "tamu@local",
+                    quizAttempts: guestData.quizAttempts || 0,
+                    lastAttemptDate: todayStr
+                };
+
                 document.getElementById('global-loading').classList.add('hidden');
-                document.getElementById('auth-page').classList.remove('hidden');
-            }
+                document.getElementById('user-info-badge').classList.remove('hidden');
+                document.getElementById('user-name-display').innerText = "Tamu";
+                document.getElementById('user-avatar').src = "https://placehold.co/32?text=T";
+
+                document.getElementById('portal-page').classList.remove('hidden');
+                document.getElementById('welcome-name').innerText = "Tamu";
+                
+                updateQuotaDisplay();
+                window.showToast("Berhasil masuk sebagai Tamu!", "success");
+            }, 600);
         };
 
         window.logout = async function() {
-            await signOut(auth);
+            if(!isGuestMode) {
+                await signOut(auth);
+            }
+            localStorage.removeItem('tka_guest_profile');
             window.location.reload();
         };
 
         function initCloudListeners() {
-            if (!currentUser) return;
+            if (!currentUser || isGuestMode) return;
             const soalQuery = collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka');
             onSnapshot(soalQuery, (snapshot) => {
                 bankSoalCloud = [];
@@ -544,6 +572,10 @@
         window.cekPin = function() {
             if(document.getElementById('pin-input').value === ADMIN_PIN) {
                 tutupModalPin();
+                if(isGuestMode) {
+                    window.showToast("Mode Tamu tidak memiliki akses Admin/Guru.", "error");
+                    return;
+                }
                 document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
                 document.getElementById('founder-page').classList.remove('hidden');
                 document.getElementById('btn-ganti-peran').classList.remove('hidden');
@@ -642,7 +674,16 @@
             }
 
             userProfileData.quizAttempts = (userProfileData.quizAttempts || 0) + 1;
-            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { quizAttempts: userProfileData.quizAttempts });
+            
+            if(isGuestMode) {
+                localStorage.setItem('tka_guest_profile', JSON.stringify({
+                    quizAttempts: userProfileData.quizAttempts,
+                    lastAttemptDate: new Date().toDateString()
+                }));
+            } else {
+                await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { quizAttempts: userProfileData.quizAttempts });
+            }
+            
             updateQuotaDisplay();
 
             currentIndex = 0; score = 0;
@@ -714,18 +755,21 @@
                 document.getElementById('progress-bar').style.width = `100%`;
 
                 try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), {
-                        userId: currentUser.uid, userName: userProfileData.displayName,
-                        jenjang: document.getElementById('u-jenjang').value, mapel: document.getElementById('u-mapel').value,
-                        score: score, timestamp: new Date().toLocaleString('id-ID')
-                    });
+                    if(!isGuestMode) {
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), {
+                            userId: currentUser.uid, userName: userProfileData.displayName,
+                            jenjang: document.getElementById('u-jenjang').value, mapel: document.getElementById('u-mapel').value,
+                            score: score, timestamp: new Date().toLocaleString('id-ID')
+                        });
+                    }
                 } catch(e) {}
             }
         };
 
         onAuthStateChanged(auth, async (user) => {
-            if (user) await handleAuthUser(user);
-            else {
+            if (user) {
+                await handleAuthUser(user);
+            } else if (!isGuestMode) {
                 document.getElementById('global-loading').classList.add('hidden');
                 document.getElementById('auth-page').classList.remove('hidden');
                 document.getElementById('portal-page').classList.add('hidden');
