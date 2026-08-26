@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Cerdas TKA - Cloud & AI</title>
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="Platform latihan TKA dengan bank soal, evaluasi otomatis, dan laporan hasil belajar.">
+    <title>Kuis TKA — Latihan & Evaluasi</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -37,6 +39,30 @@
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        button, input, select, textarea { min-height: 44px; }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 3px solid rgba(99,102,241,.25);
+            outline-offset: 2px;
+        }
+        .soft-hover { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+        .soft-hover:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -14px rgba(15,23,42,.20); }
+        .stat-card { background: linear-gradient(135deg,#fff,rgba(248,250,252,.92)); }
+        .quiz-option { min-height: 56px; }
+        .quiz-option.correct { border-color:#10b981!important; background:#ecfdf5!important; color:#064e3b!important; }
+        .quiz-option.wrong { border-color:#f43f5e!important; background:#fff1f2!important; color:#881337!important; }
+        .quiz-option:disabled { cursor: default; opacity: 1; }
+        .progress-shine { position: relative; overflow: hidden; }
+        .progress-shine::after {
+            content:""; position:absolute; inset:0; transform:translateX(-100%);
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+            animation: shine 2.2s infinite;
+        }
+        @keyframes shine { to { transform:translateX(100%); } }
+        @media (max-width: 640px) {
+            .mobile-tight { padding: 1rem!important; }
+            .quiz-option { font-size: .875rem; }
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col font-sans">
@@ -151,7 +177,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="font-bold text-lg text-slate-800 mb-1">Akses Terbatas</h3>
-                <p class="text-xs text-slate-500 mb-6">Masukkan PIN keamanan Guru. (Hint: 1234)</p>
+                <p class="text-xs text-slate-500 mb-6">Masukkan PIN akses Guru. Untuk produksi, amankan admin menggunakan Firebase Custom Claims dan Firestore Rules.</p>
                 <input type="password" id="pin-input" class="w-full text-center tracking-[0.5em] font-bold text-2xl p-3 border-2 border-slate-200 rounded-xl focus:border-founder-500 focus:outline-none mb-4" placeholder="••••" maxlength="4">
                 <div class="flex gap-2">
                     <button onclick="window.tutupModalPin()" class="w-1/2 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 rounded-xl">Batal</button>
@@ -179,22 +205,33 @@
                             <select id="f-tingkat" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit / HOTS">Sulit / HOTS</option></select>
                         </div>
                         <select id="f-mapel" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Literasi Membaca">Literasi Membaca</option><option value="Numerasi & Matematika">Numerasi & Matematika</option><option value="Sains & Sosial">Sains & Sosial</option></select>
-                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan pertanyaan..."></textarea>
-                        <input type="text" id="f-pil-A" placeholder="Opsi A" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
-                        <input type="text" id="f-pil-B" placeholder="Opsi B" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
-                        <input type="text" id="f-pil-C" placeholder="Opsi C" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
-                        <input type="text" id="f-pil-D" placeholder="Opsi D" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan pertanyaan..." maxlength="1200"></textarea>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="text" id="f-pil-A" placeholder="Opsi A" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
+                            <input type="text" id="f-pil-B" placeholder="Opsi B" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
+                            <input type="text" id="f-pil-C" placeholder="Opsi C" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
+                            <input type="text" id="f-pil-D" placeholder="Opsi D" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
+                        </div>
+                        <textarea id="f-pembahasan" rows="2" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Pembahasan / alasan jawaban benar..." maxlength="1000"></textarea>
                         <div class="grid grid-cols-2 gap-2 items-center">
                             <select id="f-kunci" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-emerald-50 text-emerald-700 font-bold"><option value="0">Kunci: A</option><option value="1">Kunci: B</option><option value="2">Kunci: C</option><option value="3">Kunci: D</option></select>
-                            <button onclick="window.simpanSoalCloud()" class="bg-founder-600 hover:bg-founder-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-sm">Simpan</button>
+                            <button onclick="window.simpanSoalCloud()" class="bg-founder-600 hover:bg-founder-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Soal</button>
                         </div>
+                        <button onclick="window.resetFormSoal()" class="w-full text-xs font-bold text-slate-500 hover:text-slate-800 py-2">Kosongkan Form</button>
                     </div>
                 </div>
 
                 <!-- Kanan: Database Soal -->
                 <div class="lg:col-span-2 glass-card rounded-3xl p-6 flex flex-col h-[600px]">
                     <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-                        <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-server text-indigo-500"></i> Database Soal Firestore (<span id="count-db-cloud">0</span>)</h2>
+                        <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-server text-indigo-500"></i> Database Soal (<span id="count-db-cloud">0</span>)</h2>
+                        <span id="admin-sync-status" class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Tersinkron</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                        <input id="admin-search" oninput="window.filterAdminSoal()" type="search" placeholder="Cari soal..." class="sm:col-span-2 text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <select id="admin-filter-jenjang" onchange="window.filterAdminSoal()" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                            <option value="">Semua jenjang</option><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option>
+                        </select>
                     </div>
                     <div id="admin-db-list" class="flex-grow overflow-y-auto custom-scroll space-y-3 pr-2">
                         <div class="text-center text-slate-400 text-sm py-10">Memuat data dari database cloud...</div>
@@ -240,18 +277,20 @@
 
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <button onclick="window.mulaiKuis(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat via AI (Groq)
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat dengan AI
                 </button>
                 <button onclick="window.mulaiKuis(false)" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-xl transition text-sm flex items-center justify-center gap-2">
                     <i class="fa-solid fa-cloud-arrow-down text-indigo-400"></i> Ambil dari Firestore
                 </button>
             </div>
+            <p class="mt-5 text-[11px] text-slate-400">Setiap sesi berisi hingga 10 soal. Kuota harian dipakai saat sesi dimulai.</p>
         </section>
 
         <!-- Loading State Kuis -->
         <section id="loading-section" class="glass-card rounded-3xl p-12 text-center hidden max-w-lg mx-auto w-full">
             <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full spinner mx-auto mb-4"></div>
             <h3 class="font-bold text-slate-900">Menyiapkan Soal Ujian...</h3>
+            <p class="text-xs text-slate-500 mt-2">Mohon tunggu, sistem sedang memvalidasi bank soal dan kuota Anda.</p>
         </section>
 
         <!-- 4. HALAMAN KUIS AKTIF -->
@@ -295,11 +334,21 @@
             </div>
             <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Ujian Selesai!</h2>
             <p class="text-slate-500 text-sm mb-6">Hasil nilai Anda telah dicatat ke dalam database Cloud.</p>
-            <div class="bg-slate-50 p-5 rounded-2xl max-w-xs mx-auto mb-6 border border-slate-200">
-                <span class="text-xs text-slate-500 font-bold uppercase block mb-1">Skor Akhir</span>
-                <span id="final-score" class="text-4xl font-black text-indigo-600">0</span>
+            <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
+                <div class="stat-card p-4 rounded-2xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 font-bold uppercase block mb-1">Skor</span>
+                    <span id="final-score" class="text-3xl font-black text-indigo-600">0</span>
+                </div>
+                <div class="stat-card p-4 rounded-2xl border border-slate-200">
+                    <span class="text-[11px] text-slate-500 font-bold uppercase block mb-1">Benar</span>
+                    <span id="final-correct" class="text-3xl font-black text-emerald-600">0/0</span>
+                </div>
             </div>
-            <button onclick="window.bukaUser()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition text-sm shadow-md">Kembali ke Menu</button>
+            <p id="result-message" class="text-sm font-semibold text-slate-600 mb-6">Tetap semangat belajar.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="window.ulangiKuis()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition text-sm shadow-md"><i class="fa-solid fa-rotate-right mr-1"></i> Coba Lagi</button>
+                <button onclick="window.bukaUser()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3 px-6 rounded-xl transition text-sm">Kembali ke Menu</button>
+            </div>
         </section>
     </main>
 
@@ -307,9 +356,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
         import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase Asli Milikmu
+        // Firebase config boleh berada di frontend, tetapi API key layanan AI JANGAN ditaruh di HTML.
+        // Nilai di bawah tetap memakai proyek yang sama agar fitur Firebase tidak berubah.
         const firebaseConfig = {
             apiKey: "AIzaSyAOHslpDrbf7dubS6MiX4Qcj2Nbr4W3CkY",
             authDomain: "quiz-tka.firebaseapp.com",
@@ -329,8 +379,12 @@
         setPersistence(auth, browserLocalPersistence);
 
         const appId = "quiz-tka-prod";
-        const GROQ_API_KEY = "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";
-        const ADMIN_PIN = "1234";
+        // Endpoint ini harus memanggil Groq dari backend/serverless agar API key tidak bocor ke browser.
+        // Contoh: /api/generate-quiz
+        const GROQ_API_ENDPOINT = window.QUIZ_CONFIG?.groqEndpoint || "";
+        // PIN di frontend hanya proteksi UI, bukan mekanisme keamanan server.
+        // Gunakan Firebase Custom Claims / Firestore Rules untuk keamanan admin yang sesungguhnya.
+        const ADMIN_PIN = window.QUIZ_CONFIG?.adminPin || "1234";
         const MAX_LIMIT_PER_DAY = 3;
         const TOTAL_QUESTIONS_PER_SESSION = 10;
 
@@ -340,8 +394,10 @@
         let activeQuestions = [];
         let currentIndex = 0;
         let score = 0;
+        let correctAnswers = 0;
         let userSelectedAnswer = null;
         let isGuestMode = false;
+        let lastQuizConfig = { jenjang: "SMA", mapel: "Literasi Membaca", pakaiAI: false };
 
         const DEFAULT_QUESTIONS = [
             { id: "def_1", jenjang: "SD", mapel: "Literasi Membaca", tingkat: "Mudah", soal: "Budi memiliki 3 buah apel, lalu membeli lagi 5 buah. Berapa jumlah apel Budi sekarang?", pilihan: ["6", "7", "8", "9"], jawaban: 2, pembahasan: "3 + 5 = 8 buah apel." },
@@ -358,10 +414,33 @@
             const toast = document.createElement('div');
             const bgColor = type === 'error' ? 'bg-rose-600' : (type === 'success' ? 'bg-emerald-600' : 'bg-indigo-600');
             toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center gap-2`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${message}</span>`;
+            const icon = type === "error" ? "fa-circle-exclamation" : (type === "success" ? "fa-circle-check" : "fa-circle-info");
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span></span>`;
+            toast.querySelector("span").textContent = message;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         }
+
+
+        function escapeHTML(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+            }[ch]));
+        }
+
+        function getResultMessage(scoreValue) {
+            if (scoreValue >= 90) return "Luar biasa! Penguasaan materi Anda sangat baik.";
+            if (scoreValue >= 75) return "Bagus! Tinggal sedikit lagi untuk hasil yang lebih tinggi.";
+            if (scoreValue >= 60) return "Cukup baik. Tinjau kembali pembahasan soal yang keliru.";
+            return "Tidak masalah. Gunakan pembahasan untuk memperkuat materi sebelum mencoba lagi.";
+        }
+
+        window.resetFormSoal = function() {
+            ["f-soal","f-pil-A","f-pil-B","f-pil-C","f-pil-D","f-pembahasan"].forEach(id => {
+                const el = document.getElementById(id); if (el) el.value = "";
+            });
+            const key = document.getElementById("f-kunci"); if (key) key.value = "0";
+        };
 
         async function handleAuthUser(user) {
             currentUser = user;
@@ -528,8 +607,15 @@
             onSnapshot(soalQuery, (snapshot) => {
                 bankSoalCloud = [];
                 snapshot.forEach(docSnap => bankSoalCloud.push({ id: docSnap.id, ...docSnap.data() }));
+                const status = document.getElementById("admin-sync-status");
+                if (status) { status.textContent = "Tersinkron"; status.className = "text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full"; }
                 renderAdminSoalList();
-            }, (err) => console.log(err));
+            }, (err) => {
+                const status = document.getElementById("admin-sync-status");
+                if (status) { status.textContent = "Gagal sinkron"; status.className = "text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-full"; }
+                window.showToast("Tidak dapat memuat bank soal dari Firestore.", "error");
+                console.error(err);
+            });
 
             const laporanQuery = collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa');
             onSnapshot(laporanQuery, (snapshot) => {
@@ -539,10 +625,13 @@
                 let rows = '';
                 snapshot.forEach(docSnap => {
                     const d = docSnap.data();
-                    rows += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${d.userName}</td><td class="px-4 py-3 text-xs">${d.timestamp || '-'}</td><td class="px-4 py-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[11px] font-bold">${d.jenjang} - ${d.mapel}</span></td><td class="px-4 py-3 text-center font-black text-emerald-600">${d.score}</td></tr>`;
+                    rows += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${escapeHTML(d.userName || "Pengguna")}</td><td class="px-4 py-3 text-xs">${escapeHTML(d.timestamp || '-')}</td><td class="px-4 py-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[11px] font-bold">${escapeHTML(d.jenjang || '-')} - ${escapeHTML(d.mapel || '-')}</span></td><td class="px-4 py-3 text-center font-black text-emerald-600">${Number(d.score) || 0}</td></tr>`;
                 });
                 tbody.innerHTML = rows || `<tr><td colspan="4" class="text-center py-6 text-slate-400">Belum ada laporan.</td></tr>`;
-            }, (err) => console.log(err));
+            }, (err) => {
+                window.showToast("Laporan siswa tidak dapat dimuat.", "error");
+                console.error(err);
+            });
         }
 
         window.kembaliKePortal = function() {
@@ -581,7 +670,7 @@
                 document.getElementById('btn-ganti-peran').classList.remove('hidden');
                 window.switchAdminTab('soal');
             } else {
-                window.showToast("PIN Salah! (Hint: 1234)", "error");
+                window.showToast("PIN tidak sesuai.", "error");
             }
         }
 
@@ -602,35 +691,92 @@
             const pilB = document.getElementById('f-pil-B').value.trim();
             const pilC = document.getElementById('f-pil-C').value.trim();
             const pilD = document.getElementById('f-pil-D').value.trim();
+            const pembahasan = document.getElementById('f-pembahasan').value.trim();
             const kunci = parseInt(document.getElementById('f-kunci').value);
 
-            if(!soal || !pilA || !pilB || !pilC || !pilD) return window.showToast("Semua kolom wajib diisi!", "error");
+            if(!soal || !pilA || !pilB || !pilC || !pilD) return window.showToast("Pertanyaan dan 4 opsi wajib diisi.", "error");
+            if([pilA,pilB,pilC,pilD].some((x, i, arr) => arr.findIndex(y => y.toLowerCase() === x.toLowerCase()) !== i)) {
+                return window.showToast("Opsi jawaban tidak boleh duplikat.", "error");
+            }
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka'), {
-                    jenjang, tingkat, mapel, soal, pilihan: [pilA, pilB, pilC, pilD], jawaban: kunci, pembahasan: "Pembahasan pengajar."
+                    jenjang, tingkat, mapel, soal,
+                    pilihan: [pilA, pilB, pilC, pilD],
+                    jawaban: kunci,
+                    pembahasan: pembahasan || "Belum ada pembahasan."
                 });
-                window.showToast("Soal berhasil disimpan!", "success");
-                document.getElementById('f-soal').value = '';
-                document.getElementById('f-pil-A').value = '';
-                document.getElementById('f-pil-B').value = '';
-                document.getElementById('f-pil-C').value = '';
-                document.getElementById('f-pil-D').value = '';
+                window.showToast("Soal berhasil disimpan.", "success");
+                window.resetFormSoal();
             } catch(e) {
-                window.showToast("Gagal simpan ke Firestore.", "error");
+                window.showToast("Gagal menyimpan soal. Periksa Firestore Rules.", "error");
+                console.error(e);
             }
         }
 
-        function renderAdminSoalList() {
+        function renderAdminSoalList(items = bankSoalCloud) {
             const container = document.getElementById('admin-db-list');
-            const list = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
+            const list = items.length > 0 ? items : (bankSoalCloud.length === 0 ? DEFAULT_QUESTIONS : []);
             document.getElementById('count-db-cloud').innerText = list.length;
             if(!container) return;
+            if (!list.length) {
+                container.innerHTML = `<div class="text-center text-slate-400 text-sm py-10">Belum ada soal yang cocok dengan filter.</div>`;
+                return;
+            }
             container.innerHTML = '';
             list.forEach((q, idx) => {
-                container.innerHTML += `<div class="bg-slate-50 border border-slate-200 p-3 rounded-xl"><div class="flex justify-between text-[11px] font-bold text-indigo-600 mb-1"><span>${q.jenjang} - ${q.mapel}</span><span>${q.tingkat}</span></div><p class="text-xs font-bold text-slate-800">${idx+1}. ${q.soal}</p></div>`;
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 border border-slate-200 p-3 rounded-xl soft-hover";
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-start gap-3";
+                const main = document.createElement('div');
+                main.className = "min-w-0";
+                const meta = document.createElement('div');
+                meta.className = "flex flex-wrap gap-2 text-[11px] font-bold text-indigo-600 mb-1";
+                meta.innerHTML = `<span>${escapeHTML(q.jenjang)} · ${escapeHTML(q.mapel)}</span><span class="text-slate-400">•</span><span>${escapeHTML(q.tingkat)}</span>`;
+                const question = document.createElement('p');
+                question.className = "text-xs font-bold text-slate-800 leading-relaxed";
+                question.textContent = `${idx + 1}. ${q.soal || ""}`;
+                main.append(meta, question);
+
+                const actions = document.createElement('div');
+                actions.className = "flex-shrink-0 flex gap-1";
+                if (q.id && !String(q.id).startsWith("def_")) {
+                    const del = document.createElement('button');
+                    del.className = "w-9 h-9 min-h-0 rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50";
+                    del.title = "Hapus soal";
+                    del.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                    del.onclick = () => window.hapusSoal(q.id);
+                    actions.appendChild(del);
+                }
+                row.append(main, actions);
+                card.appendChild(row);
+                container.appendChild(card);
             });
         }
+
+        window.filterAdminSoal = function() {
+            const q = (document.getElementById("admin-search")?.value || "").toLowerCase().trim();
+            const jenjang = document.getElementById("admin-filter-jenjang")?.value || "";
+            const pool = bankSoalCloud;
+            const filtered = pool.filter(item => {
+                const haystack = [item.soal, item.mapel, item.jenjang, item.tingkat].join(" ").toLowerCase();
+                return (!q || haystack.includes(q)) && (!jenjang || item.jenjang === jenjang);
+            });
+            renderAdminSoalList(filtered);
+        };
+
+        window.hapusSoal = async function(id) {
+            if (!id || isGuestMode) return window.showToast("Akses hapus tidak tersedia dalam mode ini.", "error");
+            if (!confirm("Hapus soal ini dari Firestore?")) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'soal_tka', id));
+                window.showToast("Soal dihapus.", "success");
+            } catch (e) {
+                window.showToast("Gagal menghapus soal.", "error");
+                console.error(e);
+            }
+        };
 
         function updateQuotaDisplay() {
             if(!userProfileData) return;
@@ -641,59 +787,88 @@
 
         window.mulaiKuis = async function(pakaiAI) {
             if(!userProfileData) return;
-            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian Anda telah habis!", "error");
+            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian Anda telah habis.", "error");
 
             const jenjang = document.getElementById('u-jenjang').value;
             const mapel = document.getElementById('u-mapel').value;
+            lastQuizConfig = { jenjang, mapel, pakaiAI };
 
             document.getElementById('user-home').classList.add('hidden');
             document.getElementById('loading-section').classList.remove('hidden');
 
-            if(pakaiAI) {
+            activeQuestions = [];
+            let sumber = pakaiAI ? "AI" : "Firestore";
+
+            if(pakaiAI && GROQ_API_ENDPOINT) {
                 try {
-                    const prompt = `Buatkan 10 soal pilihan ganda untuk jenjang ${jenjang}, mata pelajaran ${mapel}, Kurikulum Merdeka (HOTS). Format JSON: {"soal_list": [{"soal": "...", "pilihan": ["A","B","C","D"], "jawaban": 0, "pembahasan": "..."}]}`;
-                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                        method: "POST", headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
-                        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], response_format: { type: "json_object" } })
+                    const prompt = `Buatkan ${TOTAL_QUESTIONS_PER_SESSION} soal pilihan ganda untuk jenjang ${jenjang}, mata pelajaran ${mapel}, Kurikulum Merdeka, berorientasi HOTS.
+Kembalikan JSON murni dengan struktur {"soal_list":[{"soal":"...","pilihan":["A","B","C","D"],"jawaban":0,"pembahasan":"..."}]}.
+Pastikan jawaban selalu berupa indeks 0-3 dan semua soal relevan dengan jenjang/mapel.`;
+                    const res = await fetch(GROQ_API_ENDPOINT, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ prompt, jenjang, mapel, jumlah: TOTAL_QUESTIONS_PER_SESSION })
                     });
-                    if(!res.ok) throw new Error();
+                    if(!res.ok) throw new Error(`AI endpoint ${res.status}`);
                     const data = await res.json();
-                    let raw = data.choices[0].message.content.replace(/```json/gi, '').replace(/```/gi, '').trim();
-                    activeQuestions = JSON.parse(raw).soal_list;
-                } catch(e) {
+                    const list = Array.isArray(data?.soal_list) ? data.soal_list : [];
+                    activeQuestions = list.filter(q => q && q.soal && Array.isArray(q.pilihan) && q.pilihan.length === 4 && Number.isInteger(q.jawaban) && q.jawaban >= 0 && q.jawaban <= 3);
+                    if (activeQuestions.length < 1) throw new Error("Respons AI tidak valid.");
+                } catch (e) {
+                    console.warn("AI fallback:", e);
                     pakaiAI = false;
+                    window.showToast("AI tidak tersedia. Sistem memakai bank soal.", "info");
                 }
+            } else if (pakaiAI && !GROQ_API_ENDPOINT) {
+                window.showToast("Fitur AI belum dikonfigurasi di backend. Bank soal digunakan.", "info");
+                pakaiAI = false;
             }
 
             if(!pakaiAI) {
                 let pool = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
                 let filtered = pool.filter(q => q.jenjang === jenjang && q.mapel === mapel);
-                if(filtered.length < TOTAL_QUESTIONS_PER_SESSION) filtered = [...pool];
-                filtered.sort(() => Math.random() - 0.5);
+                if(filtered.length < TOTAL_QUESTIONS_PER_SESSION) {
+                    filtered = [...pool];
+                }
+                filtered = filtered
+                    .filter(q => q && q.soal && Array.isArray(q.pilihan) && q.pilihan.length === 4)
+                    .sort(() => Math.random() - 0.5);
                 activeQuestions = filtered.slice(0, TOTAL_QUESTIONS_PER_SESSION);
             }
 
-            userProfileData.quizAttempts = (userProfileData.quizAttempts || 0) + 1;
-            
-            if(isGuestMode) {
-                localStorage.setItem('tka_guest_profile', JSON.stringify({
-                    quizAttempts: userProfileData.quizAttempts,
-                    lastAttemptDate: new Date().toDateString()
-                }));
-            } else {
-                await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { quizAttempts: userProfileData.quizAttempts });
+            if (!activeQuestions.length) {
+                document.getElementById('loading-section').classList.add('hidden');
+                document.getElementById('user-home').classList.remove('hidden');
+                return window.showToast(`Belum ada soal untuk ${jenjang} — ${mapel}.`, "error");
             }
-            
-            updateQuotaDisplay();
 
-            currentIndex = 0; score = 0;
+            userProfileData.quizAttempts = (userProfileData.quizAttempts || 0) + 1;
+
+            try {
+                if(isGuestMode) {
+                    localStorage.setItem('tka_guest_profile', JSON.stringify({
+                        quizAttempts: userProfileData.quizAttempts,
+                        lastAttemptDate: new Date().toDateString()
+                    }));
+                } else {
+                    await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), {
+                        quizAttempts: userProfileData.quizAttempts
+                    });
+                }
+            } catch (e) {
+                console.error("Quota update error:", e);
+                window.showToast("Kuis dimulai, tetapi kuota belum tersimpan.", "error");
+            }
+
+            updateQuotaDisplay();
+            currentIndex = 0; score = 0; correctAnswers = 0;
             document.getElementById('loading-section').classList.add('hidden');
             document.getElementById('quiz-page').classList.remove('hidden');
             document.getElementById('badge-jenjang').innerText = jenjang;
             document.getElementById('badge-mapel-quiz').innerText = mapel;
             document.getElementById('total-q').innerText = activeQuestions.length;
             tampilkanSoalAktif();
-        }
+        };
 
         function tampilkanSoalAktif() {
             userSelectedAnswer = null;
@@ -703,15 +878,22 @@
 
             const q = activeQuestions[currentIndex];
             document.getElementById('current-q').innerText = currentIndex + 1;
-            document.getElementById('progress-bar').style.width = `${(currentIndex / activeQuestions.length) * 100}%`;
+            const progress = ((currentIndex + 1) / activeQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
             document.getElementById('question-text').innerText = q.soal;
 
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             q.pilihan.forEach((opsi, idx) => {
                 const btn = document.createElement('button');
-                btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm flex justify-between items-center transition";
-                btn.innerHTML = `<span><strong class="mr-2 text-indigo-600">${String.fromCharCode(65 + idx)}.</strong> ${opsi}</span>`;
+                btn.className = "quiz-option w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm flex justify-between items-center transition";
+                const label = document.createElement("span");
+                const strong = document.createElement("strong");
+                strong.className = "mr-2 text-indigo-600";
+                strong.textContent = `${String.fromCharCode(65 + idx)}.`;
+                label.append(strong, document.createTextNode(` ${opsi}`));
+                btn.appendChild(label);
+                btn.setAttribute("aria-label", `Pilihan ${String.fromCharCode(65 + idx)}: ${opsi}`);
                 btn.onclick = () => pilihOpsi(idx, btn);
                 container.appendChild(btn);
             });
@@ -721,26 +903,31 @@
             if (userSelectedAnswer !== null) return;
             userSelectedAnswer = idx;
             const q = activeQuestions[currentIndex];
-            const buttons = document.getElementById('options-container').children;
+            const buttons = [...document.getElementById('options-container').children];
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.style.pointerEvents = 'none';
+            });
 
             if (idx === q.jawaban) {
-                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm flex justify-between items-center";
-                document.getElementById('feedback-msg').innerText = "✅ Benar!";
+                element.classList.add("correct");
+                document.getElementById('feedback-msg').innerText = "Benar! Jawaban Anda tepat.";
                 document.getElementById('feedback-msg').className = "text-sm font-bold text-emerald-600";
-                score += Math.round(100 / activeQuestions.length);
+                correctAnswers++;
+                score = Math.round((correctAnswers / activeQuestions.length) * 100);
             } else {
-                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-semibold text-sm flex justify-between items-center";
-                if (buttons[q.jawaban]) buttons[q.jawaban].className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm flex justify-between items-center";
-                document.getElementById('feedback-msg').innerText = `❌ Kurang tepat. Kunci: ${String.fromCharCode(65 + q.jawaban)}`;
+                element.classList.add("wrong");
+                if (buttons[q.jawaban]) buttons[q.jawaban].classList.add("correct");
+                document.getElementById('feedback-msg').innerText = `Kurang tepat. Kunci: ${String.fromCharCode(65 + q.jawaban)}.`;
                 document.getElementById('feedback-msg').className = "text-sm font-bold text-rose-600";
+                score = Math.round((correctAnswers / activeQuestions.length) * 100);
             }
 
             if(q.pembahasan) {
                 document.getElementById('explanation-text').innerText = q.pembahasan;
                 document.getElementById('explanation-box').classList.remove('hidden');
             }
-
-            for(let b of buttons) b.style.pointerEvents = 'none';
             document.getElementById('btn-next').classList.remove('hidden');
         }
 
@@ -748,23 +935,45 @@
             currentIndex++;
             if (currentIndex < activeQuestions.length) {
                 tampilkanSoalAktif();
-            } else {
-                document.getElementById('quiz-page').classList.add('hidden');
-                document.getElementById('result-page').classList.remove('hidden');
-                document.getElementById('final-score').innerText = score;
-                document.getElementById('progress-bar').style.width = `100%`;
+                return;
+            }
 
-                try {
-                    if(!isGuestMode) {
-                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), {
-                            userId: currentUser.uid, userName: userProfileData.displayName,
-                            jenjang: document.getElementById('u-jenjang').value, mapel: document.getElementById('u-mapel').value,
-                            score: score, timestamp: new Date().toLocaleString('id-ID')
-                        });
-                    }
-                } catch(e) {}
+            const finalScore = Math.round((correctAnswers / activeQuestions.length) * 100);
+            document.getElementById('quiz-page').classList.add('hidden');
+            document.getElementById('result-page').classList.remove('hidden');
+            document.getElementById('final-score').innerText = finalScore;
+            document.getElementById('final-correct').innerText = `${correctAnswers}/${activeQuestions.length}`;
+            document.getElementById('result-message').innerText = getResultMessage(finalScore);
+            document.getElementById('progress-bar').style.width = `100%`;
+
+            try {
+                if(!isGuestMode) {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), {
+                        userId: currentUser.uid,
+                        userName: userProfileData.displayName,
+                        jenjang: lastQuizConfig.jenjang,
+                        mapel: lastQuizConfig.mapel,
+                        score: finalScore,
+                        correct: correctAnswers,
+                        total: activeQuestions.length,
+                        timestamp: new Date().toLocaleString('id-ID')
+                    });
+                }
+            } catch(e) {
+                window.showToast("Nilai tampil, tetapi laporan belum tersimpan.", "error");
+                console.error(e);
             }
         };
+
+        window.ulangiKuis = function() {
+            document.getElementById('result-page').classList.add('hidden');
+            window.mulaiKuis(lastQuizConfig.pakaiAI);
+        };
+
+        document.getElementById("pin-input")?.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") window.cekPin();
+            if (event.key === "Escape") window.tutupModalPin();
+        });
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
