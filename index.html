@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="description" content="Platform latihan TKA dengan bank soal, evaluasi otomatis, dan laporan hasil belajar.">
-    <title>Kuis TKA — Latihan & Evaluasi</title>
+    <title>Kuis Cerdas TKA - Cloud & AI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -39,30 +37,6 @@
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        button, input, select, textarea { min-height: 44px; }
-        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-            outline: 3px solid rgba(99,102,241,.25);
-            outline-offset: 2px;
-        }
-        .soft-hover { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-        .soft-hover:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -14px rgba(15,23,42,.20); }
-        .stat-card { background: linear-gradient(135deg,#fff,rgba(248,250,252,.92)); }
-        .quiz-option { min-height: 56px; }
-        .quiz-option.correct { border-color:#10b981!important; background:#ecfdf5!important; color:#064e3b!important; }
-        .quiz-option.wrong { border-color:#f43f5e!important; background:#fff1f2!important; color:#881337!important; }
-        .quiz-option:disabled { cursor: default; opacity: 1; }
-        .progress-shine { position: relative; overflow: hidden; }
-        .progress-shine::after {
-            content:""; position:absolute; inset:0; transform:translateX(-100%);
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
-            animation: shine 2.2s infinite;
-        }
-        @keyframes shine { to { transform:translateX(100%); } }
-        @media (max-width: 640px) {
-            .mobile-tight { padding: 1rem!important; }
-            .quiz-option { font-size: .875rem; }
-        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col font-sans">
@@ -177,7 +151,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
                 <h3 class="font-bold text-lg text-slate-800 mb-1">Akses Terbatas</h3>
-                <p class="text-xs text-slate-500 mb-6">Masukkan PIN akses Guru. Untuk produksi, amankan admin menggunakan Firebase Custom Claims dan Firestore Rules.</p>
+                <p class="text-xs text-slate-500 mb-6">Masukkan PIN keamanan Guru. (Hint: 1234)</p>
                 <input type="password" id="pin-input" class="w-full text-center tracking-[0.5em] font-bold text-2xl p-3 border-2 border-slate-200 rounded-xl focus:border-founder-500 focus:outline-none mb-4" placeholder="••••" maxlength="4">
                 <div class="flex gap-2">
                     <button onclick="window.tutupModalPin()" class="w-1/2 py-2.5 text-sm font-bold text-slate-600 bg-slate-100 rounded-xl">Batal</button>
@@ -201,37 +175,31 @@
                     </h2>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <select id="f-jenjang" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option></select>
+                            <select id="f-jenjang" onchange="window.updateMapelOptions('f')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option></select>
                             <select id="f-tingkat" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit / HOTS">Sulit / HOTS</option></select>
                         </div>
-                        <select id="f-mapel" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Literasi Membaca">Literasi Membaca</option><option value="Numerasi & Matematika">Numerasi & Matematika</option><option value="Sains & Sosial">Sains & Sosial</option></select>
-                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan pertanyaan..." maxlength="1200"></textarea>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <input type="text" id="f-pil-A" placeholder="Opsi A" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
-                            <input type="text" id="f-pil-B" placeholder="Opsi B" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
-                            <input type="text" id="f-pil-C" placeholder="Opsi C" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
-                            <input type="text" id="f-pil-D" placeholder="Opsi D" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none" maxlength="300">
-                        </div>
-                        <textarea id="f-pembahasan" rows="2" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Pembahasan / alasan jawaban benar..." maxlength="1000"></textarea>
+                        <select id="f-jurusan" onchange="window.updateMapelOptions('f')" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-amber-50 outline-none hidden">
+                            <option value="IPA">Jurusan IPA</option>
+                            <option value="IPS">Jurusan IPS</option>
+                            <option value="Bahasa">Jurusan Bahasa</option>
+                        </select>
+                        <select id="f-mapel" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"></select>
+                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan pertanyaan..."></textarea>
+                        <input type="text" id="f-pil-A" placeholder="Opsi A" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <input type="text" id="f-pil-B" placeholder="Opsi B" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <input type="text" id="f-pil-C" placeholder="Opsi C" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <input type="text" id="f-pil-D" placeholder="Opsi D" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <div class="grid grid-cols-2 gap-2 items-center">
                             <select id="f-kunci" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-emerald-50 text-emerald-700 font-bold"><option value="0">Kunci: A</option><option value="1">Kunci: B</option><option value="2">Kunci: C</option><option value="3">Kunci: D</option></select>
-                            <button onclick="window.simpanSoalCloud()" class="bg-founder-600 hover:bg-founder-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-sm"><i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Soal</button>
+                            <button onclick="window.simpanSoalCloud()" class="bg-founder-600 hover:bg-founder-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-sm">Simpan</button>
                         </div>
-                        <button onclick="window.resetFormSoal()" class="w-full text-xs font-bold text-slate-500 hover:text-slate-800 py-2">Kosongkan Form</button>
                     </div>
                 </div>
 
                 <!-- Kanan: Database Soal -->
                 <div class="lg:col-span-2 glass-card rounded-3xl p-6 flex flex-col h-[600px]">
                     <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
-                        <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-server text-indigo-500"></i> Database Soal (<span id="count-db-cloud">0</span>)</h2>
-                        <span id="admin-sync-status" class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Tersinkron</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
-                        <input id="admin-search" oninput="window.filterAdminSoal()" type="search" placeholder="Cari soal..." class="sm:col-span-2 text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
-                        <select id="admin-filter-jenjang" onchange="window.filterAdminSoal()" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
-                            <option value="">Semua jenjang</option><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option>
-                        </select>
+                        <h2 class="font-bold text-lg text-slate-800"><i class="fa-solid fa-server text-indigo-500"></i> Database Soal Firestore (<span id="count-db-cloud">0</span>)</h2>
                     </div>
                     <div id="admin-db-list" class="flex-grow overflow-y-auto custom-scroll space-y-3 pr-2">
                         <div class="text-center text-slate-400 text-sm py-10">Memuat data dari database cloud...</div>
@@ -258,39 +226,46 @@
         <section id="user-home" class="glass-card rounded-3xl p-6 sm:p-10 hidden max-w-3xl mx-auto w-full text-center">
             <div class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Mode Peserta Ujian</div>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Pilih Kategori Kuis TKA</h2>
-            <p class="text-slate-500 text-sm mb-6">Sistem akan menyusun 10 soal pilihan ganda secara acak (HOTS).</p>
+            <p class="text-slate-500 text-sm mb-6">Sistem akan menyusun 10 soal pilihan ganda secara acak &amp; berbeda setiap sesi (HOTS), mengikuti kisi-kisi Tes Kemampuan Akademik.</p>
             
             <div class="bg-rose-50 text-rose-600 text-xs font-bold px-3 py-2 rounded-xl border border-rose-100 inline-block mb-6">
                 <i class="fa-solid fa-ticket"></i> Sisa Limit Kuis Hari Ini: <span id="sisa-kuota-text" class="text-base mx-1">3</span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-left">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 text-left">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Jenjang</label>
-                    <select id="u-jenjang" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"><option value="SD">SD / Sederajat</option><option value="SMP">SMP / Sederajat</option><option value="SMA" selected>SMA / Sederajat</option></select>
+                    <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"><option value="SD">SD / Sederajat</option><option value="SMP">SMP / Sederajat</option><option value="SMA" selected>SMA / Sederajat</option></select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran</label>
-                    <select id="u-mapel" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"><option value="Literasi Membaca">Literasi Membaca</option><option value="Numerasi & Matematika">Numerasi & Matematika</option><option value="Sains & Sosial">Sains & Sosial</option></select>
+                <div id="u-jurusan-wrap">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Jurusan (Peminatan)</label>
+                    <select id="u-jurusan" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
+                        <option value="IPA">IPA (Sains)</option>
+                        <option value="IPS">IPS (Sosial)</option>
+                        <option value="Bahasa">Bahasa & Budaya</option>
+                    </select>
                 </div>
+            </div>
+            <div class="text-left mb-6">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran (sesuai kisi-kisi TKA)</label>
+                <select id="u-mapel" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"></select>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <button onclick="window.mulaiKuis(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat dengan AI
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat via AI (Groq)
                 </button>
                 <button onclick="window.mulaiKuis(false)" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-xl transition text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-cloud-arrow-down text-indigo-400"></i> Ambil dari Firestore
+                    <i class="fa-solid fa-database text-indigo-400"></i> Ambil dari Bank Soal
                 </button>
             </div>
-            <p class="mt-5 text-[11px] text-slate-400">Setiap sesi berisi hingga 10 soal. Kuota harian dipakai saat sesi dimulai.</p>
         </section>
 
         <!-- Loading State Kuis -->
         <section id="loading-section" class="glass-card rounded-3xl p-12 text-center hidden max-w-lg mx-auto w-full">
             <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full spinner mx-auto mb-4"></div>
             <h3 class="font-bold text-slate-900">Menyiapkan Soal Ujian...</h3>
-            <p class="text-xs text-slate-500 mt-2">Mohon tunggu, sistem sedang memvalidasi bank soal dan kuota Anda.</p>
+            <p class="text-xs text-slate-400 mt-2">Menyusun soal baru & unik agar tidak monoton...</p>
         </section>
 
         <!-- 4. HALAMAN KUIS AKTIF -->
@@ -299,6 +274,7 @@
                 <div class="flex gap-2">
                     <span id="badge-jenjang" class="text-[11px] font-bold uppercase bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">SD</span>
                     <span id="badge-mapel-quiz" class="text-[11px] font-bold uppercase bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg">Mapel</span>
+                    <span id="badge-topik-quiz" class="text-[11px] font-bold uppercase bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg hidden">Topik</span>
                 </div>
                 <div class="text-sm font-bold text-slate-500">Soal <span id="current-q" class="text-indigo-600">1</span> / <span id="total-q">10</span></div>
             </div>
@@ -334,21 +310,11 @@
             </div>
             <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Ujian Selesai!</h2>
             <p class="text-slate-500 text-sm mb-6">Hasil nilai Anda telah dicatat ke dalam database Cloud.</p>
-            <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-6">
-                <div class="stat-card p-4 rounded-2xl border border-slate-200">
-                    <span class="text-[11px] text-slate-500 font-bold uppercase block mb-1">Skor</span>
-                    <span id="final-score" class="text-3xl font-black text-indigo-600">0</span>
-                </div>
-                <div class="stat-card p-4 rounded-2xl border border-slate-200">
-                    <span class="text-[11px] text-slate-500 font-bold uppercase block mb-1">Benar</span>
-                    <span id="final-correct" class="text-3xl font-black text-emerald-600">0/0</span>
-                </div>
+            <div class="bg-slate-50 p-5 rounded-2xl max-w-xs mx-auto mb-6 border border-slate-200">
+                <span class="text-xs text-slate-500 font-bold uppercase block mb-1">Skor Akhir</span>
+                <span id="final-score" class="text-4xl font-black text-indigo-600">0</span>
             </div>
-            <p id="result-message" class="text-sm font-semibold text-slate-600 mb-6">Tetap semangat belajar.</p>
-            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <button onclick="window.ulangiKuis()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition text-sm shadow-md"><i class="fa-solid fa-rotate-right mr-1"></i> Coba Lagi</button>
-                <button onclick="window.bukaUser()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3 px-6 rounded-xl transition text-sm">Kembali ke Menu</button>
-            </div>
+            <button onclick="window.bukaUser()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition text-sm shadow-md">Kembali ke Menu</button>
         </section>
     </main>
 
@@ -356,10 +322,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
         import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
-        // Firebase config boleh berada di frontend, tetapi API key layanan AI JANGAN ditaruh di HTML.
-        // Nilai di bawah tetap memakai proyek yang sama agar fitur Firebase tidak berubah.
+        // Konfigurasi Firebase Asli Milikmu
         const firebaseConfig = {
             apiKey: "AIzaSyAOHslpDrbf7dubS6MiX4Qcj2Nbr4W3CkY",
             authDomain: "quiz-tka.firebaseapp.com",
@@ -379,14 +344,11 @@
         setPersistence(auth, browserLocalPersistence);
 
         const appId = "quiz-tka-prod";
-        // Endpoint ini harus memanggil Groq dari backend/serverless agar API key tidak bocor ke browser.
-        // Contoh: /api/generate-quiz
-        const GROQ_API_ENDPOINT = window.QUIZ_CONFIG?.groqEndpoint || "";
-        // PIN di frontend hanya proteksi UI, bukan mekanisme keamanan server.
-        // Gunakan Firebase Custom Claims / Firestore Rules untuk keamanan admin yang sesungguhnya.
-        const ADMIN_PIN = window.QUIZ_CONFIG?.adminPin || "1234";
+        const GROQ_API_KEY = "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";
+        const ADMIN_PIN = "1234";
         const MAX_LIMIT_PER_DAY = 3;
         const TOTAL_QUESTIONS_PER_SESSION = 10;
+        const RIWAYAT_MAX_PER_MAPEL = 60; // jumlah maksimal judul soal yang diingat agar tidak diulang
 
         let currentUser = null;
         let userProfileData = null;
@@ -394,18 +356,136 @@
         let activeQuestions = [];
         let currentIndex = 0;
         let score = 0;
-        let correctAnswers = 0;
         let userSelectedAnswer = null;
         let isGuestMode = false;
-        let lastQuizConfig = { jenjang: "SMA", mapel: "Literasi Membaca", pakaiAI: false };
 
+        // ==========================================
+        // STRUKTUR MATA PELAJARAN SESUAI KISI-KISI TKA
+        // (Permendikdasmen No. 9 Tahun 2025 & Kepmendikdasmen No. 95/M/2025)
+        // SMA: mapel wajib (Bahasa Indonesia, Matematika, Bahasa Inggris)
+        //      + mapel pilihan sesuai peminatan/jurusan (IPA/IPS/Bahasa)
+        // SD & SMP: mapel inti sesuai capaian pembelajaran Kurikulum Merdeka
+        // ==========================================
+        const TKA_MAPEL = {
+            SD: ["Bahasa Indonesia", "Matematika", "IPAS (IPA & IPS)", "Pendidikan Pancasila"],
+            SMP: ["Bahasa Indonesia", "Matematika", "Bahasa Inggris", "IPA", "IPS"],
+            SMA: {
+                wajib: ["Bahasa Indonesia", "Matematika", "Bahasa Inggris"],
+                IPA: ["Fisika", "Kimia", "Biologi"],
+                IPS: ["Ekonomi", "Geografi", "Sejarah", "Sosiologi"],
+                Bahasa: ["Sastra Indonesia", "Antropologi", "Bahasa Inggris Lanjutan"]
+            }
+        };
+
+        // Pokok materi (subtopik) per mapel, dipakai untuk memutar fokus soal AI
+        // agar soal bervariasi dan tetap relevan dengan kompetensi kurikulum.
+        const TOPIK_MATERI = {
+            "Bahasa Indonesia": ["teks eksposisi", "teks narasi", "teks argumentasi", "kalimat efektif", "makna kata & konteks", "menyimpulkan isi bacaan", "unsur intrinsik cerita", "penalaran teks nonfiksi"],
+            "Matematika": ["aljabar", "aritmetika sosial", "geometri & pengukuran", "statistika & peluang", "fungsi & persamaan", "barisan & deret", "trigonometri dasar", "logika matematika"],
+            "IPAS (IPA & IPS)": ["ekosistem", "siklus air", "gaya & energi", "kenampakan alam Indonesia", "kegiatan ekonomi masyarakat", "sistem tata surya", "perubahan wujud benda"],
+            "Pendidikan Pancasila": ["nilai-nilai Pancasila", "norma & aturan", "hak dan kewajiban warga", "keberagaman budaya Indonesia"],
+            "Bahasa Inggris": ["reading comprehension", "grammar in context", "vocabulary in use", "descriptive text", "narrative text", "procedure text", "expressing opinion"],
+            "Bahasa Inggris Lanjutan": ["analytical exposition", "report text", "hortatory exposition", "conditional sentences", "reported speech"],
+            "IPA": ["klasifikasi makhluk hidup", "zat dan perubahannya", "energi dan perubahannya", "sistem organ tubuh", "pemanasan global", "listrik dan magnet"],
+            "IPS": ["interaksi sosial", "kondisi geografis Indonesia", "sejarah pergerakan nasional", "kegiatan ekonomi & pasar", "globalisasi"],
+            "Fisika": ["kinematika gerak", "hukum Newton", "usaha dan energi", "gelombang & optik", "listrik dinamis", "termodinamika"],
+            "Kimia": ["struktur atom", "ikatan kimia", "stoikiometri", "larutan asam basa", "laju reaksi", "termokimia"],
+            "Biologi": ["sel dan jaringan", "genetika & pewarisan sifat", "ekosistem & lingkungan", "sistem pencernaan", "bioteknologi", "evolusi"],
+            "Ekonomi": ["permintaan & penawaran", "pasar & harga keseimbangan", "kebijakan moneter & fiskal", "pendapatan nasional", "koperasi & badan usaha"],
+            "Geografi": ["fenomena atmosfer", "dinamika kependudukan", "mitigasi bencana", "peta & penginderaan jauh", "interaksi desa-kota"],
+            "Sejarah": ["masa praaksara Indonesia", "kolonialisme & imperialisme", "pergerakan nasional", "kemerdekaan & revolusi", "orde lama & orde baru"],
+            "Sosiologi": ["interaksi sosial", "struktur & stratifikasi sosial", "perubahan sosial", "konflik & integrasi sosial", "lembaga sosial"],
+            "Sastra Indonesia": ["puisi & majas", "unsur intrinsik novel", "drama & naskah", "kritik sastra"],
+            "Antropologi": ["kebudayaan & tradisi lokal", "keragaman etnis Indonesia", "perubahan kebudayaan", "bahasa & masyarakat"]
+        };
+
+        // ==========================================
+        // BANK SOAL REFERENSI (OFFLINE)
+        // Kumpulan soal orisinil yang disusun mengikuti kisi-kisi
+        // Kurikulum Merdeka & kerangka TKA per mapel-jenjang-jurusan.
+        // Ini BUKAN hasil salin dari situs lain (menghindari isu hak cipta &
+        // batasan CORS pada browser) — melainkan referensi lokal yang
+        // dipakai sebagai cadangan berkualitas saat mode AI/Firestore
+        // tidak tersedia atau datanya masih sedikit.
+        // ==========================================
         const DEFAULT_QUESTIONS = [
-            { id: "def_1", jenjang: "SD", mapel: "Literasi Membaca", tingkat: "Mudah", soal: "Budi memiliki 3 buah apel, lalu membeli lagi 5 buah. Berapa jumlah apel Budi sekarang?", pilihan: ["6", "7", "8", "9"], jawaban: 2, pembahasan: "3 + 5 = 8 buah apel." },
-            { id: "def_2", jenjang: "SD", mapel: "Numerasi & Matematika", tingkat: "Sedang", soal: "Hasil dari 125 + 75 - 50 adalah...", pilihan: ["130", "140", "150", "160"], jawaban: 2, pembahasan: "125 + 75 = 200, lalu 200 - 50 = 150." },
-            { id: "def_3", jenjang: "SMP", mapel: "Numerasi & Matematika", tingkat: "Sedang", soal: "Harga sebuah jaket setelah diskon 20% adalah Rp160.000. Berapa harga awal jaket tersebut?", pilihan: ["Rp180.000", "Rp192.000", "Rp200.000", "Rp220.000"], jawaban: 2, pembahasan: "80% x Harga = 160.000, maka Harga = 200.000." },
-            { id: "def_4", jenjang: "SMP", mapel: "Sains & Sosial", tingkat: "Sulit / HOTS", soal: "Planet manakah yang dijuluki sebagai planet merah di tata surya?", pilihan: ["Venus", "Mars", "Jupiter", "Saturnus"], jawaban: 1, pembahasan: "Mars tampak kemerahan karena kandungan besi oksida di permukaannya." },
-            { id: "def_5", jenjang: "SMA", mapel: "Numerasi & Matematika", tingkat: "Sulit / HOTS", soal: "Nilai dari limit x mendekati 2 untuk fungsi (x² - 4) / (x - 2) adalah...", pilihan: ["0", "2", "4", "Tak terhingga"], jawaban: 2, pembahasan: "Difaktorkan menjadi (x-2)(x+2)/(x-2) = x+2. Masukkan x=2 menghasilkan 4." },
-            { id: "def_6", jenjang: "SMA", mapel: "Literasi Membaca", tingkat: "Sedang", soal: "Manakah yang merupakan ciri utama dari teks eksposisi?", pilihan: ["Menceritakan fiksi", "Menyajikan argumen logis dan fakta", "Menggambarkan objek", "Berisi dialog drama"], jawaban: 1, pembahasan: "Teks eksposisi menyajikan informasi dan argumen berdasarkan fakta." }
+            // ---------- SD ----------
+            { id: "sd_bindo_1", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Mudah", topik: "menyimpulkan isi bacaan", soal: "Rani rajin menabung setiap hari agar bisa membeli sepeda impiannya. Ia menyisihkan uang jajan setiap hari. Simpulan yang tepat dari bacaan tersebut adalah...", pilihan: ["Rani gemar bersepeda", "Rani rajin menabung untuk mencapai tujuannya", "Rani tidak suka jajan", "Rani memiliki sepeda baru"], jawaban: 1, pembahasan: "Bacaan menekankan kebiasaan menabung Rani untuk mencapai tujuan (membeli sepeda)." },
+            { id: "sd_bindo_2", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Sedang", topik: "kalimat efektif", soal: "Kalimat berikut yang termasuk kalimat efektif adalah...", pilihan: ["Ibu pergi ke ke pasar membeli sayur.", "Ibu pergi ke pasar untuk membeli sayur.", "Ibu pergi pasar membeli-beli sayur.", "Ibu ke pasar pergi membeli sayur."], jawaban: 1, pembahasan: "Kalimat efektif harus jelas, tidak boros kata, dan strukturnya baku." },
+            { id: "sd_bindo_3", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "teks narasi", soal: "Meski kakinya terluka, Dito tetap membantu adiknya menyeberang sungai kecil itu dengan hati-hati. Sifat Dito dalam cerita tersebut adalah...", pilihan: ["Pemarah", "Penakut", "Penyayang dan berani", "Malas"], jawaban: 2, pembahasan: "Tindakan Dito menolong adiknya meski terluka menunjukkan sifat penyayang dan berani." },
+            { id: "sd_mtk_1", jenjang: "SD", mapel: "Matematika", tingkat: "Mudah", topik: "operasi hitung campuran", soal: "Hasil dari 45 + 28 - 15 adalah...", pilihan: ["48", "58", "68", "78"], jawaban: 1, pembahasan: "45 + 28 = 73, lalu 73 - 15 = 58." },
+            { id: "sd_mtk_2", jenjang: "SD", mapel: "Matematika", tingkat: "Sedang", topik: "pecahan", soal: "Ibu memiliki 3/4 kg gula, lalu digunakan 1/4 kg untuk membuat kue. Sisa gula ibu adalah...", pilihan: ["1/4 kg", "1/2 kg", "2/4 kg", "3/4 kg"], jawaban: 1, pembahasan: "3/4 - 1/4 = 2/4 = 1/2 kg." },
+            { id: "sd_mtk_3", jenjang: "SD", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "bangun datar", soal: "Sebuah taman berbentuk persegi panjang berukuran 12 m x 8 m akan dipasangi pagar keliling. Panjang pagar yang dibutuhkan adalah...", pilihan: ["20 m", "40 m", "48 m", "96 m"], jawaban: 1, pembahasan: "Keliling = 2 x (p + l) = 2 x (12+8) = 40 m." },
+            { id: "sd_ipas_1", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Mudah", topik: "siklus air", soal: "Proses berubahnya uap air menjadi titik-titik air di awan disebut...", pilihan: ["Evaporasi", "Kondensasi", "Presipitasi", "Infiltrasi"], jawaban: 1, pembahasan: "Kondensasi adalah proses perubahan uap air menjadi butiran air di awan." },
+            { id: "sd_ipas_2", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Sedang", topik: "kegiatan ekonomi masyarakat", soal: "Nelayan yang mencari ikan di laut merupakan kegiatan ekonomi pada bidang...", pilihan: ["Pertanian", "Perikanan", "Perkebunan", "Perindustrian"], jawaban: 1, pembahasan: "Kegiatan menangkap ikan termasuk dalam bidang perikanan." },
+            { id: "sd_ipas_3", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Sulit / HOTS", topik: "ekosistem", soal: "Jika populasi ulat di suatu sawah berkurang drastis karena pestisida, dampak yang paling mungkin terjadi pada burung pemakan ulat adalah...", pilihan: ["Populasi burung meningkat pesat", "Populasi burung menurun karena kekurangan makanan", "Tidak ada pengaruh sama sekali", "Burung berubah menjadi herbivora"], jawaban: 1, pembahasan: "Berkurangnya ulat sebagai sumber makanan akan menurunkan populasi burung pemakan ulat (rantai makanan)." },
+            { id: "sd_pkn_1", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Mudah", topik: "nilai-nilai Pancasila", soal: "Sikap gotong royong membersihkan lingkungan mencerminkan pengamalan sila Pancasila yang ke-...", pilihan: ["Kesatu", "Kedua", "Ketiga", "Keempat"], jawaban: 2, pembahasan: "Gotong royong mencerminkan sila ke-3, Persatuan Indonesia." },
+            { id: "sd_pkn_2", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Sedang", topik: "hak dan kewajiban warga", soal: "Berikut yang merupakan kewajiban siswa di sekolah adalah...", pilihan: ["Mendapatkan nilai bagus tanpa belajar", "Menaati tata tertib sekolah", "Bebas memilih pelajaran", "Meminta fasilitas mewah"], jawaban: 1, pembahasan: "Menaati tata tertib sekolah adalah kewajiban setiap siswa." },
+            { id: "sd_pkn_3", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Sulit / HOTS", topik: "keberagaman budaya Indonesia", soal: "Meskipun berbeda suku dan agama, teman-teman di kelas tetap bermain bersama dengan rukun. Sikap ini menunjukkan penerapan nilai...", pilihan: ["Individualisme", "Toleransi dalam keberagaman", "Fanatisme kelompok", "Persaingan sehat"], jawaban: 1, pembahasan: "Sikap rukun di tengah perbedaan mencerminkan toleransi terhadap keberagaman." },
+
+            // ---------- SMP ----------
+            { id: "smp_bindo_1", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Mudah", topik: "makna kata & konteks", soal: "Kata 'menyita' pada kalimat 'Pekerjaan itu menyita banyak waktu' bermakna...", pilihan: ["Merampas", "Menghabiskan", "Menyimpan", "Menunda"], jawaban: 1, pembahasan: "Dalam konteks tersebut, 'menyita' berarti menghabiskan (waktu)." },
+            { id: "smp_bindo_2", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Sedang", topik: "teks eksposisi", soal: "Ide pokok sebuah paragraf biasanya terletak pada...", pilihan: ["Selalu di akhir paragraf", "Kalimat utama, bisa di awal, akhir, atau keduanya", "Selalu di tengah paragraf", "Judul teks"], jawaban: 1, pembahasan: "Ide pokok terdapat pada kalimat utama yang letaknya bisa bervariasi." },
+            { id: "smp_bindo_3", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "penalaran teks nonfiksi", soal: "Sebuah artikel menyatakan data penjualan naik 20% namun tidak mencantumkan sumber data. Sikap kritis yang tepat terhadap teks tersebut adalah...", pilihan: ["Langsung mempercayai karena angkanya spesifik", "Mempertanyakan validitas data karena sumber tidak jelas", "Mengabaikan seluruh isi artikel", "Menyebarkan informasi tersebut tanpa verifikasi"], jawaban: 1, pembahasan: "Pembaca kritis perlu mempertanyakan keabsahan data yang tidak memiliki sumber jelas." },
+            { id: "smp_mtk_1", jenjang: "SMP", mapel: "Matematika", tingkat: "Mudah", topik: "aritmetika sosial", soal: "Seorang pedagang membeli barang seharga Rp50.000 dan menjualnya seharga Rp65.000. Persentase keuntungannya adalah...", pilihan: ["15%", "20%", "30%", "35%"], jawaban: 2, pembahasan: "Untung = 15.000. Persentase = 15.000/50.000 x 100% = 30%." },
+            { id: "smp_mtk_2", jenjang: "SMP", mapel: "Matematika", tingkat: "Sedang", topik: "aljabar", soal: "Jika 3x - 5 = 16, maka nilai x adalah...", pilihan: ["5", "6", "7", "8"], jawaban: 2, pembahasan: "3x = 21, sehingga x = 7." },
+            { id: "smp_mtk_3", jenjang: "SMP", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "statistika", soal: "Nilai ulangan 5 siswa adalah 70, 80, 90, 60, dan 100. Jika ditambahkan satu siswa lagi dengan nilai 50, bagaimana pengaruhnya terhadap rata-rata?", pilihan: ["Rata-rata naik", "Rata-rata tetap", "Rata-rata turun", "Tidak bisa ditentukan"], jawaban: 2, pembahasan: "Rata-rata awal 80, setelah tambah nilai 50 rata-rata menjadi 75, sehingga turun." },
+            { id: "smp_eng_1", jenjang: "SMP", mapel: "Bahasa Inggris", tingkat: "Mudah", topik: "vocabulary in use", soal: "My sister is very ____; she always helps others without being asked.", pilihan: ["lazy", "kind", "angry", "shy"], jawaban: 1, pembahasan: "'Kind' fits the context of someone who helps others willingly." },
+            { id: "smp_eng_2", jenjang: "SMP", mapel: "Bahasa Inggris", tingkat: "Sedang", topik: "descriptive text", soal: "Which sentence best describes a physical appearance in a descriptive text?", pilihan: ["She goes to school every day.", "She has long black hair and bright eyes.", "She will visit her aunt tomorrow.", "She likes reading novels."], jawaban: 1, pembahasan: "Descriptive text focuses on physical traits, like hair and eyes." },
+            { id: "smp_eng_3", jenjang: "SMP", mapel: "Bahasa Inggris", tingkat: "Sulit / HOTS", topik: "reading comprehension", soal: "In the sentence 'Although it was raining heavily, the match continued,' what can be inferred about the players?", pilihan: ["They stopped playing immediately", "They were determined to keep playing despite the weather", "The match was cancelled", "They were unaware it was raining"], jawaban: 1, pembahasan: "'Although...continued' implies the players kept playing despite the rain." },
+            { id: "smp_ipa_1", jenjang: "SMP", mapel: "IPA", tingkat: "Mudah", topik: "klasifikasi makhluk hidup", soal: "Hewan yang berkembang biak dengan bertelur dan melahirkan disebut...", pilihan: ["Ovipar", "Vivipar", "Ovovivipar", "Fragmentasi"], jawaban: 2, pembahasan: "Ovovivipar adalah cara berkembang biak dengan bertelur di dalam tubuh induk lalu melahirkan." },
+            { id: "smp_ipa_2", jenjang: "SMP", mapel: "IPA", tingkat: "Sedang", topik: "zat dan perubahannya", soal: "Peristiwa berikut yang termasuk perubahan kimia adalah...", pilihan: ["Es mencair", "Kertas dibakar menjadi abu", "Air menguap", "Lilin meleleh"], jawaban: 1, pembahasan: "Pembakaran kertas menghasilkan zat baru (abu, gas), sehingga termasuk perubahan kimia." },
+            { id: "smp_ipa_3", jenjang: "SMP", mapel: "IPA", tingkat: "Sulit / HOTS", topik: "sistem organ tubuh", soal: "Seseorang yang jarang mengonsumsi serat berisiko mengalami gangguan pencernaan karena...", pilihan: ["Serat mempercepat gerak peristaltik usus sehingga sisa makanan mudah dikeluarkan", "Serat menghambat penyerapan air di usus besar", "Serat meningkatkan produksi enzim pencernaan", "Serat merusak dinding lambung"], jawaban: 0, pembahasan: "Serat membantu gerak peristaltik usus sehingga mencegah sembelit." },
+            { id: "smp_ips_1", jenjang: "SMP", mapel: "IPS", tingkat: "Mudah", topik: "kondisi geografis Indonesia", soal: "Indonesia terletak di antara dua benua, yaitu...", pilihan: ["Asia dan Afrika", "Asia dan Australia", "Australia dan Amerika", "Afrika dan Eropa"], jawaban: 1, pembahasan: "Indonesia berada di posisi silang antara Benua Asia dan Australia." },
+            { id: "smp_ips_2", jenjang: "SMP", mapel: "IPS", tingkat: "Sedang", topik: "kegiatan ekonomi & pasar", soal: "Ketika permintaan suatu barang meningkat sementara jumlah barang tetap, maka harga barang cenderung...", pilihan: ["Turun", "Naik", "Tetap", "Tidak menentu"], jawaban: 1, pembahasan: "Sesuai hukum permintaan-penawaran, harga naik jika permintaan naik dan pasokan tetap." },
+            { id: "smp_ips_3", jenjang: "SMP", mapel: "IPS", tingkat: "Sulit / HOTS", topik: "sejarah pergerakan nasional", soal: "Berdirinya Budi Utomo tahun 1908 dianggap sebagai awal kebangkitan nasional karena...", pilihan: ["Merupakan organisasi militer pertama", "Menjadi organisasi modern pertama yang berjuang lewat pendidikan dan kesadaran nasional", "Berhasil mengusir penjajah secara langsung", "Didirikan oleh pemerintah kolonial"], jawaban: 1, pembahasan: "Budi Utomo menandai perjuangan dengan cara terorganisasi modern, bukan lagi kedaerahan." },
+
+            // ---------- SMA - Mapel Wajib ----------
+            { id: "sma_bindo_1", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Mudah", topik: "kalimat efektif", soal: "Penulisan kalimat yang sesuai kaidah ejaan yang benar adalah...", pilihan: ["Dia tinggal di Jl. Merdeka No. 5, Jakarta.", "dia Tinggal di jl merdeka no 5 jakarta", "Dia tinggal Di Jl Merdeka no. 5 Jakarta", "dia tinggal di Jl.merdeka no.5,jakarta"], jawaban: 0, pembahasan: "Kalimat pertama sudah sesuai kaidah huruf kapital dan tanda baca." },
+            { id: "sma_bindo_2", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Sedang", topik: "teks argumentasi", soal: "Ciri utama teks argumentasi adalah...", pilihan: ["Berisi urutan langkah kerja", "Menyajikan pendapat disertai bukti dan alasan logis", "Menceritakan kejadian secara kronologis", "Menggambarkan suasana secara rinci"], jawaban: 1, pembahasan: "Teks argumentasi bertujuan meyakinkan pembaca dengan pendapat yang didukung bukti." },
+            { id: "sma_bindo_3", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "unsur intrinsik cerita", soal: "Dalam sebuah cerpen, tokoh utama digambarkan melalui dialog dan reaksinya terhadap tokoh lain, bukan melalui narasi langsung. Teknik penokohan ini disebut...", pilihan: ["Teknik analitik", "Teknik dramatik", "Teknik deskriptif", "Teknik ekspositori"], jawaban: 1, pembahasan: "Teknik dramatik menggambarkan watak tokoh lewat dialog, tindakan, atau reaksi, bukan penjelasan langsung." },
+            { id: "sma_mtk_1", jenjang: "SMA", mapel: "Matematika", tingkat: "Mudah", topik: "fungsi & persamaan", soal: "Jika f(x) = 2x + 3, maka nilai f(4) adalah...", pilihan: ["9", "10", "11", "12"], jawaban: 2, pembahasan: "f(4) = 2(4) + 3 = 11." },
+            { id: "sma_mtk_2", jenjang: "SMA", mapel: "Matematika", tingkat: "Sedang", topik: "barisan & deret", soal: "Suku ke-10 dari barisan aritmetika 3, 7, 11, 15, ... adalah...", pilihan: ["37", "39", "41", "43"], jawaban: 1, pembahasan: "Un = a + (n-1)b = 3 + 9(4) = 39." },
+            { id: "sma_mtk_3", jenjang: "SMA", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "fungsi & limit", soal: "Nilai dari limit x mendekati 2 untuk fungsi (x² - 4) / (x - 2) adalah...", pilihan: ["0", "2", "4", "Tak terhingga"], jawaban: 2, pembahasan: "Difaktorkan menjadi (x-2)(x+2)/(x-2) = x+2. Substitusi x=2 menghasilkan 4." },
+            { id: "sma_eng_1", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Mudah", topik: "grammar in context", soal: "She ____ to the library every Monday.", pilihan: ["go", "goes", "going", "gone"], jawaban: 1, pembahasan: "Subjek tunggal (she) menggunakan verb + s dalam simple present: goes." },
+            { id: "sma_eng_2", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Sedang", topik: "narrative text", soal: "The main purpose of a narrative text is to...", pilihan: ["Explain how something works", "Entertain readers with a sequence of events", "Persuade readers to take action", "Describe a place in detail"], jawaban: 1, pembahasan: "Narrative text aims to entertain through a storyline with events and characters." },
+            { id: "sma_eng_3", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Sulit / HOTS", topik: "expressing opinion", soal: "'In my opinion, remote work should remain optional because it improves employee well-being.' The underlined-style sentence is an example of...", pilihan: ["A fact statement", "An opinion supported by reasoning", "A narrative event", "A procedural instruction"], jawaban: 1, pembahasan: "Kalimat tersebut menyatakan pendapat pribadi yang disertai alasan logis." },
+
+            // ---------- SMA - Jurusan IPA ----------
+            { id: "sma_fis_1", jenjang: "SMA", mapel: "Fisika", tingkat: "Mudah", topik: "kinematika gerak", soal: "Sebuah mobil bergerak dengan kecepatan tetap 20 m/s selama 5 detik. Jarak yang ditempuh adalah...", pilihan: ["50 m", "75 m", "100 m", "125 m"], jawaban: 2, pembahasan: "Jarak = kecepatan x waktu = 20 x 5 = 100 m." },
+            { id: "sma_fis_2", jenjang: "SMA", mapel: "Fisika", tingkat: "Sedang", topik: "hukum Newton", soal: "Sebuah benda bermassa 4 kg diberi gaya 20 N. Percepatan yang dialami benda adalah...", pilihan: ["2 m/s²", "4 m/s²", "5 m/s²", "8 m/s²"], jawaban: 2, pembahasan: "a = F/m = 20/4 = 5 m/s²." },
+            { id: "sma_fis_3", jenjang: "SMA", mapel: "Fisika", tingkat: "Sulit / HOTS", topik: "usaha dan energi", soal: "Dua benda bermassa sama dijatuhkan dari ketinggian berbeda: benda A dari 2 m, benda B dari 4 m. Perbandingan energi kinetik saat menyentuh tanah (EA : EB) adalah...", pilihan: ["1 : 1", "1 : 2", "1 : 4", "2 : 1"], jawaban: 1, pembahasan: "Energi kinetik saat tanah = energi potensial awal = mgh, sehingga EA:EB = hA:hB = 2:4 = 1:2." },
+            { id: "sma_kim_1", jenjang: "SMA", mapel: "Kimia", tingkat: "Mudah", topik: "struktur atom", soal: "Jumlah elektron pada atom netral sama dengan jumlah...", pilihan: ["Neutron", "Proton", "Nukleon", "Isotop"], jawaban: 1, pembahasan: "Pada atom netral, jumlah elektron = jumlah proton." },
+            { id: "sma_kim_2", jenjang: "SMA", mapel: "Kimia", tingkat: "Sedang", topik: "stoikiometri", soal: "Pada reaksi 2H2 + O2 → 2H2O, jika terdapat 4 mol H2, mol O2 yang dibutuhkan agar bereaksi sempurna adalah...", pilihan: ["1 mol", "2 mol", "4 mol", "8 mol"], jawaban: 1, pembahasan: "Perbandingan mol H2:O2 = 2:1, sehingga untuk 4 mol H2 dibutuhkan 2 mol O2." },
+            { id: "sma_kim_3", jenjang: "SMA", mapel: "Kimia", tingkat: "Sulit / HOTS", topik: "laju reaksi", soal: "Menaikkan suhu reaksi umumnya mempercepat laju reaksi karena...", pilihan: ["Konsentrasi zat berkurang", "Energi kinetik partikel meningkat sehingga tumbukan efektif lebih sering terjadi", "Volume wadah reaksi mengecil", "Katalis terbentuk secara otomatis"], jawaban: 1, pembahasan: "Suhu tinggi meningkatkan energi kinetik partikel, memperbanyak tumbukan efektif antar partikel." },
+            { id: "sma_bio_1", jenjang: "SMA", mapel: "Biologi", tingkat: "Mudah", topik: "sel dan jaringan", soal: "Organel sel yang berfungsi sebagai tempat respirasi seluler untuk menghasilkan energi adalah...", pilihan: ["Ribosom", "Mitokondria", "Lisosom", "Badan Golgi"], jawaban: 1, pembahasan: "Mitokondria adalah tempat berlangsungnya respirasi sel untuk menghasilkan ATP." },
+            { id: "sma_bio_2", jenjang: "SMA", mapel: "Biologi", tingkat: "Sedang", topik: "genetika & pewarisan sifat", soal: "Persilangan tanaman berbunga merah (Mm) dengan sesamanya menghasilkan keturunan dengan rasio genotipe...", pilihan: ["1 MM : 1 mm", "1 MM : 2 Mm : 1 mm", "3 Mm : 1 mm", "Semua Mm"], jawaban: 1, pembahasan: "Persilangan Mm x Mm menghasilkan rasio genotipe 1:2:1 (MM:Mm:mm) sesuai hukum Mendel." },
+            { id: "sma_bio_3", jenjang: "SMA", mapel: "Biologi", tingkat: "Sulit / HOTS", topik: "bioteknologi", soal: "Pemanfaatan bakteri untuk memproduksi insulin manusia merupakan contoh penerapan...", pilihan: ["Bioteknologi konvensional", "Bioteknologi modern melalui rekayasa genetika", "Fermentasi tradisional", "Kultur jaringan"], jawaban: 1, pembahasan: "Penyisipan gen manusia ke bakteri untuk memproduksi insulin adalah rekayasa genetika (bioteknologi modern)." },
+
+            // ---------- SMA - Jurusan IPS ----------
+            { id: "sma_eko_1", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Mudah", topik: "permintaan & penawaran", soal: "Jika harga suatu barang naik, sesuai hukum penawaran maka jumlah barang yang ditawarkan produsen akan...", pilihan: ["Menurun", "Meningkat", "Tetap", "Tidak berpengaruh"], jawaban: 1, pembahasan: "Hukum penawaran: semakin tinggi harga, semakin besar jumlah barang yang ditawarkan." },
+            { id: "sma_eko_2", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Sedang", topik: "pasar & harga keseimbangan", soal: "Harga keseimbangan pasar terjadi pada saat...", pilihan: ["Jumlah permintaan lebih besar dari penawaran", "Jumlah penawaran lebih besar dari permintaan", "Jumlah permintaan sama dengan penawaran", "Tidak ada transaksi di pasar"], jawaban: 2, pembahasan: "Harga keseimbangan terbentuk saat kurva permintaan dan penawaran berpotongan (Qd = Qs)." },
+            { id: "sma_eko_3", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Sulit / HOTS", topik: "kebijakan moneter & fiskal", soal: "Ketika inflasi tinggi, kebijakan moneter yang tepat dilakukan bank sentral adalah...", pilihan: ["Menurunkan suku bunga acuan", "Menaikkan suku bunga acuan untuk mengurangi jumlah uang beredar", "Mencetak lebih banyak uang", "Menghapus pajak"], jawaban: 1, pembahasan: "Menaikkan suku bunga acuan membuat masyarakat lebih memilih menabung, mengurangi uang beredar, sehingga menekan inflasi." },
+            { id: "sma_geo_1", jenjang: "SMA", mapel: "Geografi", tingkat: "Mudah", topik: "fenomena atmosfer", soal: "Lapisan atmosfer tempat terjadinya sebagian besar fenomena cuaca adalah...", pilihan: ["Troposfer", "Stratosfer", "Mesosfer", "Termosfer"], jawaban: 0, pembahasan: "Troposfer adalah lapisan atmosfer terendah tempat terjadinya cuaca seperti hujan dan angin." },
+            { id: "sma_geo_2", jenjang: "SMA", mapel: "Geografi", tingkat: "Sedang", topik: "dinamika kependudukan", soal: "Perpindahan penduduk dari desa ke kota untuk mencari pekerjaan disebut...", pilihan: ["Urbanisasi", "Transmigrasi", "Ruralisasi", "Emigrasi"], jawaban: 0, pembahasan: "Urbanisasi adalah perpindahan penduduk dari desa ke kota." },
+            { id: "sma_geo_3", jenjang: "SMA", mapel: "Geografi", tingkat: "Sulit / HOTS", topik: "mitigasi bencana", soal: "Wilayah pesisir yang rawan tsunami sebaiknya menerapkan mitigasi berupa...", pilihan: ["Membangun permukiman padat di garis pantai", "Menanam mangrove dan menyiapkan jalur evakuasi", "Menghilangkan sistem peringatan dini", "Membiarkan kawasan tanpa perencanaan tata ruang"], jawaban: 1, pembahasan: "Mangrove meredam gelombang dan jalur evakuasi mempercepat penyelamatan warga saat tsunami." },
+            { id: "sma_sej_1", jenjang: "SMA", mapel: "Sejarah", tingkat: "Mudah", topik: "masa praaksara Indonesia", soal: "Zaman ketika manusia purba mulai hidup menetap dan bercocok tanam disebut zaman...", pilihan: ["Berburu dan meramu", "Bercocok tanam", "Perundagian", "Logam"], jawaban: 1, pembahasan: "Zaman bercocok tanam ditandai dengan kehidupan menetap dan mulai bertani." },
+            { id: "sma_sej_2", jenjang: "SMA", mapel: "Sejarah", tingkat: "Sedang", topik: "kolonialisme & imperialisme", soal: "Sistem tanam paksa (Cultuurstelsel) yang diterapkan Belanda bertujuan utama untuk...", pilihan: ["Mensejahterakan petani pribumi", "Mengisi kas kerajaan Belanda yang defisit", "Meningkatkan pendidikan rakyat", "Membangun infrastruktur untuk rakyat"], jawaban: 1, pembahasan: "Tanam paksa diterapkan untuk mengisi kas Belanda yang kosong akibat Perang Jawa dan Belgia." },
+            { id: "sma_sej_3", jenjang: "SMA", mapel: "Sejarah", tingkat: "Sulit / HOTS", topik: "pergerakan nasional", soal: "Sumpah Pemuda tahun 1928 dianggap tonggak penting persatuan bangsa karena...", pilihan: ["Menyatukan seluruh kerajaan Nusantara secara politik", "Menegaskan satu tanah air, bangsa, dan bahasa sebagai identitas bersama", "Mengakhiri penjajahan Belanda secara langsung", "Membentuk pemerintahan Republik Indonesia"], jawaban: 1, pembahasan: "Sumpah Pemuda menegaskan identitas bersama (tanah air, bangsa, bahasa) yang mempersatukan pemuda lintas daerah." },
+            { id: "sma_sos_1", jenjang: "SMA", mapel: "Sosiologi", tingkat: "Mudah", topik: "interaksi sosial", soal: "Interaksi sosial yang mengarah pada kerja sama untuk mencapai tujuan bersama disebut proses...", pilihan: ["Asosiatif", "Disosiatif", "Kompetitif", "Konfliktual"], jawaban: 0, pembahasan: "Proses asosiatif mengarah pada kerja sama, akomodasi, dan asimilasi." },
+            { id: "sma_sos_2", jenjang: "SMA", mapel: "Sosiologi", tingkat: "Sedang", topik: "struktur & stratifikasi sosial", soal: "Sistem stratifikasi sosial yang bersifat tertutup, seperti sistem kasta, ditandai dengan...", pilihan: ["Kemudahan berpindah status sosial", "Status sosial ditentukan sejak lahir dan sulit berubah", "Status diperoleh murni dari prestasi", "Tidak adanya perbedaan status sosial"], jawaban: 1, pembahasan: "Stratifikasi tertutup (misal kasta) menetapkan status sejak lahir dan sulit berpindah." },
+            { id: "sma_sos_3", jenjang: "SMA", mapel: "Sosiologi", tingkat: "Sulit / HOTS", topik: "konflik & integrasi sosial", soal: "Konflik antarkelompok dapat berujung pada integrasi sosial apabila...", pilihan: ["Salah satu kelompok dipaksa mengalah tanpa kompromi", "Terjadi dialog dan kompromi yang menghasilkan kesepakatan bersama", "Konflik dibiarkan tanpa penyelesaian", "Kelompok yang kalah dikucilkan selamanya"], jawaban: 1, pembahasan: "Integrasi pascakonflik umumnya tercapai lewat dialog, kompromi, dan akomodasi kepentingan bersama." },
+
+            // ---------- SMA - Jurusan Bahasa ----------
+            { id: "sma_sastra_1", jenjang: "SMA", mapel: "Sastra Indonesia", tingkat: "Mudah", topik: "puisi & majas", soal: "Ungkapan 'hatinya sekeras batu' menggunakan majas...", pilihan: ["Metafora", "Personifikasi", "Hiperbola", "Ironi"], jawaban: 0, pembahasan: "Metafora membandingkan langsung dua hal tanpa kata 'seperti' atau 'bagai'." },
+            { id: "sma_sastra_2", jenjang: "SMA", mapel: "Sastra Indonesia", tingkat: "Sedang", topik: "unsur intrinsik novel", soal: "Sudut pandang di mana pengarang menggunakan kata ganti 'aku' sebagai tokoh utama disebut sudut pandang...", pilihan: ["Orang pertama pelaku utama", "Orang ketiga serba tahu", "Orang kedua", "Orang ketiga terbatas"], jawaban: 0, pembahasan: "Sudut pandang orang pertama pelaku utama menggunakan 'aku' sebagai tokoh utama cerita." },
+            { id: "sma_sastra_3", jenjang: "SMA", mapel: "Sastra Indonesia", tingkat: "Sulit / HOTS", topik: "drama & naskah", soal: "Dalam naskah drama, konflik batin yang dialami tokoh biasanya disampaikan melalui...", pilihan: ["Setting panggung", "Monolog atau dialog batin tokoh", "Kostum tokoh", "Tata lampu panggung"], jawaban: 1, pembahasan: "Konflik batin tokoh umumnya diungkapkan lewat monolog atau dialog batin dalam naskah drama." },
+            { id: "sma_antro_1", jenjang: "SMA", mapel: "Antropologi", tingkat: "Mudah", topik: "kebudayaan & tradisi lokal", soal: "Upacara adat yang diwariskan turun-temurun dalam suatu masyarakat merupakan bagian dari unsur kebudayaan berupa...", pilihan: ["Sistem religi/upacara", "Sistem ekonomi", "Sistem politik", "Sistem teknologi"], jawaban: 0, pembahasan: "Upacara adat termasuk unsur kebudayaan sistem religi dan upacara keagamaan." },
+            { id: "sma_antro_2", jenjang: "SMA", mapel: "Antropologi", tingkat: "Sedang", topik: "keragaman etnis Indonesia", soal: "Keragaman etnis di Indonesia terbentuk salah satunya karena faktor...", pilihan: ["Letak geografis kepulauan yang memisahkan kelompok masyarakat", "Iklim yang selalu sama di semua wilayah", "Bahasa nasional yang tunggal sejak awal", "Tidak adanya interaksi antarwilayah"], jawaban: 0, pembahasan: "Kondisi kepulauan menyebabkan isolasi antarwilayah sehingga budaya berkembang berbeda-beda." },
+            { id: "sma_antro_3", jenjang: "SMA", mapel: "Antropologi", tingkat: "Sulit / HOTS", topik: "perubahan kebudayaan", soal: "Masuknya budaya global melalui internet dapat memicu perubahan kebudayaan lokal melalui proses yang disebut...", pilihan: ["Akulturasi/asimilasi budaya", "Isolasi budaya", "Stagnasi budaya", "Involusi budaya"], jawaban: 0, pembahasan: "Percampuran budaya lokal dan global umumnya terjadi melalui akulturasi atau asimilasi." },
+            { id: "sma_eng2_1", jenjang: "SMA", mapel: "Bahasa Inggris Lanjutan", tingkat: "Mudah", topik: "conditional sentences", soal: "If it rains tomorrow, I ____ at home.", pilihan: ["stay", "will stay", "stayed", "would stay"], jawaban: 1, pembahasan: "Conditional type 1 menggunakan 'will + verb' pada klausa utama." },
+            { id: "sma_eng2_2", jenjang: "SMA", mapel: "Bahasa Inggris Lanjutan", tingkat: "Sedang", topik: "report text", soal: "A report text is mainly used to...", pilihan: ["Tell a personal story", "Describe general facts about a class of things", "Give step-by-step instructions", "Persuade the reader to act"], jawaban: 1, pembahasan: "Report text menjelaskan fakta umum tentang sebuah kategori (misalnya hewan, fenomena alam)." },
+            { id: "sma_eng2_3", jenjang: "SMA", mapel: "Bahasa Inggris Lanjutan", tingkat: "Sulit / HOTS", topik: "analytical exposition", soal: "'Social media should be regulated more strictly because it spreads misinformation quickly.' This statement is an example of a thesis in...", pilihan: ["Narrative text", "Analytical exposition text", "Descriptive text", "Recount text"], jawaban: 1, pembahasan: "Analytical exposition menyampaikan tesis/pendapat yang diperkuat argumen, seperti contoh tersebut." }
         ];
 
         window.showToast = function(message, type = 'info') {
@@ -414,33 +494,70 @@
             const toast = document.createElement('div');
             const bgColor = type === 'error' ? 'bg-rose-600' : (type === 'success' ? 'bg-emerald-600' : 'bg-indigo-600');
             toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center gap-2`;
-            const icon = type === "error" ? "fa-circle-exclamation" : (type === "success" ? "fa-circle-check" : "fa-circle-info");
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span></span>`;
-            toast.querySelector("span").textContent = message;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 4000);
         }
 
+        // ==========================================
+        // PENGISI DROPDOWN MAPEL DINAMIS (mengikuti jenjang + jurusan)
+        // prefix: 'u' untuk form siswa, 'f' untuk form admin
+        // ==========================================
+        window.updateMapelOptions = function(prefix) {
+            const jenjang = document.getElementById(`${prefix}-jenjang`).value;
+            const jurusanWrap = prefix === 'u' ? document.getElementById('u-jurusan-wrap') : document.getElementById('f-jurusan');
+            const mapelSelect = document.getElementById(`${prefix}-mapel`);
+            let daftarMapel = [];
 
-        function escapeHTML(value) {
-            return String(value ?? "").replace(/[&<>"']/g, ch => ({
-                "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-            }[ch]));
-        }
+            if (jenjang === 'SMA') {
+                if (jurusanWrap) jurusanWrap.classList.remove('hidden');
+                const jurusan = document.getElementById(`${prefix}-jurusan`).value || 'IPA';
+                daftarMapel = [...TKA_MAPEL.SMA.wajib, ...(TKA_MAPEL.SMA[jurusan] || [])];
+            } else {
+                if (jurusanWrap) jurusanWrap.classList.add('hidden');
+                daftarMapel = TKA_MAPEL[jenjang] || [];
+            }
 
-        function getResultMessage(scoreValue) {
-            if (scoreValue >= 90) return "Luar biasa! Penguasaan materi Anda sangat baik.";
-            if (scoreValue >= 75) return "Bagus! Tinggal sedikit lagi untuk hasil yang lebih tinggi.";
-            if (scoreValue >= 60) return "Cukup baik. Tinjau kembali pembahasan soal yang keliru.";
-            return "Tidak masalah. Gunakan pembahasan untuk memperkuat materi sebelum mencoba lagi.";
-        }
-
-        window.resetFormSoal = function() {
-            ["f-soal","f-pil-A","f-pil-B","f-pil-C","f-pil-D","f-pembahasan"].forEach(id => {
-                const el = document.getElementById(id); if (el) el.value = "";
-            });
-            const key = document.getElementById("f-kunci"); if (key) key.value = "0";
+            mapelSelect.innerHTML = daftarMapel.map(m => `<option value="${m}">${m}</option>`).join('');
         };
+
+        function inisialisasiFormMapel() {
+            window.updateMapelOptions('u');
+            window.updateMapelOptions('f');
+        }
+
+        // ==========================================
+        // RIWAYAT SOAL (ANTI-PENGULANGAN)
+        // Menyimpan cuplikan soal yang pernah muncul per mata pelajaran
+        // di localStorage, lalu memberitahu AI agar tidak membuat soal
+        // yang mirip supaya kuis tidak terasa monoton/itu-itu saja.
+        // ==========================================
+        function ambilRiwayatSoal(mapel) {
+            try {
+                const raw = localStorage.getItem(`tka_riwayat_${mapel}`);
+                return raw ? JSON.parse(raw) : [];
+            } catch(e) { return []; }
+        }
+
+        function simpanRiwayatSoal(mapel, daftarSoalBaru) {
+            try {
+                let riwayat = ambilRiwayatSoal(mapel);
+                riwayat = riwayat.concat(daftarSoalBaru.map(q => q.soal));
+                if (riwayat.length > RIWAYAT_MAX_PER_MAPEL) {
+                    riwayat = riwayat.slice(riwayat.length - RIWAYAT_MAX_PER_MAPEL);
+                }
+                localStorage.setItem(`tka_riwayat_${mapel}`, JSON.stringify(riwayat));
+            } catch(e) { /* abaikan jika storage penuh */ }
+        }
+
+        function acakArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
 
         async function handleAuthUser(user) {
             currentUser = user;
@@ -607,15 +724,8 @@
             onSnapshot(soalQuery, (snapshot) => {
                 bankSoalCloud = [];
                 snapshot.forEach(docSnap => bankSoalCloud.push({ id: docSnap.id, ...docSnap.data() }));
-                const status = document.getElementById("admin-sync-status");
-                if (status) { status.textContent = "Tersinkron"; status.className = "text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full"; }
                 renderAdminSoalList();
-            }, (err) => {
-                const status = document.getElementById("admin-sync-status");
-                if (status) { status.textContent = "Gagal sinkron"; status.className = "text-[11px] font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-full"; }
-                window.showToast("Tidak dapat memuat bank soal dari Firestore.", "error");
-                console.error(err);
-            });
+            }, (err) => console.log(err));
 
             const laporanQuery = collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa');
             onSnapshot(laporanQuery, (snapshot) => {
@@ -625,13 +735,10 @@
                 let rows = '';
                 snapshot.forEach(docSnap => {
                     const d = docSnap.data();
-                    rows += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${escapeHTML(d.userName || "Pengguna")}</td><td class="px-4 py-3 text-xs">${escapeHTML(d.timestamp || '-')}</td><td class="px-4 py-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[11px] font-bold">${escapeHTML(d.jenjang || '-')} - ${escapeHTML(d.mapel || '-')}</span></td><td class="px-4 py-3 text-center font-black text-emerald-600">${Number(d.score) || 0}</td></tr>`;
+                    rows += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${d.userName}</td><td class="px-4 py-3 text-xs">${d.timestamp || '-'}</td><td class="px-4 py-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[11px] font-bold">${d.jenjang} - ${d.mapel}</span></td><td class="px-4 py-3 text-center font-black text-emerald-600">${d.score}</td></tr>`;
                 });
                 tbody.innerHTML = rows || `<tr><td colspan="4" class="text-center py-6 text-slate-400">Belum ada laporan.</td></tr>`;
-            }, (err) => {
-                window.showToast("Laporan siswa tidak dapat dimuat.", "error");
-                console.error(err);
-            });
+            }, (err) => console.log(err));
         }
 
         window.kembaliKePortal = function() {
@@ -670,7 +777,7 @@
                 document.getElementById('btn-ganti-peran').classList.remove('hidden');
                 window.switchAdminTab('soal');
             } else {
-                window.showToast("PIN tidak sesuai.", "error");
+                window.showToast("PIN Salah! (Hint: 1234)", "error");
             }
         }
 
@@ -691,92 +798,35 @@
             const pilB = document.getElementById('f-pil-B').value.trim();
             const pilC = document.getElementById('f-pil-C').value.trim();
             const pilD = document.getElementById('f-pil-D').value.trim();
-            const pembahasan = document.getElementById('f-pembahasan').value.trim();
             const kunci = parseInt(document.getElementById('f-kunci').value);
 
-            if(!soal || !pilA || !pilB || !pilC || !pilD) return window.showToast("Pertanyaan dan 4 opsi wajib diisi.", "error");
-            if([pilA,pilB,pilC,pilD].some((x, i, arr) => arr.findIndex(y => y.toLowerCase() === x.toLowerCase()) !== i)) {
-                return window.showToast("Opsi jawaban tidak boleh duplikat.", "error");
-            }
+            if(!soal || !pilA || !pilB || !pilC || !pilD) return window.showToast("Semua kolom wajib diisi!", "error");
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka'), {
-                    jenjang, tingkat, mapel, soal,
-                    pilihan: [pilA, pilB, pilC, pilD],
-                    jawaban: kunci,
-                    pembahasan: pembahasan || "Belum ada pembahasan."
+                    jenjang, tingkat, mapel, soal, pilihan: [pilA, pilB, pilC, pilD], jawaban: kunci, pembahasan: "Pembahasan pengajar."
                 });
-                window.showToast("Soal berhasil disimpan.", "success");
-                window.resetFormSoal();
+                window.showToast("Soal berhasil disimpan!", "success");
+                document.getElementById('f-soal').value = '';
+                document.getElementById('f-pil-A').value = '';
+                document.getElementById('f-pil-B').value = '';
+                document.getElementById('f-pil-C').value = '';
+                document.getElementById('f-pil-D').value = '';
             } catch(e) {
-                window.showToast("Gagal menyimpan soal. Periksa Firestore Rules.", "error");
-                console.error(e);
+                window.showToast("Gagal simpan ke Firestore.", "error");
             }
         }
 
-        function renderAdminSoalList(items = bankSoalCloud) {
+        function renderAdminSoalList() {
             const container = document.getElementById('admin-db-list');
-            const list = items.length > 0 ? items : (bankSoalCloud.length === 0 ? DEFAULT_QUESTIONS : []);
+            const list = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
             document.getElementById('count-db-cloud').innerText = list.length;
             if(!container) return;
-            if (!list.length) {
-                container.innerHTML = `<div class="text-center text-slate-400 text-sm py-10">Belum ada soal yang cocok dengan filter.</div>`;
-                return;
-            }
             container.innerHTML = '';
             list.forEach((q, idx) => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-50 border border-slate-200 p-3 rounded-xl soft-hover";
-                const row = document.createElement('div');
-                row.className = "flex justify-between items-start gap-3";
-                const main = document.createElement('div');
-                main.className = "min-w-0";
-                const meta = document.createElement('div');
-                meta.className = "flex flex-wrap gap-2 text-[11px] font-bold text-indigo-600 mb-1";
-                meta.innerHTML = `<span>${escapeHTML(q.jenjang)} · ${escapeHTML(q.mapel)}</span><span class="text-slate-400">•</span><span>${escapeHTML(q.tingkat)}</span>`;
-                const question = document.createElement('p');
-                question.className = "text-xs font-bold text-slate-800 leading-relaxed";
-                question.textContent = `${idx + 1}. ${q.soal || ""}`;
-                main.append(meta, question);
-
-                const actions = document.createElement('div');
-                actions.className = "flex-shrink-0 flex gap-1";
-                if (q.id && !String(q.id).startsWith("def_")) {
-                    const del = document.createElement('button');
-                    del.className = "w-9 h-9 min-h-0 rounded-lg bg-white border border-slate-200 text-rose-500 hover:bg-rose-50";
-                    del.title = "Hapus soal";
-                    del.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                    del.onclick = () => window.hapusSoal(q.id);
-                    actions.appendChild(del);
-                }
-                row.append(main, actions);
-                card.appendChild(row);
-                container.appendChild(card);
+                container.innerHTML += `<div class="bg-slate-50 border border-slate-200 p-3 rounded-xl"><div class="flex justify-between text-[11px] font-bold text-indigo-600 mb-1"><span>${q.jenjang} - ${q.mapel}</span><span>${q.tingkat}</span></div><p class="text-xs font-bold text-slate-800">${idx+1}. ${q.soal}</p></div>`;
             });
         }
-
-        window.filterAdminSoal = function() {
-            const q = (document.getElementById("admin-search")?.value || "").toLowerCase().trim();
-            const jenjang = document.getElementById("admin-filter-jenjang")?.value || "";
-            const pool = bankSoalCloud;
-            const filtered = pool.filter(item => {
-                const haystack = [item.soal, item.mapel, item.jenjang, item.tingkat].join(" ").toLowerCase();
-                return (!q || haystack.includes(q)) && (!jenjang || item.jenjang === jenjang);
-            });
-            renderAdminSoalList(filtered);
-        };
-
-        window.hapusSoal = async function(id) {
-            if (!id || isGuestMode) return window.showToast("Akses hapus tidak tersedia dalam mode ini.", "error");
-            if (!confirm("Hapus soal ini dari Firestore?")) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'soal_tka', id));
-                window.showToast("Soal dihapus.", "success");
-            } catch (e) {
-                window.showToast("Gagal menghapus soal.", "error");
-                console.error(e);
-            }
-        };
 
         function updateQuotaDisplay() {
             if(!userProfileData) return;
@@ -785,90 +835,126 @@
             document.getElementById('limit-info').innerText = `${sisa} / ${MAX_LIMIT_PER_DAY}`;
         }
 
+        // ==========================================
+        // GENERATOR SOAL AI — DIBUAT LEBIH FLEKSIBEL & BERVARIASI
+        // - memilih beberapa subtopik acak dari kisi-kisi mapel terkait
+        // - menghindari pengulangan dengan mengirim riwayat soal terakhir
+        // - temperature tinggi + instruksi eksplisit untuk konteks/angka baru
+        // ==========================================
+        async function generateSoalAI(jenjang, mapel, jurusan) {
+            const semuaTopik = TOPIK_MATERI[mapel] || ["konsep dasar", "penerapan konsep", "analisis kasus"];
+            const topikTerpilih = acakArray(semuaTopik).slice(0, Math.min(4, semuaTopik.length));
+            const riwayat = ambilRiwayatSoal(mapel).slice(-25); // batasi agar prompt tidak terlalu panjang
+            const seedSesi = `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+
+            const konteksJurusan = jurusan ? ` (peminatan ${jurusan})` : '';
+            const daftarHindari = riwayat.length > 0
+                ? `\n\nJANGAN membuat soal yang sama atau mirip (topik, angka, maupun narasi) dengan daftar soal yang SUDAH PERNAH dipakai berikut ini:\n- ${riwayat.join('\n- ')}`
+                : '';
+
+            const prompt = `Kamu adalah penyusun soal Tes Kemampuan Akademik (TKA) sesuai Permendikdasmen No. 9 Tahun 2025 dan kisi-kisi Kurikulum Merdeka.
+Buatkan 10 soal pilihan ganda ORISINIL untuk jenjang ${jenjang}, mata pelajaran ${mapel}${konteksJurusan}.
+
+Ketentuan wajib:
+1. Fokuskan soal pada sub-topik berikut secara merata (boleh dikombinasikan): ${topikTerpilih.join(', ')}.
+2. Gaya soal harus HOTS (Higher Order Thinking Skill): penalaran, analisis, dan pemecahan masalah kontekstual — bukan hafalan/definisi hafalan literal.
+3. Gunakan konteks, nama tokoh, angka, dan situasi yang BERBEDA dari contoh-contoh soal umum/klise yang sering muncul di buku teks.
+4. Variasikan tingkat kesulitan: sebagian mudah, sebagian sedang, sebagian sulit/HOTS, namun tetap sesuai capaian pembelajaran jenjang ${jenjang}.
+5. Setiap soal punya tepat 4 opsi jawaban dan 1 kunci jawaban benar, plus pembahasan singkat yang jelas.
+6. Gunakan Bahasa Indonesia yang baik dan baku (kecuali mapel Bahasa Inggris, gunakan Bahasa Inggris).
+${daftarHindari}
+
+Kode sesi acak (abaikan angka ini, hanya untuk memastikan variasi): ${seedSesi}
+
+Format JSON WAJIB (tanpa teks lain di luar JSON):
+{"soal_list": [{"soal": "...", "pilihan": ["A","B","C","D"], "jawaban": 0, "pembahasan": "...", "topik": "..."}]}`;
+
+            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    messages: [{ role: "user", content: prompt }],
+                    response_format: { type: "json_object" },
+                    temperature: 1.05,
+                    top_p: 0.95,
+                    presence_penalty: 0.6,
+                    frequency_penalty: 0.4
+                })
+            });
+            if (!res.ok) throw new Error('Groq API error');
+            const data = await res.json();
+            let raw = data.choices[0].message.content.replace(/```json/gi, '').replace(/```/gi, '').trim();
+            const parsed = JSON.parse(raw);
+            const hasil = parsed.soal_list || [];
+            if (!Array.isArray(hasil) || hasil.length === 0) throw new Error('Format soal AI kosong');
+            return hasil;
+        }
+
         window.mulaiKuis = async function(pakaiAI) {
             if(!userProfileData) return;
-            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian Anda telah habis.", "error");
+            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian Anda telah habis!", "error");
 
             const jenjang = document.getElementById('u-jenjang').value;
             const mapel = document.getElementById('u-mapel').value;
-            lastQuizConfig = { jenjang, mapel, pakaiAI };
+            const jurusan = jenjang === 'SMA' ? document.getElementById('u-jurusan').value : null;
 
             document.getElementById('user-home').classList.add('hidden');
             document.getElementById('loading-section').classList.remove('hidden');
 
-            activeQuestions = [];
-            let sumber = pakaiAI ? "AI" : "Firestore";
-
-            if(pakaiAI && GROQ_API_ENDPOINT) {
+            if(pakaiAI) {
                 try {
-                    const prompt = `Buatkan ${TOTAL_QUESTIONS_PER_SESSION} soal pilihan ganda untuk jenjang ${jenjang}, mata pelajaran ${mapel}, Kurikulum Merdeka, berorientasi HOTS.
-Kembalikan JSON murni dengan struktur {"soal_list":[{"soal":"...","pilihan":["A","B","C","D"],"jawaban":0,"pembahasan":"..."}]}.
-Pastikan jawaban selalu berupa indeks 0-3 dan semua soal relevan dengan jenjang/mapel.`;
-                    const res = await fetch(GROQ_API_ENDPOINT, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ prompt, jenjang, mapel, jumlah: TOTAL_QUESTIONS_PER_SESSION })
-                    });
-                    if(!res.ok) throw new Error(`AI endpoint ${res.status}`);
-                    const data = await res.json();
-                    const list = Array.isArray(data?.soal_list) ? data.soal_list : [];
-                    activeQuestions = list.filter(q => q && q.soal && Array.isArray(q.pilihan) && q.pilihan.length === 4 && Number.isInteger(q.jawaban) && q.jawaban >= 0 && q.jawaban <= 3);
-                    if (activeQuestions.length < 1) throw new Error("Respons AI tidak valid.");
-                } catch (e) {
-                    console.warn("AI fallback:", e);
+                    activeQuestions = await generateSoalAI(jenjang, mapel, jurusan);
+                    simpanRiwayatSoal(mapel, activeQuestions);
+                } catch(e) {
+                    console.error("Gagal generate soal AI:", e);
+                    window.showToast("AI sedang sibuk, mengambil soal dari bank soal cadangan.", "info");
                     pakaiAI = false;
-                    window.showToast("AI tidak tersedia. Sistem memakai bank soal.", "info");
                 }
-            } else if (pakaiAI && !GROQ_API_ENDPOINT) {
-                window.showToast("Fitur AI belum dikonfigurasi di backend. Bank soal digunakan.", "info");
-                pakaiAI = false;
             }
 
             if(!pakaiAI) {
                 let pool = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
                 let filtered = pool.filter(q => q.jenjang === jenjang && q.mapel === mapel);
                 if(filtered.length < TOTAL_QUESTIONS_PER_SESSION) {
-                    filtered = [...pool];
+                    // Lengkapi dari pool jenjang yang sama dulu, baru dari seluruh pool, agar tetap relevan
+                    const cadanganJenjang = pool.filter(q => q.jenjang === jenjang && q.mapel !== mapel);
+                    filtered = acakArray([...filtered, ...cadanganJenjang, ...pool]);
+                    // hapus duplikat berdasarkan id/soal
+                    const unik = [];
+                    const terpakai = new Set();
+                    for (const q of filtered) {
+                        const kunciUnik = q.id || q.soal;
+                        if (!terpakai.has(kunciUnik)) { terpakai.add(kunciUnik); unik.push(q); }
+                    }
+                    filtered = unik;
+                } else {
+                    filtered = acakArray(filtered);
                 }
-                filtered = filtered
-                    .filter(q => q && q.soal && Array.isArray(q.pilihan) && q.pilihan.length === 4)
-                    .sort(() => Math.random() - 0.5);
                 activeQuestions = filtered.slice(0, TOTAL_QUESTIONS_PER_SESSION);
             }
 
-            if (!activeQuestions.length) {
-                document.getElementById('loading-section').classList.add('hidden');
-                document.getElementById('user-home').classList.remove('hidden');
-                return window.showToast(`Belum ada soal untuk ${jenjang} — ${mapel}.`, "error");
-            }
-
             userProfileData.quizAttempts = (userProfileData.quizAttempts || 0) + 1;
-
-            try {
-                if(isGuestMode) {
-                    localStorage.setItem('tka_guest_profile', JSON.stringify({
-                        quizAttempts: userProfileData.quizAttempts,
-                        lastAttemptDate: new Date().toDateString()
-                    }));
-                } else {
-                    await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), {
-                        quizAttempts: userProfileData.quizAttempts
-                    });
-                }
-            } catch (e) {
-                console.error("Quota update error:", e);
-                window.showToast("Kuis dimulai, tetapi kuota belum tersimpan.", "error");
+            
+            if(isGuestMode) {
+                localStorage.setItem('tka_guest_profile', JSON.stringify({
+                    quizAttempts: userProfileData.quizAttempts,
+                    lastAttemptDate: new Date().toDateString()
+                }));
+            } else {
+                await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'data'), { quizAttempts: userProfileData.quizAttempts });
             }
-
+            
             updateQuotaDisplay();
-            currentIndex = 0; score = 0; correctAnswers = 0;
+
+            currentIndex = 0; score = 0;
             document.getElementById('loading-section').classList.add('hidden');
             document.getElementById('quiz-page').classList.remove('hidden');
             document.getElementById('badge-jenjang').innerText = jenjang;
             document.getElementById('badge-mapel-quiz').innerText = mapel;
             document.getElementById('total-q').innerText = activeQuestions.length;
             tampilkanSoalAktif();
-        };
+        }
 
         function tampilkanSoalAktif() {
             userSelectedAnswer = null;
@@ -878,22 +964,23 @@ Pastikan jawaban selalu berupa indeks 0-3 dan semua soal relevan dengan jenjang/
 
             const q = activeQuestions[currentIndex];
             document.getElementById('current-q').innerText = currentIndex + 1;
-            const progress = ((currentIndex + 1) / activeQuestions.length) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-bar').style.width = `${(currentIndex / activeQuestions.length) * 100}%`;
             document.getElementById('question-text').innerText = q.soal;
+
+            const badgeTopik = document.getElementById('badge-topik-quiz');
+            if (q.topik) {
+                badgeTopik.innerText = q.topik;
+                badgeTopik.classList.remove('hidden');
+            } else {
+                badgeTopik.classList.add('hidden');
+            }
 
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             q.pilihan.forEach((opsi, idx) => {
                 const btn = document.createElement('button');
-                btn.className = "quiz-option w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm flex justify-between items-center transition";
-                const label = document.createElement("span");
-                const strong = document.createElement("strong");
-                strong.className = "mr-2 text-indigo-600";
-                strong.textContent = `${String.fromCharCode(65 + idx)}.`;
-                label.append(strong, document.createTextNode(` ${opsi}`));
-                btn.appendChild(label);
-                btn.setAttribute("aria-label", `Pilihan ${String.fromCharCode(65 + idx)}: ${opsi}`);
+                btn.className = "w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm flex justify-between items-center transition";
+                btn.innerHTML = `<span><strong class="mr-2 text-indigo-600">${String.fromCharCode(65 + idx)}.</strong> ${opsi}</span>`;
                 btn.onclick = () => pilihOpsi(idx, btn);
                 container.appendChild(btn);
             });
@@ -903,31 +990,26 @@ Pastikan jawaban selalu berupa indeks 0-3 dan semua soal relevan dengan jenjang/
             if (userSelectedAnswer !== null) return;
             userSelectedAnswer = idx;
             const q = activeQuestions[currentIndex];
-            const buttons = [...document.getElementById('options-container').children];
-
-            buttons.forEach(b => {
-                b.disabled = true;
-                b.style.pointerEvents = 'none';
-            });
+            const buttons = document.getElementById('options-container').children;
 
             if (idx === q.jawaban) {
-                element.classList.add("correct");
-                document.getElementById('feedback-msg').innerText = "Benar! Jawaban Anda tepat.";
+                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm flex justify-between items-center";
+                document.getElementById('feedback-msg').innerText = "✅ Benar!";
                 document.getElementById('feedback-msg').className = "text-sm font-bold text-emerald-600";
-                correctAnswers++;
-                score = Math.round((correctAnswers / activeQuestions.length) * 100);
+                score += Math.round(100 / activeQuestions.length);
             } else {
-                element.classList.add("wrong");
-                if (buttons[q.jawaban]) buttons[q.jawaban].classList.add("correct");
-                document.getElementById('feedback-msg').innerText = `Kurang tepat. Kunci: ${String.fromCharCode(65 + q.jawaban)}.`;
+                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-semibold text-sm flex justify-between items-center";
+                if (buttons[q.jawaban]) buttons[q.jawaban].className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm flex justify-between items-center";
+                document.getElementById('feedback-msg').innerText = `❌ Kurang tepat. Kunci: ${String.fromCharCode(65 + q.jawaban)}`;
                 document.getElementById('feedback-msg').className = "text-sm font-bold text-rose-600";
-                score = Math.round((correctAnswers / activeQuestions.length) * 100);
             }
 
             if(q.pembahasan) {
                 document.getElementById('explanation-text').innerText = q.pembahasan;
                 document.getElementById('explanation-box').classList.remove('hidden');
             }
+
+            for(let b of buttons) b.style.pointerEvents = 'none';
             document.getElementById('btn-next').classList.remove('hidden');
         }
 
@@ -935,45 +1017,23 @@ Pastikan jawaban selalu berupa indeks 0-3 dan semua soal relevan dengan jenjang/
             currentIndex++;
             if (currentIndex < activeQuestions.length) {
                 tampilkanSoalAktif();
-                return;
-            }
+            } else {
+                document.getElementById('quiz-page').classList.add('hidden');
+                document.getElementById('result-page').classList.remove('hidden');
+                document.getElementById('final-score').innerText = score;
+                document.getElementById('progress-bar').style.width = `100%`;
 
-            const finalScore = Math.round((correctAnswers / activeQuestions.length) * 100);
-            document.getElementById('quiz-page').classList.add('hidden');
-            document.getElementById('result-page').classList.remove('hidden');
-            document.getElementById('final-score').innerText = finalScore;
-            document.getElementById('final-correct').innerText = `${correctAnswers}/${activeQuestions.length}`;
-            document.getElementById('result-message').innerText = getResultMessage(finalScore);
-            document.getElementById('progress-bar').style.width = `100%`;
-
-            try {
-                if(!isGuestMode) {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), {
-                        userId: currentUser.uid,
-                        userName: userProfileData.displayName,
-                        jenjang: lastQuizConfig.jenjang,
-                        mapel: lastQuizConfig.mapel,
-                        score: finalScore,
-                        correct: correctAnswers,
-                        total: activeQuestions.length,
-                        timestamp: new Date().toLocaleString('id-ID')
-                    });
-                }
-            } catch(e) {
-                window.showToast("Nilai tampil, tetapi laporan belum tersimpan.", "error");
-                console.error(e);
+                try {
+                    if(!isGuestMode) {
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), {
+                            userId: currentUser.uid, userName: userProfileData.displayName,
+                            jenjang: document.getElementById('u-jenjang').value, mapel: document.getElementById('u-mapel').value,
+                            score: score, timestamp: new Date().toLocaleString('id-ID')
+                        });
+                    }
+                } catch(e) {}
             }
         };
-
-        window.ulangiKuis = function() {
-            document.getElementById('result-page').classList.add('hidden');
-            window.mulaiKuis(lastQuizConfig.pakaiAI);
-        };
-
-        document.getElementById("pin-input")?.addEventListener("keydown", (event) => {
-            if (event.key === "Enter") window.cekPin();
-            if (event.key === "Escape") window.tutupModalPin();
-        });
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -984,6 +1044,9 @@ Pastikan jawaban selalu berupa indeks 0-3 dan semua soal relevan dengan jenjang/
                 document.getElementById('portal-page').classList.add('hidden');
             }
         });
+
+        // Inisialisasi dropdown mapel saat halaman dimuat
+        inisialisasiFormMapel();
     </script>
 </body>
 </html>
