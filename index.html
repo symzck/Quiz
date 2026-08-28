@@ -270,13 +270,14 @@
 
         <!-- 4. HALAMAN KUIS AKTIF -->
         <section id="quiz-page" class="glass-card rounded-3xl p-6 sm:p-8 hidden max-w-3xl mx-auto w-full">
-            <div class="flex justify-between items-center mb-5 pb-4 border-b border-slate-100">
-                <div class="flex gap-2">
+            <div class="flex flex-wrap justify-between items-center gap-y-2 mb-5 pb-4 border-b border-slate-100">
+                <div class="flex flex-wrap gap-2">
                     <span id="badge-jenjang" class="text-[11px] font-bold uppercase bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">SD</span>
                     <span id="badge-mapel-quiz" class="text-[11px] font-bold uppercase bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg">Mapel</span>
+                    <span id="badge-tingkat-quiz" class="text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg hidden">Tingkat</span>
                     <span id="badge-topik-quiz" class="text-[11px] font-bold uppercase bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg hidden">Topik</span>
                 </div>
-                <div class="text-sm font-bold text-slate-500">Soal <span id="current-q" class="text-indigo-600">1</span> / <span id="total-q">10</span></div>
+                <div class="text-sm font-bold text-slate-500 shrink-0">Soal <span id="current-q" class="text-indigo-600">1</span> / <span id="total-q">10</span></div>
             </div>
 
             <div class="w-full bg-slate-100 rounded-full h-2 mb-6 overflow-hidden">
@@ -557,6 +558,22 @@
                 [a[i], a[j]] = [a[j], a[i]];
             }
             return a;
+        }
+
+        // ==========================================
+        // URUTAN PENEMPATAN SOAL DALAM SESI
+        // Soal disusun dari tingkat Mudah -> Sedang -> Sulit/HOTS agar peserta
+        // "pemanasan" dulu sebelum menghadapi soal HOTS, meniru pola susunan
+        // butir soal TKA resmi. Diacak dulu sebelum diurutkan supaya isi di
+        // dalam tiap tingkat tetap bervariasi setiap sesi (sort bersifat stabil).
+        // ==========================================
+        const URUTAN_TINGKAT = { "Mudah": 0, "Sedang": 1, "Sulit / HOTS": 2 };
+        function urutkanBerdasarkanTingkat(daftarSoal) {
+            return acakArray(daftarSoal).sort((a, b) => {
+                const ra = URUTAN_TINGKAT[a.tingkat] ?? 1;
+                const rb = URUTAN_TINGKAT[b.tingkat] ?? 1;
+                return ra - rb;
+            });
         }
 
         async function handleAuthUser(user) {
@@ -859,7 +876,7 @@ Ketentuan wajib:
 1. Fokuskan soal pada sub-topik berikut secara merata (boleh dikombinasikan): ${topikTerpilih.join(', ')}.
 2. Gaya soal harus HOTS (Higher Order Thinking Skill): penalaran, analisis, dan pemecahan masalah kontekstual — bukan hafalan/definisi hafalan literal.
 3. Gunakan konteks, nama tokoh, angka, dan situasi yang BERBEDA dari contoh-contoh soal umum/klise yang sering muncul di buku teks.
-4. Variasikan tingkat kesulitan: sebagian mudah, sebagian sedang, sebagian sulit/HOTS, namun tetap sesuai capaian pembelajaran jenjang ${jenjang}.
+4. Variasikan tingkat kesulitan: sebagian mudah, sebagian sedang, sebagian sulit/HOTS, namun tetap sesuai capaian pembelajaran jenjang ${jenjang}. Sertakan field "tingkat" pada SETIAP soal dengan nilai PERSIS salah satu dari: "Mudah", "Sedang", atau "Sulit / HOTS" (jangan pakai istilah lain).
 5. Setiap soal punya tepat 4 opsi jawaban dan 1 kunci jawaban benar, plus pembahasan singkat yang jelas.
 6. Gunakan Bahasa Indonesia yang baik dan baku (kecuali mapel Bahasa Inggris, gunakan Bahasa Inggris).
 ${daftarHindari}
@@ -867,7 +884,7 @@ ${daftarHindari}
 Kode sesi acak (abaikan angka ini, hanya untuk memastikan variasi): ${seedSesi}
 
 Format JSON WAJIB (tanpa teks lain di luar JSON):
-{"soal_list": [{"soal": "...", "pilihan": ["A","B","C","D"], "jawaban": 0, "pembahasan": "...", "topik": "..."}]}`;
+{"soal_list": [{"soal": "...", "pilihan": ["A","B","C","D"], "jawaban": 0, "pembahasan": "...", "topik": "...", "tingkat": "Mudah"}]}`;
 
             const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
@@ -914,25 +931,37 @@ Format JSON WAJIB (tanpa teks lain di luar JSON):
             }
 
             if(!pakaiAI) {
-                let pool = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
-                let filtered = pool.filter(q => q.jenjang === jenjang && q.mapel === mapel);
-                if(filtered.length < TOTAL_QUESTIONS_PER_SESSION) {
-                    // Lengkapi dari pool jenjang yang sama dulu, baru dari seluruh pool, agar tetap relevan
-                    const cadanganJenjang = pool.filter(q => q.jenjang === jenjang && q.mapel !== mapel);
-                    filtered = acakArray([...filtered, ...cadanganJenjang, ...pool]);
-                    // hapus duplikat berdasarkan id/soal
-                    const unik = [];
-                    const terpakai = new Set();
-                    for (const q of filtered) {
-                        const kunciUnik = q.id || q.soal;
-                        if (!terpakai.has(kunciUnik)) { terpakai.add(kunciUnik); unik.push(q); }
-                    }
-                    filtered = unik;
-                } else {
-                    filtered = acakArray(filtered);
+                // PENTING: gabungkan sumber (Firestore + bank referensi lokal) TERLEBIH DAHULU,
+                // baru difilter jenjang+mapel yang SAMA PERSIS. Tidak boleh menambal dengan
+                // soal dari mapel/jenjang lain — itulah penyebab "soal nyasar" sebelumnya.
+                const gabungan = [...DEFAULT_QUESTIONS, ...bankSoalCloud];
+                const dipakai = new Set();
+                const semuaSoalUnik = [];
+                for (const q of gabungan) {
+                    const kunciUnik = q.id || q.soal;
+                    if (!dipakai.has(kunciUnik)) { dipakai.add(kunciUnik); semuaSoalUnik.push(q); }
                 }
-                activeQuestions = filtered.slice(0, TOTAL_QUESTIONS_PER_SESSION);
+
+                let cocok = acakArray(semuaSoalUnik.filter(q => q.jenjang === jenjang && q.mapel === mapel));
+
+                if (cocok.length === 0) {
+                    document.getElementById('loading-section').classList.add('hidden');
+                    document.getElementById('user-home').classList.remove('hidden');
+                    window.showToast(`Belum ada soal tersimpan untuk ${mapel} jenjang ${jenjang}. Coba tombol "Buat via AI".`, "error");
+                    return;
+                }
+
+                if (cocok.length < TOTAL_QUESTIONS_PER_SESSION) {
+                    window.showToast(`Bank soal ${mapel} baru punya ${cocok.length} soal (belum genap ${TOTAL_QUESTIONS_PER_SESSION}). Sesi ini akan berisi ${cocok.length} soal.`, "info");
+                }
+
+                activeQuestions = cocok.slice(0, TOTAL_QUESTIONS_PER_SESSION);
             }
+
+            // Urutkan dari termudah -> tersulit agar peserta "pemanasan" dulu,
+            // namun tetap acak di dalam masing-masing tingkat agar tidak monoton.
+            activeQuestions = urutkanBerdasarkanTingkat(activeQuestions);
+
 
             userProfileData.quizAttempts = (userProfileData.quizAttempts || 0) + 1;
             
@@ -966,6 +995,18 @@ Format JSON WAJIB (tanpa teks lain di luar JSON):
             document.getElementById('current-q').innerText = currentIndex + 1;
             document.getElementById('progress-bar').style.width = `${(currentIndex / activeQuestions.length) * 100}%`;
             document.getElementById('question-text').innerText = q.soal;
+
+            const badgeTingkat = document.getElementById('badge-tingkat-quiz');
+            if (q.tingkat) {
+                badgeTingkat.innerText = q.tingkat;
+                const warna = q.tingkat === 'Mudah' ? 'bg-emerald-50 text-emerald-700'
+                    : q.tingkat.startsWith('Sulit') ? 'bg-rose-50 text-rose-700'
+                    : 'bg-amber-50 text-amber-700';
+                badgeTingkat.className = `text-[11px] font-bold uppercase px-2.5 py-1 rounded-lg ${warna}`;
+                badgeTingkat.classList.remove('hidden');
+            } else {
+                badgeTingkat.classList.add('hidden');
+            }
 
             const badgeTopik = document.getElementById('badge-topik-quiz');
             if (q.topik) {
