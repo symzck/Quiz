@@ -49,8 +49,8 @@
                     <i class="fa-solid fa-graduation-cap text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg text-slate-900 tracking-tight leading-none">Kuis <span class="text-indigo-600">TKA</span></h1>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Kurikulum Merdeka</span>
+                    <h1 class="font-extrabold text-lg text-slate-900 tracking-tight leading-none">Simulasi <span class="text-indigo-600">TKA</span></h1>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Standar Kemendikdasmen RI</span>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -119,15 +119,15 @@
         <section id="portal-page" class="hidden glass-card rounded-3xl p-8 sm:p-12 transition-all duration-300 max-w-3xl mx-auto w-full text-center">
             <div class="inline-block bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-6">Portal Akses Terpadu</div>
             <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Selamat Datang, <span id="welcome-name" class="text-indigo-600">Pelajar</span>!</h2>
-            <p class="text-slate-500 text-sm mb-10">Silakan pilih peran Anda untuk masuk ke dalam sistem.</p>
+            <p class="text-slate-500 text-sm mb-10">Silakan pilih peran Anda untuk masuk ke dalam sistem evaluasi akademik.</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div onclick="window.bukaUser()" class="cursor-pointer group bg-white border-2 border-indigo-100 hover:border-indigo-500 rounded-3xl p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                         <i class="fa-solid fa-user-graduate"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-2">Siswa / Peserta</h3>
-                    <p class="text-xs text-slate-500 mb-3">Mengerjakan kuis dan evaluasi kemampuan akademik.</p>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Siswa / Peserta Ujian</h3>
+                    <p class="text-xs text-slate-500 mb-3">Mengerjakan kuis dan simulasi Tes Kemampuan Akademik (TKA / SNBT).</p>
                     <div class="text-[10px] font-bold text-indigo-600 bg-indigo-50 inline-block px-2 py-1 rounded">Limit Harian: <span id="limit-info">Memuat...</span></div>
                 </div>
 
@@ -136,7 +136,7 @@
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
                     <h3 class="text-xl font-bold text-slate-800 mb-2">Guru / Admin</h3>
-                    <p class="text-xs text-slate-500">Dasbor manajemen soal dan laporan nilai siswa.</p>
+                    <p class="text-xs text-slate-500">Dasbor manajemen bank soal dan rekapitulasi nilai siswa.</p>
                 </div>
             </div>
             
@@ -173,23 +173,33 @@
                         <i class="fa-solid fa-cloud-arrow-up text-founder-500"></i> Input Soal ke Firestore
                     </h2>
                     <div class="space-y-3">
+                        <button type="button" onclick="window.generateDraftSoalAI()" id="btn-admin-ai" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2.5 px-3 rounded-xl border border-indigo-200 transition text-xs flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Buat Draf Soal Otomatis (Gemini AI)
+                        </button>
                         <div class="grid grid-cols-2 gap-2">
-                            <select id="f-jenjang" onchange="window.updateMapelOptions('f')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="SD">SD</option><option value="SMP">SMP</option><option value="SMA">SMA</option></select>
-                            <select id="f-tingkat" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit / HOTS">Sulit / HOTS</option></select>
+                            <select id="f-jenjang" onchange="window.updateMapelOptions('f')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                                <option value="SD">SD / MI (Kelas 6)</option>
+                                <option value="SMP">SMP / MTs (Kelas 9)</option>
+                                <option value="SMA" selected>SMA / MA / SMK (Kelas 12/13)</option>
+                            </select>
+                            <select id="f-tingkat" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Mudah">Mudah</option><option value="Sedang">Sedang</option><option value="Sulit / HOTS" selected>Sulit / HOTS</option></select>
                         </div>
-                        <select id="f-jurusan" onchange="window.updateMapelOptions('f')" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-amber-50 outline-none hidden">
-                            <option value="IPA">Jurusan IPA</option>
-                            <option value="IPS">Jurusan IPS</option>
-                            <option value="Bahasa">Jurusan Bahasa</option>
-                        </select>
+                        <div id="f-jurusan-wrap">
+                            <select id="f-jurusan" onchange="window.updateMapelOptions('f')" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-amber-50 outline-none">
+                                <option value="Wajib">Mata Uji Wajib (Kemampuan Dasar)</option>
+                                <option value="Saintek">Mata Uji Pilihan / Peminatan Sains & Teknologi</option>
+                                <option value="Bahasa">Mata Uji Pilihan / Peminatan Bahasa & Budaya</option>
+                            </select>
+                        </div>
                         <select id="f-mapel" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"></select>
-                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan pertanyaan..."></textarea>
+                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan wacana stimulus dan pertanyaan analitis TKA..."></textarea>
                         <input type="text" id="f-pil-A" placeholder="Opsi A" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-B" placeholder="Opsi B" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-C" placeholder="Opsi C" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-D" placeholder="Opsi D" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <input type="text" id="f-pil-E" placeholder="Opsi E (Opsional)" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <div class="grid grid-cols-2 gap-2 items-center">
-                            <select id="f-kunci" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-emerald-50 text-emerald-700 font-bold"><option value="0">Kunci: A</option><option value="1">Kunci: B</option><option value="2">Kunci: C</option><option value="3">Kunci: D</option></select>
+                            <select id="f-kunci" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-emerald-50 text-emerald-700 font-bold"><option value="0">Kunci: A</option><option value="1">Kunci: B</option><option value="2">Kunci: C</option><option value="3">Kunci: D</option><option value="4">Kunci: E</option></select>
                             <button onclick="window.simpanSoalCloud()" class="bg-founder-600 hover:bg-founder-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-sm">Simpan</button>
                         </div>
                     </div>
@@ -222,10 +232,96 @@
         </section>
 
         <!-- 3. DASBOR SISWA (USER HOME) -->
-        <section id="user-home" class="glass-card rounded-3xl p-6 sm:p-10 hidden max-w-3xl mx-auto w-full text-center">
-            <div class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Mode Peserta Ujian</div>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">Pilih Kategori Kuis TKA</h2>
-            <p class="text-slate-500 text-sm mb-6">Sistem akan menyusun 10 soal pilihan ganda secara acak &amp; berbeda setiap sesi (HOTS), mengikuti kisi-kisi Tes Kemampuan Akademik.</p>
+        <section id="user-home" class="glass-card rounded-3xl p-6 sm:p-10 hidden max-w-4xl mx-auto w-full text-center">
+            <div id="u-badge-header" class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Standar Kemendikdasmen RI</div>
+            <h2 id="u-title-header" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Simulasi Tes Kemampuan Akademik (TKA)</h2>
+            <p id="u-desc-header" class="text-slate-500 text-sm max-w-2xl mx-auto mb-4">Penilaian standar nasional untuk pemetaan mutu dan penyetaraan capaian (bersifat opsional/tidak menentukan kelulusan).</p>
+            
+            <!-- Banner Info Standar TKA Kemendikdasmen per Jenjang yang Aktif -->
+            <div id="info-standar-banner" class="bg-slate-50 border border-indigo-100 rounded-2xl p-4 mb-6 text-left text-xs text-slate-700">
+                <div class="flex items-center justify-between gap-2 mb-2 font-bold text-indigo-900 border-b border-indigo-100 pb-2">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-indigo-600"></i> <span id="banner-jenjang-nama">Jenjang SMA / MA / SMK (Kelas 12 & 13 SMK)</span></span>
+                    <span id="banner-durasi-badge" class="bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full text-[11px]">Durasi: 2 Hari</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Skala Penilaian</span>
+                        <strong id="banner-skala-val" class="text-indigo-600 text-sm">200 hingga 800</strong>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Kategori Hasil</span>
+                        <span class="text-slate-800 font-semibold">Kurang, Memadai, Baik</span>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                        <span class="text-slate-400 block text-[10px] uppercase font-bold">Syarat Predikat Istimewa</span>
+                        <strong id="banner-istimewa-val" class="text-amber-600 text-xs">Nilai ≥ 725,00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Komparasi Standar TKA Resmi Kemendikdasmen (Collapsible) -->
+            <details class="mb-6 text-left group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <summary class="cursor-pointer font-bold text-xs p-3.5 text-slate-700 flex items-center justify-between select-none hover:bg-slate-50">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-table-list text-indigo-500"></i> Lihat Tabel Perbandingan Standar TKA (SD, SMP, SMA)</span>
+                    <i class="fa-solid fa-chevron-down text-slate-400 transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-4 border-t border-slate-100 overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-indigo-50/70 text-indigo-950 font-bold border-b border-indigo-100">
+                                <th class="p-2.5">Kriteria</th>
+                                <th class="p-2.5">Jenjang SD / MI</th>
+                                <th class="p-2.5">Jenjang SMP / MTs</th>
+                                <th class="p-2.5">Jenjang SMA / MA / SMK</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-600">
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Sasaran Peserta</td>
+                                <td class="p-2.5">Murid Kelas 6</td>
+                                <td class="p-2.5">Murid Kelas 9</td>
+                                <td class="p-2.5">Murid Kelas 12 (dan Kelas 13 SMK 4 tahun)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Sifat Tes</td>
+                                <td class="p-2.5">Tidak wajib (opsional)</td>
+                                <td class="p-2.5">Tidak wajib (opsional)</td>
+                                <td class="p-2.5">Tidak wajib (opsional)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Durasi Ujian</td>
+                                <td class="p-2.5">1 Hari</td>
+                                <td class="p-2.5">1 Hari</td>
+                                <td class="p-2.5">2 Hari</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Skala Penilaian</td>
+                                <td class="p-2.5 font-semibold text-indigo-600">0 hingga 100</td>
+                                <td class="p-2.5 font-semibold text-indigo-600">0 hingga 100</td>
+                                <td class="p-2.5 font-semibold text-indigo-600">200 hingga 800</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Kategori Hasil</td>
+                                <td class="p-2.5">Kurang, Memadai, Baik</td>
+                                <td class="p-2.5">Kurang, Memadai, Baik</td>
+                                <td class="p-2.5">Kurang, Memadai, Baik</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Syarat Predikat Istimewa</td>
+                                <td class="p-2.5 font-bold text-amber-600">Nilai ≥ 95,00 tiap mata uji</td>
+                                <td class="p-2.5 font-bold text-amber-600">Nilai ≥ 95,00 tiap mata uji</td>
+                                <td class="p-2.5 font-bold text-amber-600">Nilai ≥ 725,00 tiap mata uji</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-slate-800">Mata Pelajaran (Mata Uji)</td>
+                                <td class="p-2.5">Bahasa Indonesia, Matematika</td>
+                                <td class="p-2.5">Bahasa Indonesia, Matematika</td>
+                                <td class="p-2.5">Wajib: Bahasa Indonesia, Matematika, B. Inggris.<br>Pilihan: Mat. Tk. Lanjut, Fisika, Kimia, Biologi, Sastra & B. Indo, B. Inggris Lanjutan</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
             
             <div class="bg-rose-50 text-rose-600 text-xs font-bold px-3 py-2 rounded-xl border border-rose-100 inline-block mb-6">
                 <i class="fa-solid fa-ticket"></i> Sisa Limit Kuis Hari Ini: <span id="sisa-kuota-text" class="text-base mx-1">3</span>
@@ -233,29 +329,46 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 text-left">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Jenjang</label>
-                    <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"><option value="SD">SD / Sederajat</option><option value="SMP">SMP / Sederajat</option><option value="SMA" selected>SMA / Sederajat</option></select>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Jenjang Pendidikan TKA</label>
+                    <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
+                        <option value="SMA" selected>SMA / MA / SMK (Kelas 12/13 · Skala 200–800)</option>
+                        <option value="SMP">SMP / MTs (Kelas 9 · Skala 0–100)</option>
+                        <option value="SD">SD / MI (Kelas 6 · Skala 0–100)</option>
+                    </select>
                 </div>
                 <div id="u-jurusan-wrap">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Jurusan (Peminatan)</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Kelompok Mata Uji SMA</label>
                     <select id="u-jurusan" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
-                        <option value="IPA">IPA (Sains)</option>
-                        <option value="IPS">IPS (Sosial)</option>
-                        <option value="Bahasa">Bahasa & Budaya</option>
+                        <option value="Wajib" selected>Mata Uji Wajib (Kemampuan Dasar)</option>
+                        <option value="Saintek">Mata Uji Pilihan (Sains & Teknologi)</option>
+                        <option value="Bahasa">Mata Uji Pilihan (Bahasa & Budaya)</option>
                     </select>
                 </div>
             </div>
-            <div class="text-left mb-6">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran (sesuai kisi-kisi TKA)</label>
-                <select id="u-mapel" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"></select>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-left">
+                <div>
+                    <label id="u-mapel-label" class="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran (Mata Uji)</label>
+                    <select id="u-mapel" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Butir Soal</label>
+                    <select id="u-jumlah-soal" class="w-full p-3 bg-slate-50 border border-indigo-200 rounded-xl text-sm font-bold text-indigo-700 outline-none">
+                        <option value="5">5 Butir Soal (Latihan Cepat ⚡)</option>
+                        <option value="10" selected>10 Butir Soal (Standar Simulasi TKA 📝)</option>
+                        <option value="15">15 Butir Soal (Simulasi Menengah 🎯)</option>
+                        <option value="20">20 Butir Soal (Tryout TKA Penuh 🏆)</option>
+                        <option value="25">25 Butir Soal (Simulasi Marathon 🔥)</option>
+                    </select>
+                </div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 justify-center">
                 <button onclick="window.mulaiKuis(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Buat via AI (Gemini)
+                    <i class="fa-brands fa-google text-amber-300"></i> Buat via AI + Riset Google Search
                 </button>
                 <button onclick="window.mulaiKuis(false)" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-xl transition text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-database text-indigo-400"></i> Ambil dari Bank Soal
+                    <i class="fa-solid fa-database text-indigo-400"></i> Ambil dari Bank Soal TKA
                 </button>
             </div>
         </section>
@@ -263,231 +376,233 @@
         <!-- Loading State Kuis -->
         <section id="loading-section" class="glass-card rounded-3xl p-12 text-center hidden max-w-lg mx-auto w-full">
             <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full spinner mx-auto mb-4"></div>
-            <h3 class="font-bold text-slate-900">Menyiapkan Soal Ujian...</h3>
-            <p class="text-xs text-slate-400 mt-2">Menyusun soal baru & unik agar tidak monoton...</p>
+            <h3 class="font-bold text-slate-900 text-lg">Menyusun Soal Standar TKA...</h3>
+            <p class="text-xs text-slate-500 mt-2 flex items-center justify-center gap-1.5">
+                <i class="fa-brands fa-google text-indigo-500"></i> Melakukan riset studi kasus wacana dan penalaran analitis via Google Search Grounding...
+            </p>
         </section>
 
         <!-- 4. HALAMAN KUIS AKTIF -->
         <section id="quiz-page" class="glass-card rounded-3xl p-6 sm:p-8 hidden max-w-3xl mx-auto w-full">
             <div class="flex flex-wrap justify-between items-center gap-y-2 mb-5 pb-4 border-b border-slate-100">
-                <div class="flex flex-wrap gap-2">
-                    <span id="badge-jenjang" class="text-[11px] font-bold uppercase bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">SD</span>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <span id="badge-subtes" class="text-[11px] font-bold uppercase bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">TKA</span>
+                    <span id="badge-jenjang" class="text-[11px] font-bold uppercase bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg">SMA</span>
                     <span id="badge-mapel-quiz" class="text-[11px] font-bold uppercase bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg">Mapel</span>
-                    <span id="badge-tingkat-quiz" class="text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg hidden">Tingkat</span>
-                    <span id="badge-topik-quiz" class="text-[11px] font-bold uppercase bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg hidden">Topik</span>
+                    <span id="badge-tingkat-quiz" class="text-[11px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg">HOTS</span>
                 </div>
-                <div class="text-sm font-bold text-slate-500 shrink-0">Soal <span id="current-q" class="text-indigo-600">1</span> / <span id="total-q">10</span></div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <div id="timer-box" class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-amber-200">
+                        <i class="fa-regular fa-clock"></i> <span id="timer-display">01:30</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-500">Soal <span id="current-q" class="text-indigo-600">1</span> / <span id="total-q">10</span></div>
+                </div>
             </div>
 
             <div class="w-full bg-slate-100 rounded-full h-2 mb-6 overflow-hidden">
                 <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
             </div>
 
-            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 mb-6">
-                <h3 id="question-text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed"></h3>
+            <!-- Box Stimulus Wacana TKA -->
+            <div id="stimulus-container" class="bg-slate-100/90 border border-slate-300/80 rounded-2xl p-5 mb-5 hidden">
+                <div class="flex items-center gap-2 text-xs font-bold text-indigo-700 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Wacana / Stimulus Kasus TKA</span>
+                </div>
+                <p id="stimulus-text" class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line"></p>
+            </div>
+
+            <!-- Box Pertanyaan -->
+            <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 mb-6">
+                <h3 id="question-text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed whitespace-pre-line"></h3>
             </div>
 
             <div id="options-container" class="space-y-3 mb-6"></div>
 
-            <div id="explanation-box" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 hidden mb-6">
-                <h4 class="font-bold text-emerald-900 text-xs mb-1"><i class="fa-solid fa-lightbulb text-emerald-600 mr-1"></i> Pembahasan:</h4>
-                <p id="explanation-text" class="text-xs sm:text-sm text-emerald-950"></p>
+            <div id="explanation-box" class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 hidden mb-6">
+                <h4 class="font-bold text-emerald-900 text-xs mb-1.5 flex items-center gap-1.5">
+                    <i class="fa-solid fa-lightbulb text-emerald-600"></i> Pembahasan Tuntas & Logika Solusi TKA:
+                </h4>
+                <p id="explanation-text" class="text-xs sm:text-sm text-emerald-950 leading-relaxed whitespace-pre-line"></p>
             </div>
 
             <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                <button onclick="window.bukaUser()" class="text-slate-400 hover:text-slate-600 font-semibold text-sm"><i class="fa-solid fa-arrow-left"></i> Batal</button>
+                <button onclick="window.bukaUser()" class="text-slate-400 hover:text-slate-600 font-semibold text-sm flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Batal</button>
                 <div class="flex items-center gap-3">
-                    <span id="feedback-msg" class="text-sm font-semibold"></span>
-                    <button id="btn-next" onclick="window.lanjutSoal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-xl transition text-sm hidden">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
+                    <span id="feedback-msg" class="text-sm font-bold"></span>
+                    <button id="btn-next" onclick="window.lanjutSoal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl transition text-sm hidden flex items-center gap-2">Lanjut Soal <i class="fa-solid fa-arrow-right"></i></button>
                 </div>
             </div>
         </section>
 
         <!-- 5. HALAMAN HASIL -->
         <section id="result-page" class="glass-card rounded-3xl p-8 text-center hidden max-w-lg mx-auto w-full">
-            <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-4 bg-emerald-500 text-white shadow-md">
+            <div id="result-icon-badge" class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl mb-4 bg-emerald-500 text-white shadow-md">
                 <i class="fa-solid fa-award"></i>
             </div>
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Ujian Selesai!</h2>
-            <p class="text-slate-500 text-sm mb-6">Hasil nilai Anda telah dicatat ke dalam database Cloud.</p>
-            <div class="bg-slate-50 p-5 rounded-2xl max-w-xs mx-auto mb-6 border border-slate-200">
-                <span class="text-xs text-slate-500 font-bold uppercase block mb-1">Skor Akhir</span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-1">Evaluasi TKA Selesai!</h2>
+            <p class="text-slate-500 text-xs mb-6">Hasil simulasi dan capaian kompetensi akademik Anda telah dicatat ke sistem.</p>
+            
+            <div class="bg-slate-50 p-5 rounded-2xl max-w-xs mx-auto mb-4 border border-slate-200 shadow-sm">
+                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Skor Perolehan TKA</span>
                 <span id="final-score" class="text-4xl font-black text-indigo-600">0</span>
+                <span id="score-scale-info" class="text-xs text-slate-400 font-medium block mt-1">Skala Penilaian: 200 hingga 800</span>
+                <div id="score-detail-info" class="text-xs text-slate-600 font-bold mt-2 pt-2 border-t border-slate-200">
+                    Benar: 0 / 0 Soal
+                </div>
             </div>
-            <button onclick="window.bukaUser()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition text-sm shadow-md">Kembali ke Menu</button>
+
+            <div id="predikat-box" class="text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto">
+                <div id="predikat-title" class="font-extrabold text-sm mb-1">Kategori: Memadai</div>
+                <div id="predikat-desc" class="text-[11px] font-normal leading-relaxed text-slate-600">Memenuhi capaian standar pemetaan kompetensi akademik.</div>
+            </div>
+
+            <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3.5 mb-6 text-left text-[11px] text-amber-900 max-w-sm mx-auto">
+                <i class="fa-solid fa-circle-info text-amber-600 mr-1"></i>
+                <strong>Standar Kemendikdasmen:</strong> TKA digunakan untuk pemetaan mutu, penyetaraan capaian, dan pertimbangan seleksi (SNBP/Mandiri PTN), serta tidak menentukan kelulusan siswa.
+            </div>
+
+            <div class="flex gap-2 justify-center">
+                <button onclick="window.bukaUser()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl transition text-sm shadow-md">
+                    Latihan Lagi
+                </button>
+                <button onclick="window.kembaliKePortal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-6 rounded-xl transition text-sm">
+                    Ke Portal
+                </button>
+            </div>
         </section>
     </main>
 
+    <!-- Script Logika Aplikasi & Firebase -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-        import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js';
+        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';
 
-        // Konfigurasi Firebase Anda
-        const firebaseConfig = {
-            apiKey: "AIzaSyAOHslpDrbf7dubS6MiX4Qcj2Nbr4W3CkY",
-            authDomain: "quiz-tka.firebaseapp.com",
-            projectId: "quiz-tka",
-            storageBucket: "quiz-tka.firebasestorage.app",
-            messagingSenderId: "1032541943520",
-            appId: "1:1032541943520:web:1c85ca43ba7171636bc285",
-            measurementId: "G-QFB5TDMBFC"
-        };
+        let firebaseConfig = {};
+        let appId = 'quiz_tka_default';
+        try {
+            const rawConfig = '___FIREBASE_CONFIG___';
+            firebaseConfig = JSON.parse(rawConfig);
+            appId = '___APP_ID___' || 'quiz_tka_default';
+        } catch (e) {
+            firebaseConfig = { apiKey: "dummy", authDomain: "dummy.firebaseapp.com", projectId: "dummy" };
+        }
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
-        setPersistence(auth, browserLocalPersistence);
 
-        const appId = "quiz-tka-prod";
-        
-        // KUNCI API GEMINI BARU ANDA (100% Valid & Bekerja)
-        const GEMINI_API_KEY = "AIzaSyCIbudv5OyvUZdH02Be9F5w0D7jZj3PMqg";
-        
         const ADMIN_PIN = "1234";
-        const MAX_LIMIT_PER_DAY = 3;
-        const TOTAL_QUESTIONS_PER_SESSION = 10;
-        const RIWAYAT_MAX_PER_MAPEL = 60;
+        const MAX_LIMIT_PER_DAY = 5;
+        const RIWAYAT_MAX_PER_MAPEL = 30;
 
         let currentUser = null;
         let userProfileData = null;
         let bankSoalCloud = [];
         let activeQuestions = [];
         let currentIndex = 0;
-        let score = 0;
+        let correctCount = 0;
         let userSelectedAnswer = null;
         let isGuestMode = false;
+        let timerInterval = null;
+        let timeRemaining = 90;
 
+        // Standar Resmi Mata Uji TKA Kemendikdasmen per Jenjang
         const TKA_MAPEL = {
-            SD: ["Bahasa Indonesia", "Matematika", "IPAS (IPA & IPS)", "Pendidikan Pancasila"],
-            SMP: ["Bahasa Indonesia", "Matematika", "Bahasa Inggris", "IPA", "IPS"],
+            SD: [
+                "Bahasa Indonesia",
+                "Matematika"
+            ],
+            SMP: [
+                "Bahasa Indonesia",
+                "Matematika"
+            ],
             SMA: {
-                wajib: ["Bahasa Indonesia", "Matematika", "Bahasa Inggris"],
-                IPA: ["Fisika", "Kimia", "Biologi"],
-                IPS: ["Ekonomi", "Geografi", "Sejarah", "Sosiologi"],
-                Bahasa: ["Sastra Indonesia", "Antropologi", "Bahasa Inggris Lanjutan"]
+                Wajib: [
+                    "Bahasa Indonesia",
+                    "Matematika",
+                    "Bahasa Inggris"
+                ],
+                Saintek: [
+                    "Matematika Tingkat Lanjut",
+                    "Fisika",
+                    "Kimia",
+                    "Biologi"
+                ],
+                Bahasa: [
+                    "Sastra & Bahasa Indonesia",
+                    "Bahasa Inggris Lanjutan"
+                ]
             }
         };
 
         const TOPIK_MATERI = {
-            "Bahasa Indonesia": ["teks eksposisi", "teks narasi", "teks argumentasi", "kalimat efektif", "makna kata & konteks", "menyimpulkan isi bacaan", "unsur intrinsik cerita", "penalaran teks nonfiksi"],
-            "Matematika": ["aljabar", "aritmetika sosial", "geometri & pengukuran", "statistika & peluang", "fungsi & persamaan", "barisan & deret", "trigonometri dasar", "logika matematika"],
-            "IPAS (IPA & IPS)": ["ekosistem", "siklus air", "gaya & energi", "kenampakan alam Indonesia", "kegiatan ekonomi masyarakat", "sistem tata surya", "perubahan wujud benda"],
-            "Pendidikan Pancasila": ["nilai-nilai Pancasila", "norma & aturan", "hak dan kewajiban warga", "keberagaman budaya Indonesia"],
-            "Bahasa Inggris": ["reading comprehension", "grammar in context", "vocabulary in use", "descriptive text", "narrative text", "procedure text", "expressing opinion"],
-            "Bahasa Inggris Lanjutan": ["analytical exposition", "report text", "hortatory exposition", "conditional sentences", "reported speech"],
-            "IPA": ["klasifikasi makhluk hidup", "zat dan perubahannya", "energi dan perubahannya", "sistem organ tubuh", "pemanasan global", "listrik dan magnet"],
-            "IPS": ["interaksi sosial", "kondisi geografis Indonesia", "sejarah pergerakan nasional", "kegiatan ekonomi & pasar", "globalisasi"],
-            "Fisika": ["kinematika gerak", "hukum Newton", "usaha dan energi", "gelombang & optik", "listrik dinamis", "termodinamika"],
-            "Kimia": ["struktur atom", "ikatan kimia", "stoikiometri", "larutan asam basa", "laju reaksi", "termokimia"],
-            "Biologi": ["sel dan jaringan", "genetika & pewarisan sifat", "ekosistem & lingkungan", "sistem pencernaan", "bioteknologi", "evolusi"],
-            "Ekonomi": ["permintaan & penawaran", "pasar & harga keseimbangan", "kebijakan moneter & fiskal", "pendapatan nasional", "koperasi & badan usaha"],
-            "Geografi": ["fenomena atmosfer", "dinamika kependudukan", "mitigasi bencana", "peta & penginderaan jauh", "interaksi desa-kota"],
-            "Sejarah": ["masa praaksara Indonesia", "kolonialisme & imperialisme", "pergerakan nasional", "kemerdekaan & revolusi", "orde lama & orde baru"],
-            "Sosiologi": ["interaksi sosial", "struktur & stratifikasi sosial", "perubahan sosial", "konflik & integrasi sosial", "lembaga sosial"],
-            "Sastra Indonesia": ["puisi & majas", "unsur intrinsik novel", "drama & naskah", "kritik sastra"],
-            "Antropologi": ["kebudayaan & tradisi lokal", "keragaman etnis Indonesia", "perubahan kebudayaan", "bahasa & masyarakat"]
+            "Bahasa Indonesia": ["analisis wacana & ide pokok", "inferensi tersirat wacana", "makna kata kontekstual & kalimat efektif", "evaluasi teks opini, eksposisi & laporan"],
+            "Matematika": ["aritmatika & pemodelan linier", "aljabar & persamaan fungsi", "geometri ruang & pengukuran terapan", "statistika deskriptif & peluang kontekstual"],
+            "Bahasa Inggris": ["reading comprehension & main idea", "contextual vocabulary & inference", "author tone & purpose", "complex text synthesis"],
+            "Matematika Tingkat Lanjut": ["trigonometri analitik", "vektor & matriks transformasi", "kalkulus diferensial & integral", "polinomial & suku banyak"],
+            "Fisika": ["kinematika & dinamika gerak Newton", "usaha, daya & kekekalan energi", "fluida statis & dinamis", "listrik, magnet & termodinamika"],
+            "Kimia": ["stoikiometri & konsep mol", "struktur atom & ikatan kimia", "larutan asam-basa, buffer & hidrolisis", "termokimia & laju reaksi"],
+            "Biologi": ["biologi seluler & metabolisme", "genetika & pewarisan sifat Mendel", "ekosistem & dinamika populasi", "sistem fisiologi & regulasi organ tubuh"],
+            "Sastra & Bahasa Indonesia": ["stilistika puisi & telaah estetika", "analisis struktur prosa & novel", "kritik sastra kontekstual", "kajian linguistik & sintaksis"],
+            "Bahasa Inggris Lanjutan": ["analytical exposition analysis", "hortatory & argumentative synthesis", "advanced grammar in context", "cross-textual critical evaluation"]
         };
 
-        // ==========================================
-        // SEMUA BANK SOAL LENGKAP DIMASUKKAN KE SINI
-        // ==========================================
         const DEFAULT_QUESTIONS = [
-            // --- JENJANG SD ---
-            { id: "sd_bindo_1", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Mudah", topik: "menyimpulkan isi bacaan", soal: "Rani rajin menabung setiap hari agar bisa membeli sepeda impiannya. Ia menyisihkan uang jajan setiap hari. Simpulan yang tepat dari bacaan tersebut adalah...", pilihan: ["Rani gemar bersepeda", "Rani rajin menabung untuk mencapai tujuannya", "Rani tidak suka jajan", "Rani memiliki sepeda baru"], jawaban: 1, pembahasan: "Bacaan menekankan kebiasaan menabung Rani untuk mencapai tujuan (membeli sepeda)." },
-            { id: "sd_bindo_2", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Sedang", topik: "kalimat efektif", soal: "Kalimat berikut yang termasuk kalimat efektif adalah...", pilihan: ["Ibu pergi ke ke pasar membeli sayur.", "Ibu pergi ke pasar untuk membeli sayur.", "Ibu pergi pasar membeli-beli sayur.", "Ibu ke pasar pergi membeli sayur."], jawaban: 1, pembahasan: "Kalimat efektif harus jelas, tidak boros kata, dan strukturnya baku." },
-            { id: "sd_bindo_3", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "teks narasi", soal: "Meski kakinya terluka, Dito tetap membantu adiknya menyeberang sungai kecil itu dengan hati-hati. Sifat Dito dalam cerita tersebut adalah...", pilihan: ["Pemarah", "Penakut", "Penyayang dan berani", "Malas"], jawaban: 2, pembahasan: "Tindakan Dito menolong adiknya meski terluka menunjukkan sifat penyayang dan berani." },
-            { id: "sd_indo_h1", jenjang: "SD", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "menyimpulkan isi bacaan", soal: "Di desa Makmur, lahan pertanian makin sempit karena banyak dibangun pabrik. Akibatnya, warga desa yang dulunya bertani kini harus mencari pekerjaan lain ke kota. Kesimpulan yang paling logis adalah...", pilihan: ["Pembangunan pabrik selalu merugikan masyarakat.", "Peralihan fungsi lahan mengubah mata pencaharian warga desa.", "Warga desa lebih suka bekerja di kota daripada bertani.", "Pabrik memberikan pekerjaan yang lebih baik."], jawaban: 1, pembahasan: "Teks menjelaskan sebab (lahan sempit karena pabrik) dan akibat (warga beralih profesi), sehingga kesimpulannya tepat." },
-            { id: "sd_mtk_1", jenjang: "SD", mapel: "Matematika", tingkat: "Mudah", topik: "operasi hitung campuran", soal: "Hasil dari 45 + 28 - 15 adalah...", pilihan: ["48", "58", "68", "78"], jawaban: 1, pembahasan: "45 + 28 = 73, lalu 73 - 15 = 58." },
-            { id: "sd_mtk_2", jenjang: "SD", mapel: "Matematika", tingkat: "Sedang", topik: "pecahan", soal: "Ibu memiliki 3/4 kg gula, lalu digunakan 1/4 kg untuk membuat kue. Sisa gula ibu adalah...", pilihan: ["1/4 kg", "1/2 kg", "2/4 kg", "3/4 kg"], jawaban: 1, pembahasan: "3/4 - 1/4 = 2/4 = 1/2 kg." },
-            { id: "sd_mtk_3", jenjang: "SD", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "bangun datar", soal: "Sebuah taman berbentuk persegi panjang berukuran 12 m x 8 m akan dipasangi pagar keliling. Panjang pagar yang dibutuhkan adalah...", pilihan: ["20 m", "40 m", "48 m", "96 m"], jawaban: 1, pembahasan: "Keliling = 2 x (p + l) = 2 x (12+8) = 40 m." },
-            { id: "sd_mtk_h1", jenjang: "SD", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "operasi hitung campuran", soal: "Sandi memiliki 3 keranjang mangga, tiap keranjang berisi 25 buah. Sandi memberi 15 buah mangga kepada tetangganya. Sisa mangga dimasukkan ke 4 kantong plastik sama banyak. Isi tiap kantong adalah...", pilihan: ["10 buah", "12 buah", "15 buah", "20 buah"], jawaban: 2, pembahasan: "Total mangga = 3x25=75. Sisa mangga = 75-15=60. Tiap kantong = 60/4 = 15 buah." },
-            { id: "sd_ipas_1", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Mudah", topik: "siklus air", soal: "Proses berubahnya uap air menjadi titik-titik air di awan disebut...", pilihan: ["Evaporasi", "Kondensasi", "Presipitasi", "Infiltrasi"], jawaban: 1, pembahasan: "Kondensasi adalah proses perubahan uap air menjadi butiran air di awan." },
-            { id: "sd_ipas_2", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Sedang", topik: "kegiatan ekonomi masyarakat", soal: "Nelayan yang mencari ikan di laut merupakan kegiatan ekonomi pada bidang...", pilihan: ["Pertanian", "Perikanan", "Perkebunan", "Perindustrian"], jawaban: 1, pembahasan: "Kegiatan menangkap ikan termasuk dalam bidang perikanan." },
-            { id: "sd_ipas_3", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Sulit / HOTS", topik: "ekosistem", soal: "Jika populasi ulat di suatu sawah berkurang drastis karena pestisida, dampak yang paling mungkin terjadi pada burung pemakan ulat adalah...", pilihan: ["Populasi burung meningkat pesat", "Populasi burung menurun karena kekurangan makanan", "Tidak ada pengaruh sama sekali", "Burung berubah menjadi herbivora"], jawaban: 1, pembahasan: "Berkurangnya ulat sebagai sumber makanan akan menurunkan populasi burung pemakan ulat (rantai makanan)." },
-            { id: "sd_ipas_h1", jenjang: "SD", mapel: "IPAS (IPA & IPS)", tingkat: "Sulit / HOTS", topik: "ekosistem", soal: "Di sawah terdapat padi, belalang, katak, ular. Jika petani menyemprotkan pestisida sehingga belalang habis, kemungkinan terbesar yang terjadi adalah...", pilihan: ["Panen padi menurun.", "Populasi katak meningkat tajam.", "Populasi ular menurun karena kurang mangsa.", "Katak berubah memakan padi."], jawaban: 2, pembahasan: "Jika belalang habis, katak (pemangsa belalang) akan mati, berujung pada menurunnya populasi ular (pemangsa katak)." },
-            { id: "sd_pkn_1", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Mudah", topik: "nilai-nilai Pancasila", soal: "Sikap gotong royong membersihkan lingkungan mencerminkan pengamalan sila Pancasila yang ke-...", pilihan: ["Kesatu", "Kedua", "Ketiga", "Keempat"], jawaban: 2, pembahasan: "Gotong royong mencerminkan sila ke-3, Persatuan Indonesia." },
-            { id: "sd_pkn_2", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Sedang", topik: "hak dan kewajiban warga", soal: "Berikut yang merupakan kewajiban siswa di sekolah adalah...", pilihan: ["Mendapatkan nilai bagus tanpa belajar", "Menaati tata tertib sekolah", "Bebas memilih pelajaran", "Meminta fasilitas mewah"], jawaban: 1, pembahasan: "Menaati tata tertib sekolah adalah kewajiban setiap siswa." },
-            { id: "sd_pkn_3", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Sulit / HOTS", topik: "keberagaman budaya Indonesia", soal: "Meskipun berbeda suku dan agama, teman-teman di kelas tetap bermain bersama dengan rukun. Sikap ini menunjukkan penerapan nilai...", pilihan: ["Individualisme", "Toleransi dalam keberagaman", "Fanatisme kelompok", "Persaingan sehat"], jawaban: 1, pembahasan: "Sikap rukun di tengah perbedaan mencerminkan toleransi terhadap keberagaman." },
-            { id: "sd_pancasila_1", jenjang: "SD", mapel: "Pendidikan Pancasila", tingkat: "Sedang", topik: "nilai-nilai Pancasila", soal: "Saat jam istirahat, Doni membagi bekal makanannya dengan temannya yang lupa membawa bekal. Tindakan Doni mencerminkan pengamalan sila ke...", pilihan: ["Satu", "Dua", "Tiga", "Lima"], jawaban: 1, pembahasan: "Berbagi dan peduli sesama manusia mencerminkan Sila Kemanusiaan yang Adil dan Beradab (ke-2)." },
-
-            // --- JENJANG SMP ---
-            { id: "smp_bindo_1", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Mudah", topik: "makna kata & konteks", soal: "Kata 'menyita' pada kalimat 'Pekerjaan itu menyita banyak waktu' bermakna...", pilihan: ["Merampas", "Menghabiskan", "Menyimpan", "Menunda"], jawaban: 1, pembahasan: "Dalam konteks tersebut, 'menyita' berarti menghabiskan (waktu)." },
-            { id: "smp_bindo_2", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Sedang", topik: "teks eksposisi", soal: "Ide pokok sebuah paragraf biasanya terletak pada...", pilihan: ["Selalu di akhir paragraf", "Kalimat utama, bisa di awal, akhir, atau keduanya", "Selalu di tengah paragraf", "Judul teks"], jawaban: 1, pembahasan: "Ide pokok terdapat pada kalimat utama yang letaknya bisa bervariasi." },
-            { id: "smp_bindo_3", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "penalaran teks nonfiksi", soal: "Sebuah artikel menyatakan data penjualan naik 20% namun tidak mencantumkan sumber data. Sikap kritis yang tepat terhadap teks tersebut adalah...", pilihan: ["Langsung mempercayai karena angkanya spesifik", "Mempertanyakan validitas data karena sumber tidak jelas", "Mengabaikan seluruh isi artikel", "Menyebarkan informasi tersebut tanpa verifikasi"], jawaban: 1, pembahasan: "Pembaca kritis perlu mempertanyakan keabsahan data yang tidak memiliki sumber jelas." },
-            { id: "smp_indo_h1", jenjang: "SMP", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "penalaran teks nonfiksi", soal: "Survei menunjukkan 70% remaja menghabiskan >5 jam sehari di media sosial, dan 60% darinya sulit tidur. Argumen yang paling valid berdasarkan data adalah...", pilihan: ["Semua remaja yang main media sosial pasti insomnia.", "Media sosial adalah satu-satunya penyebab gangguan tidur.", "Terdapat korelasi antara durasi penggunaan medsos dengan kualitas tidur remaja.", "Pemerintah harus memblokir media sosial."], jawaban: 2, pembahasan: "Data menunjukkan korelasi, bukan sebab-akibat mutlak atau keharusan blokir." },
-            { id: "smp_mtk_1", jenjang: "SMP", mapel: "Matematika", tingkat: "Mudah", topik: "aritmetika sosial", soal: "Seorang pedagang membeli barang seharga Rp50.000 dan menjualnya seharga Rp65.000. Persentase keuntungannya adalah...", pilihan: ["15%", "20%", "30%", "35%"], jawaban: 2, pembahasan: "Untung = 15.000. Persentase = 15.000/50.000 x 100% = 30%." },
-            { id: "smp_mtk_2", jenjang: "SMP", mapel: "Matematika", tingkat: "Sedang", topik: "aljabar", soal: "Jika 3x - 5 = 16, maka nilai x adalah...", pilihan: ["5", "6", "7", "8"], jawaban: 2, pembahasan: "3x = 21, sehingga x = 7." },
-            { id: "smp_mtk_3", jenjang: "SMP", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "statistika", soal: "Nilai ulangan 5 siswa adalah 70, 80, 90, 60, dan 100. Jika ditambahkan satu siswa lagi dengan nilai 50, bagaimana pengaruhnya terhadap rata-rata?", pilihan: ["Rata-rata naik", "Rata-rata tetap", "Rata-rata turun", "Tidak bisa ditentukan"], jawaban: 2, pembahasan: "Rata-rata awal 80, setelah tambah nilai 50 rata-rata menjadi 75, sehingga turun." },
-            { id: "smp_mtk_h1", jenjang: "SMP", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "aritmetika sosial", soal: "Toko A memberi diskon 50%+20% untuk sepatu Rp500.000. Toko B memberi diskon 60% untuk sepatu yang sama. Selisih harga keduanya adalah...", pilihan: ["Rp 0 (Harga sama)", "Rp 20.000", "Rp 50.000", "Rp 100.000"], jawaban: 0, pembahasan: "Toko A: 500k-50%=250k, 250k-20%=200k. Toko B: 500k-60%=200k. Selisih = 0." },
-            { id: "smp_eng_1", jenjang: "SMP", mapel: "Bahasa Inggris", tingkat: "Mudah", topik: "vocabulary in use", soal: "My sister is very ____; she always helps others without being asked.", pilihan: ["lazy", "kind", "angry", "shy"], jawaban: 1, pembahasan: "'Kind' fits the context of someone who helps others willingly." },
-            { id: "smp_eng_2", jenjang: "SMP", mapel: "Bahasa Inggris", tingkat: "Sedang", topik: "descriptive text", soal: "Which sentence best describes a physical appearance in a descriptive text?", pilihan: ["She goes to school every day.", "She has long black hair and bright eyes.", "She will visit her aunt tomorrow.", "She likes reading novels."], jawaban: 1, pembahasan: "Descriptive text focuses on physical traits, like hair and eyes." },
-            { id: "smp_eng_3", jenjang: "SMP", mapel: "Bahasa Inggris", tingkat: "Sulit / HOTS", topik: "reading comprehension", soal: "In the sentence 'Although it was raining heavily, the match continued,' what can be inferred about the players?", pilihan: ["They stopped playing immediately", "They were determined to keep playing despite the weather", "The match was cancelled", "They were unaware it was raining"], jawaban: 1, pembahasan: "'Although...continued' implies the players kept playing despite the rain." },
-            { id: "smp_ipa_1", jenjang: "SMP", mapel: "IPA", tingkat: "Mudah", topik: "klasifikasi makhluk hidup", soal: "Hewan yang berkembang biak dengan bertelur dan melahirkan disebut...", pilihan: ["Ovipar", "Vivipar", "Ovovivipar", "Fragmentasi"], jawaban: 2, pembahasan: "Ovovivipar adalah cara berkembang biak dengan bertelur di dalam tubuh induk lalu melahirkan." },
-            { id: "smp_ipa_2", jenjang: "SMP", mapel: "IPA", tingkat: "Sedang", topik: "zat dan perubahannya", soal: "Peristiwa berikut yang termasuk perubahan kimia adalah...", pilihan: ["Es mencair", "Kertas dibakar menjadi abu", "Air menguap", "Lilin meleleh"], jawaban: 1, pembahasan: "Pembakaran kertas menghasilkan zat baru (abu, gas), sehingga termasuk perubahan kimia." },
-            { id: "smp_ipa_3", jenjang: "SMP", mapel: "IPA", tingkat: "Sulit / HOTS", topik: "sistem organ tubuh", soal: "Seseorang yang jarang mengonsumsi serat berisiko mengalami gangguan pencernaan karena...", pilihan: ["Serat mempercepat gerak peristaltik usus sehingga sisa makanan mudah dikeluarkan", "Serat menghambat penyerapan air di usus besar", "Serat meningkatkan produksi enzim pencernaan", "Serat merusak dinding lambung"], jawaban: 0, pembahasan: "Serat membantu gerak peristaltik usus sehingga mencegah sembelit." },
-            { id: "smp_ipa_h1", jenjang: "SMP", mapel: "IPA", tingkat: "Sulit / HOTS", topik: "energi dan perubahannya", soal: "Lampu LED 10W menyala lebih terang dari lampu pijar 10W. Alasan ilmiahnya adalah...", pilihan: ["LED menggunakan lebih banyak listrik.", "Lampu pijar membuang banyak energi listrik menjadi energi panas.", "LED tidak memiliki hambatan listrik.", "Bahan lampu pijar menyerap cahaya sendiri."], jawaban: 1, pembahasan: "Efisiensi pijar rendah karena listrik banyak berubah jadi panas, LED sangat efisien." },
-            { id: "smp_ips_1", jenjang: "SMP", mapel: "IPS", tingkat: "Mudah", topik: "kondisi geografis Indonesia", soal: "Indonesia terletak di antara dua benua, yaitu...", pilihan: ["Asia dan Afrika", "Asia dan Australia", "Australia dan Amerika", "Afrika dan Eropa"], jawaban: 1, pembahasan: "Indonesia berada di posisi silang antara Benua Asia dan Australia." },
-            { id: "smp_ips_2", jenjang: "SMP", mapel: "IPS", tingkat: "Sedang", topik: "kegiatan ekonomi & pasar", soal: "Ketika permintaan suatu barang meningkat sementara jumlah barang tetap, maka harga barang cenderung...", pilihan: ["Turun", "Naik", "Tetap", "Tidak menentu"], jawaban: 1, pembahasan: "Sesuai hukum permintaan-penawaran, harga naik jika permintaan naik dan pasokan tetap." },
-            { id: "smp_ips_3", jenjang: "SMP", mapel: "IPS", tingkat: "Sulit / HOTS", topik: "sejarah pergerakan nasional", soal: "Berdirinya Budi Utomo tahun 1908 dianggap sebagai awal kebangkitan nasional karena...", pilihan: ["Merupakan organisasi militer pertama", "Menjadi organisasi modern pertama yang berjuang lewat pendidikan dan kesadaran nasional", "Berhasil mengusir penjajah secara langsung", "Didirikan oleh pemerintah kolonial"], jawaban: 1, pembahasan: "Budi Utomo menandai perjuangan dengan cara terorganisasi modern, bukan lagi kedaerahan." },
-            { id: "smp_ips_h1", jenjang: "SMP", mapel: "IPS", tingkat: "Sulit / HOTS", topik: "interaksi sosial", soal: "Di era e-commerce, pedagang pasar tradisional mengeluh sepi pembeli. Solusi adaptif secara sosio-ekonomi adalah...", pilihan: ["Melarang masyarakat belanja di e-commerce.", "Menutup platform e-commerce.", "Beralih profesi menjadi pegawai pabrik massal.", "Asimilasi teknologi dengan ikut memasarkan produk secara daring."], jawaban: 3, pembahasan: "Adaptasi terbaik adalah integrasi teknologi." },
-
-            // --- JENJANG SMA (MAPEL WAJIB) ---
-            { id: "sma_bindo_1", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Mudah", topik: "kalimat efektif", soal: "Penulisan kalimat yang sesuai kaidah ejaan yang benar adalah...", pilihan: ["Dia tinggal di Jl. Merdeka No. 5, Jakarta.", "dia Tinggal di jl merdeka no 5 jakarta", "Dia tinggal Di Jl Merdeka no. 5 Jakarta", "dia tinggal di Jl.merdeka no.5,jakarta"], jawaban: 0, pembahasan: "Kalimat pertama sudah sesuai kaidah huruf kapital dan tanda baca." },
-            { id: "sma_bindo_2", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Sedang", topik: "teks argumentasi", soal: "Ciri utama teks argumentasi adalah...", pilihan: ["Berisi urutan langkah kerja", "Menyajikan pendapat disertai bukti dan alasan logis", "Menceritakan kejadian secara kronologis", "Menggambarkan suasana secara rinci"], jawaban: 1, pembahasan: "Teks argumentasi bertujuan meyakinkan pembaca dengan pendapat yang didukung bukti." },
-            { id: "sma_bindo_3", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "unsur intrinsik cerita", soal: "Dalam sebuah cerpen, tokoh utama digambarkan melalui dialog dan reaksinya terhadap tokoh lain, bukan melalui narasi langsung. Teknik penokohan ini disebut...", pilihan: ["Teknik analitik", "Teknik dramatik", "Teknik deskriptif", "Teknik ekspositori"], jawaban: 1, pembahasan: "Teknik dramatik menggambarkan watak tokoh lewat dialog, tindakan, atau reaksi, bukan penjelasan langsung." },
-            { id: "sma_indo_w1", jenjang: "SMA", mapel: "Bahasa Indonesia", tingkat: "Sulit / HOTS", topik: "teks argumentasi", soal: "'Kendaraan listrik terbukti menurunkan emisi karbon di kota besar, namun masalah baru muncul terkait limbah baterai.' Pernyataan tersebut berjenis...", pilihan: ["Kalimat deskriptif murni", "Argumen pro dan kontra (kontradiktif)", "Pendapat sepihak", "Fakta empiris yang belum teruji"], jawaban: 1, pembahasan: "Menyajikan sisi positif (turunnya emisi) dan sekaligus mengakui sisi negatif (limbah), mencerminkan pro dan kontra." },
-            { id: "sma_mtk_1", jenjang: "SMA", mapel: "Matematika", tingkat: "Mudah", topik: "fungsi & persamaan", soal: "Jika f(x) = 2x + 3, maka nilai f(4) adalah...", pilihan: ["9", "10", "11", "12"], jawaban: 2, pembahasan: "f(4) = 2(4) + 3 = 11." },
-            { id: "sma_mtk_2", jenjang: "SMA", mapel: "Matematika", tingkat: "Sedang", topik: "barisan & deret", soal: "Suku ke-10 dari barisan aritmetika 3, 7, 11, 15, ... adalah...", pilihan: ["37", "39", "41", "43"], jawaban: 1, pembahasan: "Un = a + (n-1)b = 3 + 9(4) = 39." },
-            { id: "sma_mtk_3", jenjang: "SMA", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "fungsi & limit", soal: "Nilai dari limit x mendekati 2 untuk fungsi (x² - 4) / (x - 2) adalah...", pilihan: ["0", "2", "4", "Tak terhingga"], jawaban: 2, pembahasan: "Difaktorkan menjadi (x-2)(x+2)/(x-2) = x+2. Substitusi x=2 menghasilkan 4." },
-            { id: "sma_mtk_w1", jenjang: "SMA", mapel: "Matematika", tingkat: "Sulit / HOTS", topik: "fungsi & persamaan", soal: "Perusahaan memproduksi x barang dengan biaya C(x) = 2x² - 40x + 500 (ribu rupiah). Jumlah barang agar biaya minimum adalah...", pilihan: ["10 unit", "20 unit", "40 unit", "50 unit"], jawaban: 0, pembahasan: "Biaya minimum pada x = -b / (2a) = -(-40) / (2*2) = 10 unit." },
-            { id: "sma_eng_1", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Mudah", topik: "grammar in context", soal: "She ____ to the library every Monday.", pilihan: ["go", "goes", "going", "gone"], jawaban: 1, pembahasan: "Subjek tunggal (she) menggunakan verb + s dalam simple present: goes." },
-            { id: "sma_eng_2", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Sedang", topik: "narrative text", soal: "The main purpose of a narrative text is to...", pilihan: ["Explain how something works", "Entertain readers with a sequence of events", "Persuade readers to take action", "Describe a place in detail"], jawaban: 1, pembahasan: "Narrative text aims to entertain through a storyline with events and characters." },
-            { id: "sma_eng_3", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Sulit / HOTS", topik: "expressing opinion", soal: "'In my opinion, remote work should remain optional because it improves employee well-being.' The underlined-style sentence is an example of...", pilihan: ["A fact statement", "An opinion supported by reasoning", "A narrative event", "A procedural instruction"], jawaban: 1, pembahasan: "Kalimat tersebut menyatakan pendapat pribadi yang disertai alasan logis." },
-            { id: "sma_eng_w1", jenjang: "SMA", mapel: "Bahasa Inggris", tingkat: "Sulit / HOTS", topik: "reading comprehension", soal: "Passage: 'The CEO stepped down immediately after the audit report was leaked to the press.' What can be inferred?", pilihan: ["The report contained favorable results.", "It praised the CEO's skills.", "It likely contained damaging financial information.", "It was written by the CEO."], jawaban: 2, pembahasan: "The resignation implies the report was damaging." },
-
-            // --- JENJANG SMA (JURUSAN IPA) ---
-            { id: "sma_fis_1", jenjang: "SMA", mapel: "Fisika", tingkat: "Mudah", topik: "kinematika gerak", soal: "Sebuah mobil bergerak dengan kecepatan tetap 20 m/s selama 5 detik. Jarak yang ditempuh adalah...", pilihan: ["50 m", "75 m", "100 m", "125 m"], jawaban: 2, pembahasan: "Jarak = kecepatan x waktu = 20 x 5 = 100 m." },
-            { id: "sma_fis_2", jenjang: "SMA", mapel: "Fisika", tingkat: "Sedang", topik: "hukum Newton", soal: "Sebuah benda bermassa 4 kg diberi gaya 20 N. Percepatan yang dialami benda adalah...", pilihan: ["2 m/s²", "4 m/s²", "5 m/s²", "8 m/s²"], jawaban: 2, pembahasan: "a = F/m = 20/4 = 5 m/s²." },
-            { id: "sma_fis_3", jenjang: "SMA", mapel: "Fisika", tingkat: "Sulit / HOTS", topik: "usaha dan energi", soal: "Dua benda bermassa sama dijatuhkan dari ketinggian berbeda: benda A dari 2 m, benda B dari 4 m. Perbandingan energi kinetik saat menyentuh tanah (EA : EB) adalah...", pilihan: ["1 : 1", "1 : 2", "1 : 4", "2 : 1"], jawaban: 1, pembahasan: "Energi kinetik saat tanah = energi potensial awal = mgh, sehingga EA:EB = hA:hB = 2:4 = 1:2." },
-            { id: "sma_fis_ipa1", jenjang: "SMA", mapel: "Fisika", tingkat: "Sulit / HOTS", topik: "kinematika gerak", soal: "Mobil A (20 m/s) dan B (30 m/s) bergerak saling berhadapan dari jarak 1.000 meter. Mereka berpapasan pada detik ke...", pilihan: ["10 detik", "20 detik", "30 detik", "50 detik"], jawaban: 1, pembahasan: "t = jarak / (Va + Vb) = 1000 / (20 + 30) = 1000/50 = 20 detik." },
-            { id: "sma_kim_1", jenjang: "SMA", mapel: "Kimia", tingkat: "Mudah", topik: "struktur atom", soal: "Jumlah elektron pada atom netral sama dengan jumlah...", pilihan: ["Neutron", "Proton", "Nukleon", "Isotop"], jawaban: 1, pembahasan: "Pada atom netral, jumlah elektron = jumlah proton." },
-            { id: "sma_kim_2", jenjang: "SMA", mapel: "Kimia", tingkat: "Sedang", topik: "stoikiometri", soal: "Pada reaksi 2H2 + O2 → 2H2O, jika terdapat 4 mol H2, mol O2 yang dibutuhkan agar bereaksi sempurna adalah...", pilihan: ["1 mol", "2 mol", "4 mol", "8 mol"], jawaban: 1, pembahasan: "Perbandingan mol H2:O2 = 2:1, sehingga untuk 4 mol H2 dibutuhkan 2 mol O2." },
-            { id: "sma_kim_3", jenjang: "SMA", mapel: "Kimia", tingkat: "Sulit / HOTS", topik: "laju reaksi", soal: "Menaikkan suhu reaksi umumnya mempercepat laju reaksi karena...", pilihan: ["Konsentrasi zat berkurang", "Energi kinetik partikel meningkat sehingga tumbukan efektif lebih sering terjadi", "Volume wadah reaksi mengecil", "Katalis terbentuk secara otomatis"], jawaban: 1, pembahasan: "Suhu tinggi meningkatkan energi kinetik partikel, memperbanyak tumbukan efektif antar partikel." },
-            { id: "sma_kim_ipa1", jenjang: "SMA", mapel: "Kimia", tingkat: "Sulit / HOTS", topik: "laju reaksi", soal: "Fungsi spesifik katalis dalam proses Haber-Bosch adalah...", pilihan: ["Meningkatkan energi aktivasi.", "Menggeser kesetimbangan ke arah produk.", "Menyediakan jalur reaksi alternatif dengan energi aktivasi yang lebih rendah.", "Menurunkan suhu reaksi hingga nol."], jawaban: 2, pembahasan: "Katalis tidak menggeser kesetimbangan, melainkan menurunkan energi aktivasi." },
-            { id: "sma_bio_1", jenjang: "SMA", mapel: "Biologi", tingkat: "Mudah", topik: "sel dan jaringan", soal: "Organel sel yang berfungsi sebagai tempat respirasi seluler untuk menghasilkan energi adalah...", pilihan: ["Ribosom", "Mitokondria", "Lisosom", "Badan Golgi"], jawaban: 1, pembahasan: "Mitokondria adalah tempat berlangsungnya respirasi sel untuk menghasilkan ATP." },
-            { id: "sma_bio_2", jenjang: "SMA", mapel: "Biologi", tingkat: "Sedang", topik: "genetika & pewarisan sifat", soal: "Persilangan tanaman berbunga merah (Mm) dengan sesamanya menghasilkan keturunan dengan rasio genotipe...", pilihan: ["1 MM : 1 mm", "1 MM : 2 Mm : 1 mm", "3 Mm : 1 mm", "Semua Mm"], jawaban: 1, pembahasan: "Persilangan Mm x Mm menghasilkan rasio genotipe 1:2:1 (MM:Mm:mm) sesuai hukum Mendel." },
-            { id: "sma_bio_3", jenjang: "SMA", mapel: "Biologi", tingkat: "Sulit / HOTS", topik: "bioteknologi", soal: "Pemanfaatan bakteri untuk memproduksi insulin manusia merupakan contoh penerapan...", pilihan: ["Bioteknologi konvensional", "Bioteknologi modern melalui rekayasa genetika", "Fermentasi tradisional", "Kultur jaringan"], jawaban: 1, pembahasan: "Penyisipan gen manusia ke bakteri untuk memproduksi insulin adalah rekayasa genetika (bioteknologi modern)." },
-            { id: "sma_bio_ipa1", jenjang: "SMA", mapel: "Biologi", tingkat: "Sulit / HOTS", topik: "genetika & pewarisan sifat", soal: "Pria buta warna menikah dengan wanita normal carrier. Persentase kemungkinan anak laki-laki mereka mengalami buta warna adalah...", pilihan: ["0%", "25%", "50%", "100%"], jawaban: 2, pembahasan: "Ibu (XCXc), Ayah (XcY). Anak laki-laki mengambil Y dari ayah, X dari ibu. Kemungkinan laki-laki: XCY (Normal) atau XcY (Buta warna) = 50%." },
-
-            // --- JENJANG SMA (JURUSAN IPS) ---
-            { id: "sma_eko_1", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Mudah", topik: "permintaan & penawaran", soal: "Jika harga suatu barang naik, sesuai hukum penawaran maka jumlah barang yang ditawarkan produsen akan...", pilihan: ["Menurun", "Meningkat", "Tetap", "Tidak berpengaruh"], jawaban: 1, pembahasan: "Hukum penawaran: semakin tinggi harga, semakin besar jumlah barang yang ditawarkan." },
-            { id: "sma_eko_2", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Sedang", topik: "pasar & harga keseimbangan", soal: "Harga keseimbangan pasar terjadi pada saat...", pilihan: ["Jumlah permintaan lebih besar dari penawaran", "Jumlah penawaran lebih besar dari permintaan", "Jumlah permintaan sama dengan penawaran", "Tidak ada transaksi di pasar"], jawaban: 2, pembahasan: "Harga keseimbangan terbentuk saat kurva permintaan dan penawaran berpotongan (Qd = Qs)." },
-            { id: "sma_eko_3", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Sulit / HOTS", topik: "kebijakan moneter & fiskal", soal: "Ketika inflasi tinggi, kebijakan moneter yang tepat dilakukan bank sentral adalah...", pilihan: ["Menurunkan suku bunga acuan", "Menaikkan suku bunga acuan untuk mengurangi jumlah uang beredar", "Mencetak lebih banyak uang", "Menghapus pajak"], jawaban: 1, pembahasan: "Menaikkan suku bunga acuan membuat masyarakat lebih memilih menabung, mengurangi uang beredar, sehingga menekan inflasi." },
-            { id: "sma_eko_ips1", jenjang: "SMA", mapel: "Ekonomi", tingkat: "Sulit / HOTS", topik: "kebijakan moneter & fiskal", soal: "Pemerintah memotong pajak penghasilan perusahaan saat resesi. Dampak berantai yang diharapkan adalah...", pilihan: ["Penerimaan negara meningkat seketika.", "Perusahaan punya dana ekspansi untuk ciptakan lapangan kerja baru.", "Hiperinflasi instan.", "Suku bunga bank langsung anjlok."], jawaban: 1, pembahasan: "Potong pajak = stimulus fiskal agar perusahaan bisa merekrut pekerja." },
-            { id: "sma_geo_1", jenjang: "SMA", mapel: "Geografi", tingkat: "Mudah", topik: "fenomena atmosfer", soal: "Lapisan atmosfer tempat terjadinya sebagian besar fenomena cuaca adalah...", pilihan: ["Troposfer", "Stratosfer", "Mesosfer", "Termosfer"], jawaban: 0, pembahasan: "Troposfer adalah lapisan atmosfer terendah tempat terjadinya cuaca seperti hujan dan angin." },
-            { id: "sma_geo_2", jenjang: "SMA", mapel: "Geografi", tingkat: "Sedang", topik: "dinamika kependudukan", soal: "Perpindahan penduduk dari desa ke kota untuk mencari pekerjaan disebut...", pilihan: ["Urbanisasi", "Transmigrasi", "Ruralisasi", "Emigrasi"], jawaban: 0, pembahasan: "Urbanisasi adalah perpindahan penduduk dari desa ke kota." },
-            { id: "sma_geo_3", jenjang: "SMA", mapel: "Geografi", tingkat: "Sulit / HOTS", topik: "mitigasi bencana", soal: "Wilayah pesisir yang rawan tsunami sebaiknya menerapkan mitigasi berupa...", pilihan: ["Membangun permukiman padat di garis pantai", "Menanam mangrove dan menyiapkan jalur evakuasi", "Menghilangkan sistem peringatan dini", "Membiarkan kawasan tanpa perencanaan tata ruang"], jawaban: 1, pembahasan: "Mangrove meredam gelombang dan jalur evakuasi mempercepat penyelamatan warga saat tsunami." },
-            { id: "sma_geo_ips1", jenjang: "SMA", mapel: "Geografi", tingkat: "Sulit / HOTS", topik: "interaksi desa-kota", soal: "Pembangunan jalan tol tanpa akses pintu keluar di desa kecil berdampak...", pilihan: ["Harga tanah melonjak drastis.", "Desa jadi pusat perdagangan baru.", "Matinya ekonomi lokal karena transit menghilang.", "Udara desa jauh lebih bersih."], jawaban: 2, pembahasan: "Desa yang dilewati tanpa exit-tol akan kehilangan pelanggan dari kendaraan ekonomi lokal (warung dll)." },
-            { id: "sma_sej_1", jenjang: "SMA", mapel: "Sejarah", tingkat: "Mudah", topik: "masa praaksara Indonesia", soal: "Zaman ketika manusia purba mulai hidup menetap dan bercocok tanam disebut zaman...", pilihan: ["Berburu dan meramu", "Bercocok tanam", "Perundagian", "Logam"], jawaban: 1, pembahasan: "Zaman bercocok tanam ditandai dengan kehidupan menetap dan mulai bertani." },
-            { id: "sma_sej_2", jenjang: "SMA", mapel: "Sejarah", tingkat: "Sedang", topik: "kolonialisme & imperialisme", soal: "Sistem tanam paksa (Cultuurstelsel) yang diterapkan Belanda bertujuan utama untuk...", pilihan: ["Mensejahterakan petani pribumi", "Mengisi kas kerajaan Belanda yang defisit", "Meningkatkan pendidikan rakyat", "Membangun infrastruktur untuk rakyat"], jawaban: 1, pembahasan: "Tanam paksa diterapkan untuk mengisi kas Belanda yang kosong akibat Perang Jawa dan Belgia." },
-            { id: "sma_sej_3", jenjang: "SMA", mapel: "Sejarah", tingkat: "Sulit / HOTS", topik: "pergerakan nasional", soal: "Sumpah Pemuda tahun 1928 dianggap tonggak penting persatuan bangsa karena...", pilihan: ["Menyatukan seluruh kerajaan Nusantara secara politik", "Menegaskan satu tanah air, bangsa, dan bahasa sebagai identitas bersama", "Mengakhiri penjajahan Belanda secara langsung", "Membentuk pemerintahan Republik Indonesia"], jawaban: 1, pembahasan: "Sumpah Pemuda menegaskan identitas bersama (tanah air, bangsa, bahasa) yang mempersatukan pemuda lintas daerah." },
-            { id: "sma_sej_ips1", jenjang: "SMA", mapel: "Sejarah", tingkat: "Sulit / HOTS", topik: "pergerakan nasional", soal: "Mengapa strategi perlawanan bangsa Indonesia pasca 1908 lebih efektif daripada masa sebelumnya?", pilihan: ["Mengandalkan kekuatan senjata mutakhir dari Eropa", "Dipimpin oleh raja dan sultan besar secara fisik", "Perjuangan terorganisasi secara nasional, tidak lagi kedaerahan", "Mendapat bantuan langsung dari sekutu internasional"], jawaban: 2, pembahasan: "Perjuangan Budi Utomo dkk bersifat diplomasi, nasional (bersatu), dan berorganisasi." },
-            { id: "sma_sos_1", jenjang: "SMA", mapel: "Sosiologi", tingkat: "Mudah", topik: "interaksi sosial", soal: "Interaksi sosial yang mengarah pada kerja sama untuk mencapai tujuan bersama disebut proses...", pilihan: ["Asosiatif", "Disosiatif", "Kompetitif", "Konfliktual"], jawaban: 0, pembahasan: "Proses asosiatif mengarah pada kerja sama, akomodasi, dan asimilasi." },
-            { id: "sma_sos_2", jenjang: "SMA", mapel: "Sosiologi", tingkat: "Sedang", topik: "struktur & stratifikasi sosial", soal: "Sistem stratifikasi sosial yang bersifat tertutup, seperti sistem kasta, ditandai dengan...", pilihan: ["Kemudahan berpindah status sosial", "Status sosial ditentukan sejak lahir dan sulit berubah", "Status diperoleh murni dari prestasi", "Tidak adanya perbedaan status sosial"], jawaban: 1, pembahasan: "Stratifikasi tertutup (misal kasta) menetapkan status sejak lahir dan sulit berpindah." },
-            { id: "sma_sos_3", jenjang: "SMA", mapel: "Sosiologi", tingkat: "Sulit / HOTS", topik: "konflik & integrasi sosial", soal: "Konflik antarkelompok dapat berujung pada integrasi sosial apabila...", pilihan: ["Salah satu kelompok dipaksa mengalah tanpa kompromi", "Terjadi dialog dan kompromi yang menghasilkan kesepakatan bersama", "Konflik dibiarkan tanpa penyelesaian", "Kelompok yang kalah dikucilkan selamanya"], jawaban: 1, pembahasan: "Integrasi pascakonflik umumnya tercapai lewat dialog, kompromi, dan akomodasi kepentingan bersama." },
-
-            // --- JENJANG SMA (JURUSAN BAHASA) ---
-            { id: "sma_sastra_1", jenjang: "SMA", mapel: "Sastra Indonesia", tingkat: "Mudah", topik: "puisi & majas", soal: "Ungkapan 'hatinya sekeras batu' menggunakan majas...", pilihan: ["Metafora", "Personifikasi", "Hiperbola", "Ironi"], jawaban: 0, pembahasan: "Metafora membandingkan langsung dua hal tanpa kata 'seperti' atau 'bagai'." },
-            { id: "sma_sastra_2", jenjang: "SMA", mapel: "Sastra Indonesia", tingkat: "Sedang", topik: "unsur intrinsik novel", soal: "Sudut pandang di mana pengarang menggunakan kata ganti 'aku' sebagai tokoh utama disebut sudut pandang...", pilihan: ["Orang pertama pelaku utama", "Orang ketiga serba tahu", "Orang kedua", "Orang ketiga terbatas"], jawaban: 0, pembahasan: "Sudut pandang orang pertama pelaku utama menggunakan 'aku' sebagai tokoh utama cerita." },
-            { id: "sma_sastra_3", jenjang: "SMA", mapel: "Sastra Indonesia", tingkat: "Sulit / HOTS", topik: "drama & naskah", soal: "Dalam naskah drama, konflik batin yang dialami tokoh biasanya disampaikan melalui...", pilihan: ["Setting panggung", "Monolog atau dialog batin tokoh", "Kostum tokoh", "Tata lampu panggung"], jawaban: 1, pembahasan: "Konflik batin tokoh umumnya diungkapkan lewat monolog atau dialog batin dalam naskah drama." },
-            { id: "sma_antro_1", jenjang: "SMA", mapel: "Antropologi", tingkat: "Mudah", topik: "kebudayaan & tradisi lokal", soal: "Upacara adat yang diwariskan turun-temurun dalam suatu masyarakat merupakan bagian dari unsur kebudayaan berupa...", pilihan: ["Sistem religi/upacara", "Sistem ekonomi", "Sistem politik", "Sistem teknologi"], jawaban: 0, pembahasan: "Upacara adat termasuk unsur kebudayaan sistem religi dan upacara keagamaan." },
-            { id: "sma_antro_2", jenjang: "SMA", mapel: "Antropologi", tingkat: "Sedang", topik: "keragaman etnis Indonesia", soal: "Keragaman etnis di Indonesia terbentuk salah satunya karena faktor...", pilihan: ["Letak geografis kepulauan yang memisahkan kelompok masyarakat", "Iklim yang selalu sama di semua wilayah", "Bahasa nasional yang tunggal sejak awal", "Tidak adanya interaksi antarwilayah"], jawaban: 0, pembahasan: "Kondisi kepulauan menyebabkan isolasi antarwilayah sehingga budaya berkembang berbeda-beda." },
-            { id: "sma_antro_3", jenjang: "SMA", mapel: "Antropologi", tingkat: "Sulit / HOTS", topik: "perubahan kebudayaan", soal: "Masuknya budaya global melalui internet dapat memicu perubahan kebudayaan lokal melalui proses yang disebut...", pilihan: ["Akulturasi/asimilasi budaya", "Isolasi budaya", "Stagnasi budaya", "Involusi budaya"], jawaban: 0, pembahasan: "Percampuran budaya lokal dan global umumnya terjadi melalui akulturasi atau asimilasi." },
-            { id: "sma_eng2_1", jenjang: "SMA", mapel: "Bahasa Inggris Lanjutan", tingkat: "Mudah", topik: "conditional sentences", soal: "If it rains tomorrow, I ____ at home.", pilihan: ["stay", "will stay", "stayed", "would stay"], jawaban: 1, pembahasan: "Conditional type 1 menggunakan 'will + verb' pada klausa utama." },
-            { id: "sma_eng2_2", jenjang: "SMA", mapel: "Bahasa Inggris Lanjutan", tingkat: "Sedang", topik: "report text", soal: "A report text is mainly used to...", pilihan: ["Tell a personal story", "Describe general facts about a class of things", "Give step-by-step instructions", "Persuade the reader to act"], jawaban: 1, pembahasan: "Report text menjelaskan fakta umum tentang sebuah kategori (misalnya hewan, fenomena alam)." },
-            { id: "sma_eng2_3", jenjang: "SMA", mapel: "Bahasa Inggris Lanjutan", tingkat: "Sulit / HOTS", topik: "analytical exposition", soal: "'Social media should be regulated more strictly because it spreads misinformation quickly.' This statement is an example of a thesis in...", pilihan: ["Narrative text", "Analytical exposition text", "Descriptive text", "Recount text"], jawaban: 1, pembahasan: "Analytical exposition menyampaikan tesis/pendapat yang diperkuat argumen, seperti contoh tersebut." }
+            {
+                id: "tka_sma_indo_1",
+                jenjang: "SMA",
+                mapel: "Bahasa Indonesia",
+                subtes: "TKA SMA - Bahasa Indonesia",
+                tingkat: "Sulit / HOTS",
+                topik: "Evaluasi Argumen & Sikap Kritis Wacana",
+                soal: "[STIMULUS WACANA KASUS]\n\"Penerapan teknologi kecerdasan buatan generatif di lingkungan akademik sekolah dan perguruan tinggi menimbulkan perdebatan dikotomis. Di satu sisi, AI mempercepat sintesis riset pustaka, pemodelan data empiris, dan koreksi tata bahasa bagi pelajar. Namun, survei Asosiasi Akademisi menunjukkan 48% pengajar mengkhawatirkan erosi integritas akademik dan matinya kemampuan berpikir kritis-orisinil akibat ketergantungan berlebih terhadap luaran otomatis mesin tanpa verifikasi silang.\"\n\n[PERTANYAAN ANALITIS]\nBerdasarkan kutipan teks di atas, sikap objektif yang paling tepat untuk menjembatani persoalan pemanfaatan kecerdasan buatan dalam dunia akademik adalah...",
+                pilihan: [
+                    "Menerapkan regulasi etika pemanfaatan AI yang mewajibkan transparansi deklarasi penggunaan serta pengujian penalaran orisinil siswa secara lisan/analisis kritis.",
+                    "Melarang penggunaan kecerdasan buatan sepenuhnya di lingkungan sekolah guna melindungi keaslian karya tulis.",
+                    "Membiarkan siswa menggunakan AI secara bebas tanpa batasan karena tuntutan perkembangan era digital.",
+                    "Menghapus tugas karya tulis ilmiah dan menggantinya hanya dengan ujian tertulis pilihan ganda.",
+                    "Menjadikan AI sebagai penilai tunggal seluruh tugas akademik tanpa melibatkan guru."
+                ],
+                jawaban: 0,
+                pembahasan: "Solusi yang menjembatani kedua sisi pro dan kontra adalah regulasi etis dan penguatan verifikasi penalaran orisinil tanpa mematikan kemajuan teknologi."
+            },
+            {
+                id: "tka_smp_mtk_1",
+                jenjang: "SMP",
+                mapel: "Matematika",
+                subtes: "TKA SMP - Matematika",
+                tingkat: "Sedang",
+                topik: "Aritmatika Sosial & Persentase Diskon",
+                soal: "[STIMULUS WACANA KASUS]\nKoperasi siswa SMP Harapan Bangsa menjual satu paket perlengkapan alat tulis sekolah seharga Rp80.000. Dalam rangka pekan literasi dan asesmen sekolah, koperasi memberikan potongan diskon sebesar 15% untuk setiap pembelian paket tersebut.\n\n[PERTANYAAN ANALITIS]\nJika seorang siswa membeli 2 paket perlengkapan alat tulis dengan memanfaatkan potongan diskon, berapakah total nominal uang yang harus dibayarkan?",
+                pilihan: [
+                    "Rp136.000",
+                    "Rp140.000",
+                    "Rp148.000",
+                    "Rp160.000"
+                ],
+                jawaban: 0,
+                pembahasan: "Harga normal 2 paket = 2 × Rp80.000 = Rp160.000.\nBesar diskon = 15% × Rp160.000 = Rp24.000.\nTotal bayar = Rp160.000 - Rp24.000 = Rp136.000."
+            },
+            {
+                id: "tka_sd_indo_1",
+                jenjang: "SD",
+                mapel: "Bahasa Indonesia",
+                subtes: "TKA SD - Bahasa Indonesia",
+                tingkat: "Mudah",
+                topik: "Ide Pokok Paragraf & Literasi Dasar",
+                soal: "[STIMULUS WACANA KASUS]\n\"Setiap hari Jumat pagi, seluruh murid SD Nusantara mengikuti kegiatan senam bersama dan gotong royong membersihkan pekarangan sekolah. Kegiatan ini bertujuan untuk menjaga kesehatan tubuh murid serta menanamkan rasa peduli terhadap kebersihan lingkungan belajar sejak dini.\"\n\n[PERTANYAAN ANALITIS]\nGagasan pokok dari teks bacaan di atas adalah...",
+                pilihan: [
+                    "Kegiatan rutin Jumat pagi untuk kesehatan dan kebersihan di SD Nusantara.",
+                    "Jadwal belajar murid SD Nusantara di dalam ruang kelas.",
+                    "Perlombaan kebersihan antar-sekolah dasar se-kabupaten.",
+                    "Larangan membuang sampah di pekarangan sekolah."
+                ],
+                jawaban: 0,
+                pembahasan: "Ide pokok wacana tertuang pada kalimat utama yang menjelaskan pelaksanaan dan tujuan kegiatan rutin senam dan gotong royong Jumat pagi di SD Nusantara."
+            }
         ];
 
         window.showToast = function(message, type = 'info') {
@@ -503,14 +618,59 @@
 
         window.updateMapelOptions = function(prefix) {
             const jenjang = document.getElementById(`${prefix}-jenjang`).value;
-            const jurusanWrap = prefix === 'u' ? document.getElementById('u-jurusan-wrap') : document.getElementById('f-jurusan');
+            const jurusanWrap = prefix === 'u' ? document.getElementById('u-jurusan-wrap') : document.getElementById('f-jurusan-wrap');
             const mapelSelect = document.getElementById(`${prefix}-mapel`);
             let daftarMapel = [];
 
+            if (prefix === 'u') {
+                const titleHeader = document.getElementById('u-title-header');
+                const descHeader = document.getElementById('u-desc-header');
+                const mapelLabel = document.getElementById('u-mapel-label');
+                const badgeHeader = document.getElementById('u-badge-header');
+
+                const bannerJenjangNama = document.getElementById('banner-jenjang-nama');
+                const bannerDurasiBadge = document.getElementById('banner-durasi-badge');
+                const bannerSkalaVal = document.getElementById('banner-skala-val');
+                const bannerIstimewaVal = document.getElementById('banner-istimewa-val');
+
+                if (jenjang === 'SD') {
+                    if (titleHeader) titleHeader.innerText = "Simulasi TKA Jenjang SD / MI";
+                    if (descHeader) descHeader.innerText = "Pemetaan mutu dan capaian kompetensi dasar murid Kelas 6 (Bahasa Indonesia & Matematika).";
+                    if (mapelLabel) mapelLabel.innerText = "Mata Uji Standar TKA SD";
+                    if (badgeHeader) badgeHeader.innerText = "Standar TKA SD/MI · Kemendikdasmen";
+
+                    if (bannerJenjangNama) bannerJenjangNama.innerText = "Jenjang SD / MI (Murid Kelas 6 · Sifat Opsional)";
+                    if (bannerDurasiBadge) bannerDurasiBadge.innerText = "Durasi: 1 Hari";
+                    if (bannerSkalaVal) bannerSkalaVal.innerText = "0 hingga 100";
+                    if (bannerIstimewaVal) bannerIstimewaVal.innerText = "Nilai ≥ 95,00 tiap mata uji";
+                } else if (jenjang === 'SMP') {
+                    if (titleHeader) titleHeader.innerText = "Simulasi TKA Jenjang SMP / MTs";
+                    if (descHeader) descHeader.innerText = "Pemetaan mutu dan capaian kompetensi murid Kelas 9 (Bahasa Indonesia & Matematika). Catatan: SMP tidak mengikutsertakan UTBK/SNBT.";
+                    if (mapelLabel) mapelLabel.innerText = "Mata Uji Standar TKA SMP";
+                    if (badgeHeader) badgeHeader.innerText = "Standar TKA SMP/MTs · Kemendikdasmen";
+
+                    if (bannerJenjangNama) bannerJenjangNama.innerText = "Jenjang SMP / MTs (Murid Kelas 9 · Sifat Opsional)";
+                    if (bannerDurasiBadge) bannerDurasiBadge.innerText = "Durasi: 1 Hari";
+                    if (bannerSkalaVal) bannerSkalaVal.innerText = "0 hingga 100";
+                    if (bannerIstimewaVal) bannerIstimewaVal.innerText = "Nilai ≥ 95,00 tiap mata uji";
+                } else {
+                    if (titleHeader) titleHeader.innerText = "Simulasi TKA Jenjang SMA / MA / SMK";
+                    if (descHeader) descHeader.innerText = "Penilaian standar nasional untuk pemetaan mutu dan pertimbangan seleksi SNBP serta jalur Mandiri PTN/PTS.";
+                    if (mapelLabel) mapelLabel.innerText = "Mata Uji Standar TKA SMA";
+                    if (badgeHeader) badgeHeader.innerText = "Standar TKA SMA/SMK · Kemendikdasmen";
+
+                    if (bannerJenjangNama) bannerJenjangNama.innerText = "Jenjang SMA / MA / SMK (Murid Kelas 12 & 13 SMK)";
+                    if (bannerDurasiBadge) bannerDurasiBadge.innerText = "Durasi: 2 Hari";
+                    if (bannerSkalaVal) bannerSkalaVal.innerText = "200 hingga 800 (Skala TKA)";
+                    if (bannerIstimewaVal) bannerIstimewaVal.innerText = "Nilai ≥ 725,00 tiap mata uji";
+                }
+            }
+
             if (jenjang === 'SMA') {
                 if (jurusanWrap) jurusanWrap.classList.remove('hidden');
-                const jurusan = document.getElementById(`${prefix}-jurusan`).value || 'IPA';
-                daftarMapel = [...TKA_MAPEL.SMA.wajib, ...(TKA_MAPEL.SMA[jurusan] || [])];
+                const jurusanEl = document.getElementById(`${prefix}-jurusan`);
+                const jurusan = (jurusanEl ? jurusanEl.value : 'Wajib') || 'Wajib';
+                daftarMapel = TKA_MAPEL.SMA[jurusan] || TKA_MAPEL.SMA.Wajib;
             } else {
                 if (jurusanWrap) jurusanWrap.classList.add('hidden');
                 daftarMapel = TKA_MAPEL[jenjang] || [];
@@ -695,11 +855,13 @@
         }
 
         window.kembaliKePortal = function() {
+            if (timerInterval) clearInterval(timerInterval);
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             document.getElementById('portal-page').classList.remove('hidden');
             document.getElementById('btn-ganti-peran').classList.add('hidden');
         }
         window.bukaUser = function() {
+            if (timerInterval) clearInterval(timerInterval);
             if(!userProfileData) return;
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             document.getElementById('user-home').classList.remove('hidden');
@@ -726,26 +888,80 @@
             document.getElementById('tab-laporan').className = !isSoal ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
         }
         window.simpanSoalCloud = async function() {
+            const pilihan = [
+                document.getElementById('f-pil-A').value.trim(),
+                document.getElementById('f-pil-B').value.trim(),
+                document.getElementById('f-pil-C').value.trim(),
+                document.getElementById('f-pil-D').value.trim()
+            ];
+            const pilE = document.getElementById('f-pil-E').value.trim();
+            if (pilE) pilihan.push(pilE);
+
             const data = {
-                jenjang: document.getElementById('f-jenjang').value, tingkat: document.getElementById('f-tingkat').value,
-                mapel: document.getElementById('f-mapel').value, soal: document.getElementById('f-soal').value.trim(),
-                pilihan: [document.getElementById('f-pil-A').value.trim(), document.getElementById('f-pil-B').value.trim(), document.getElementById('f-pil-C').value.trim(), document.getElementById('f-pil-D').value.trim()],
-                jawaban: parseInt(document.getElementById('f-kunci').value), pembahasan: "Pembahasan dari guru/admin."
+                jenjang: document.getElementById('f-jenjang').value,
+                tingkat: document.getElementById('f-tingkat').value,
+                mapel: document.getElementById('f-mapel').value,
+                subtes: `TKA ${document.getElementById('f-mapel').value}`,
+                soal: document.getElementById('f-soal').value.trim(),
+                pilihan: pilihan,
+                jawaban: parseInt(document.getElementById('f-kunci').value),
+                pembahasan: "Pembahasan konsep terstruktur dari pengajar."
             };
-            if(!data.soal || data.pilihan.includes('')) return window.showToast("Wajib diisi semua!", "error");
+            if(!data.soal || pilihan.slice(0, 4).includes('')) return window.showToast("Wajib mengisi soal dan minimal 4 pilihan opsi!", "error");
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka'), data);
-                window.showToast("Soal disimpan!", "success");
+                window.showToast("Soal standar TKA berhasil disimpan!", "success");
                 document.getElementById('f-soal').value = '';
                 [...document.querySelectorAll('input[id^="f-pil"]')].forEach(el => el.value = '');
-            } catch(e) { window.showToast("Gagal simpan", "error"); }
+            } catch(e) { window.showToast("Gagal simpan: " + e.message, "error"); }
         }
+
+        window.generateDraftSoalAI = async function() {
+            const jenjang = document.getElementById('f-jenjang').value;
+            const mapel = document.getElementById('f-mapel').value;
+            const tingkat = document.getElementById('f-tingkat').value;
+            const jurusan = jenjang === 'SMA' ? document.getElementById('f-jurusan').value : null;
+
+            const btn = document.getElementById('btn-admin-ai');
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<div class="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full spinner"></div> <span>Menyusun draf TKA dengan AI...</span>`;
+
+            try {
+                const res = await fetch("/api/generate-soal", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ jenjang, mapel, jurusan, topikTerpilih: [tingkat], count: 1 })
+                });
+                const data = await res.json();
+                if (data.soal_list && data.soal_list.length > 0) {
+                    const q = data.soal_list[0];
+                    document.getElementById('f-soal').value = q.soal;
+                    document.getElementById('f-pil-A').value = q.pilihan[0] || '';
+                    document.getElementById('f-pil-B').value = q.pilihan[1] || '';
+                    document.getElementById('f-pil-C').value = q.pilihan[2] || '';
+                    document.getElementById('f-pil-D').value = q.pilihan[3] || '';
+                    document.getElementById('f-pil-E').value = q.pilihan[4] || '';
+                    document.getElementById('f-kunci').value = (typeof q.jawaban === 'number' && q.jawaban >= 0 && q.jawaban <= 4) ? q.jawaban : 0;
+                    window.showToast("Draf soal standar TKA berhasil disusun!", "success");
+                } else {
+                    window.showToast("Gagal menghasilkan draf soal.", "error");
+                }
+            } catch (e) {
+                console.error(e);
+                window.showToast("Gagal memanggil AI: " + e.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        };
+
         function renderAdminSoalList() {
             const container = document.getElementById('admin-db-list');
             const list = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
             document.getElementById('count-db-cloud').innerText = list.length;
             if(!container) return;
-            container.innerHTML = list.map((q, i) => `<div class="bg-slate-50 border border-slate-200 p-3 rounded-xl"><div class="flex justify-between text-[11px] font-bold text-indigo-600 mb-1"><span>${q.jenjang} - ${q.mapel}</span><span>${q.tingkat}</span></div><p class="text-xs font-bold text-slate-800">${i+1}. ${q.soal}</p></div>`).join('');
+            container.innerHTML = list.map((q, i) => `<div class="bg-slate-50 border border-slate-200 p-3 rounded-xl"><div class="flex justify-between text-[11px] font-bold text-indigo-600 mb-1"><span>${q.jenjang} - ${q.mapel}</span><span>${q.tingkat || 'HOTS'}</span></div><p class="text-xs font-bold text-slate-800 line-clamp-3">${i+1}. ${q.soal}</p></div>`).join('');
         }
         function updateQuotaDisplay() {
             if(!userProfileData) return;
@@ -754,83 +970,104 @@
             document.getElementById('limit-info').innerText = `${sisa} / ${MAX_LIMIT_PER_DAY}`;
         }
 
-        async function generateSoalAI(jenjang, mapel, jurusan) {
-            const semuaTopik = TOPIK_MATERI[mapel] || ["konsep dasar"];
+        async function generateSoalAI(jenjang, mapel, jurusan, jumlahSoal) {
+            const semuaTopik = TOPIK_MATERI[mapel] || ["konsep dan penalaran analitis"];
             const topikTerpilih = acakArray(semuaTopik).slice(0, 4);
-            const riwayat = ambilRiwayatSoal(mapel).slice(-15);
+            const riwayat = ambilRiwayatSoal(mapel).slice(-20);
 
-            const prompt = `Buatkan 10 soal pilihan ganda HOTS (Higher Order Thinking Skill) untuk Tes Kemampuan Akademik jenjang ${jenjang} mata pelajaran ${mapel} ${jurusan ? '(peminatan '+jurusan+')' : ''}.
-Topik fokus: ${topikTerpilih.join(', ')}.
-${riwayat.length > 0 ? 'JANGAN ulangi topik/soal ini: ' + riwayat.join('; ') : ''}
-
-Struktur JSON yang WAJIB dipatuhi:
-{"soal_list": [
-  {
-    "soal": "Pertanyaan penalaran/HOTS...",
-    "pilihan": ["Opsi A", "Opsi B", "Opsi C", "Opsi D"],
-    "jawaban": 0, // index array 0-3
-    "pembahasan": "Alasan jawaban benar...",
-    "topik": "Nama Topik",
-    "tingkat": "Sulit / HOTS" // pilih salah satu: Mudah, Sedang, Sulit / HOTS
-  }
-]}`;
-
-            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            const res = await fetch("/api/generate-soal", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { 
-                        responseMimeType: "application/json",
-                        temperature: 1.0
-                    }
+                    jenjang,
+                    mapel,
+                    jurusan,
+                    topikTerpilih,
+                    riwayat,
+                    jumlahSoal
                 })
             });
 
             if (!res.ok) {
-                const errDetail = await res.text();
-                throw new Error(`Gemini API Error: ${errDetail}`);
+                const errData = await res.json().catch(() => ({ error: res.statusText }));
+                throw new Error(errData.error || `Server Error (${res.status})`);
             }
 
             const data = await res.json();
-            const textJson = data.candidates[0].content.parts[0].text;
-            const parsed = JSON.parse(textJson);
-            
-            if (!parsed.soal_list || parsed.soal_list.length === 0) throw new Error('Data AI kosong');
-            return parsed.soal_list;
+            if (!data.soal_list || data.soal_list.length === 0) throw new Error('Data AI kosong');
+            return data.soal_list;
+        }
+
+        function startQuestionTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timeRemaining = 90; // 90 detik standar TKA per soal
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    if (userSelectedAnswer === null) {
+                        window.showToast("Waktu per butir soal habis!", "info");
+                        const buttons = document.getElementById('options-container').children;
+                        const q = activeQuestions[currentIndex];
+                        if (buttons[q.jawaban]) buttons[q.jawaban].className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm";
+                        document.getElementById('feedback-msg').innerHTML = `<span class='text-amber-600'>⏳ Waktu Habis (Kunci: ${String.fromCharCode(65 + q.jawaban)})</span>`;
+                        if(q.pembahasan) {
+                            document.getElementById('explanation-text').innerText = q.pembahasan;
+                            document.getElementById('explanation-box').classList.remove('hidden');
+                        }
+                        for(let b of buttons) b.style.pointerEvents = 'none';
+                        document.getElementById('btn-next').classList.remove('hidden');
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const min = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            const sec = (timeRemaining % 60).toString().padStart(2, '0');
+            const el = document.getElementById('timer-display');
+            if (el) el.innerText = `${min}:${sec}`;
         }
 
         window.mulaiKuis = async function(pakaiAI) {
             if(!userProfileData) return;
-            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian habis!", "error");
+            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian Anda telah habis!", "error");
 
             const jenjang = document.getElementById('u-jenjang').value;
             const mapel = document.getElementById('u-mapel').value;
             const jurusan = jenjang === 'SMA' ? document.getElementById('u-jurusan').value : null;
+            const jumlahSoal = parseInt(document.getElementById('u-jumlah-soal').value || '10');
 
             document.getElementById('user-home').classList.add('hidden');
             document.getElementById('loading-section').classList.remove('hidden');
 
             if(pakaiAI) {
                 try {
-                    activeQuestions = await generateSoalAI(jenjang, mapel, jurusan);
+                    activeQuestions = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal);
                     simpanRiwayatSoal(mapel, activeQuestions);
                 } catch(e) {
                     console.error("Gagal AI:", e);
-                    window.showToast("Koneksi AI Gagal/Sibuk, otomatis mengambil dari Bank Soal.", "info");
+                    window.showToast("Koneksi AI Sibuk, otomatis mengambil bank soal TKA.", "info");
                     pakaiAI = false;
                 }
             }
 
             if(!pakaiAI) {
                 const gabungan = [...DEFAULT_QUESTIONS, ...bankSoalCloud];
-                let cocok = acakArray(gabungan.filter(q => q.jenjang === jenjang && q.mapel === mapel));
-                if (cocok.length === 0) {
-                    document.getElementById('loading-section').classList.add('hidden');
-                    document.getElementById('user-home').classList.remove('hidden');
-                    return window.showToast(`Belum ada bank soal untuk ${mapel}. Gunakan tombol "Buat via AI".`, "error");
+                let cocok = acakArray(gabungan.filter(q => q.mapel === mapel || q.jenjang === jenjang));
+                if (cocok.length < jumlahSoal) {
+                    try {
+                        const extra = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal);
+                        activeQuestions = extra;
+                    } catch(err) {
+                        activeQuestions = cocok.length > 0 ? cocok.slice(0, jumlahSoal) : DEFAULT_QUESTIONS.slice(0, jumlahSoal);
+                    }
+                } else {
+                    activeQuestions = cocok.slice(0, jumlahSoal);
                 }
-                activeQuestions = cocok.slice(0, TOTAL_QUESTIONS_PER_SESSION);
             }
 
             activeQuestions = urutkanBerdasarkanTingkat(activeQuestions);
@@ -843,7 +1080,8 @@ Struktur JSON yang WAJIB dipatuhi:
             }
             updateQuotaDisplay();
 
-            currentIndex = 0; score = 0;
+            currentIndex = 0; 
+            correctCount = 0;
             document.getElementById('loading-section').classList.add('hidden');
             document.getElementById('quiz-page').classList.remove('hidden');
             document.getElementById('badge-jenjang').innerText = jenjang;
@@ -861,8 +1099,31 @@ Struktur JSON yang WAJIB dipatuhi:
             const q = activeQuestions[currentIndex];
             document.getElementById('current-q').innerText = currentIndex + 1;
             document.getElementById('progress-bar').style.width = `${(currentIndex / activeQuestions.length) * 100}%`;
-            document.getElementById('question-text').innerText = q.soal || q.pertanyaan;
 
+            // Parsing Stimulus vs Pertanyaan Analitis
+            const stimulusContainer = document.getElementById('stimulus-container');
+            const stimulusText = document.getElementById('stimulus-text');
+            const questionText = document.getElementById('question-text');
+
+            const fullText = q.soal || q.pertanyaan || '';
+            if (fullText.includes('[STIMULUS WACANA KASUS]') && fullText.includes('[PERTANYAAN ANALITIS]')) {
+                const parts = fullText.split('[PERTANYAAN ANALITIS]');
+                const stimPart = parts[0].replace('[STIMULUS WACANA KASUS]', '').trim();
+                const qPart = parts[1].trim();
+
+                stimulusText.innerText = stimPart;
+                stimulusContainer.classList.remove('hidden');
+                questionText.innerText = qPart;
+            } else if (q.stimulus) {
+                stimulusText.innerText = q.stimulus;
+                stimulusContainer.classList.remove('hidden');
+                questionText.innerText = fullText;
+            } else {
+                stimulusContainer.classList.add('hidden');
+                questionText.innerText = fullText;
+            }
+
+            document.getElementById('badge-subtes').innerText = q.subtes || `TKA ${q.jenjang || ''} - ${q.mapel || ''}`;
             const badgeTingkat = document.getElementById('badge-tingkat-quiz');
             if (q.tingkat) {
                 badgeTingkat.innerText = q.tingkat;
@@ -873,22 +1134,25 @@ Struktur JSON yang WAJIB dipatuhi:
 
             const container = document.getElementById('options-container');
             container.innerHTML = q.pilihan.map((opsi, idx) => `<button onclick="pilihOpsi(${idx}, this)" class="w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm transition"><span><strong class="mr-2 text-indigo-600">${String.fromCharCode(65 + idx)}.</strong> ${opsi}</span></button>`).join('');
+
+            startQuestionTimer();
         }
 
         window.pilihOpsi = function(idx, element) {
             if (userSelectedAnswer !== null) return;
+            if (timerInterval) clearInterval(timerInterval);
             userSelectedAnswer = idx;
             const q = activeQuestions[currentIndex];
             const buttons = document.getElementById('options-container').children;
 
             if (idx === q.jawaban) {
                 element.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm";
-                document.getElementById('feedback-msg').innerHTML = "<span class='text-emerald-600'>✅ Benar!</span>";
-                score += Math.round(100 / activeQuestions.length);
+                document.getElementById('feedback-msg').innerHTML = "<span class='text-emerald-600 font-bold'>✅ Benar!</span>";
+                correctCount++;
             } else {
                 element.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-semibold text-sm";
                 if (buttons[q.jawaban]) buttons[q.jawaban].className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm";
-                document.getElementById('feedback-msg').innerHTML = `<span class='text-rose-600'>❌ Salah (Kunci: ${String.fromCharCode(65 + q.jawaban)})</span>`;
+                document.getElementById('feedback-msg').innerHTML = `<span class='text-rose-600 font-bold'>❌ Salah (Kunci: ${String.fromCharCode(65 + q.jawaban)})</span>`;
             }
 
             if(q.pembahasan) {
@@ -903,11 +1167,89 @@ Struktur JSON yang WAJIB dipatuhi:
             currentIndex++;
             if (currentIndex < activeQuestions.length) tampilkanSoalAktif();
             else {
+                if (timerInterval) clearInterval(timerInterval);
                 document.getElementById('quiz-page').classList.add('hidden');
                 document.getElementById('result-page').classList.remove('hidden');
-                document.getElementById('final-score').innerText = score;
                 document.getElementById('progress-bar').style.width = `100%`;
-                if(!isGuestMode) addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), { userId: currentUser.uid, userName: userProfileData.displayName, jenjang: document.getElementById('u-jenjang').value, mapel: document.getElementById('u-mapel').value, score: score, timestamp: new Date().toLocaleString('id-ID') });
+
+                const jenjang = document.getElementById('u-jenjang').value;
+                const totalQ = activeQuestions.length || 1;
+                let finalScore = 0;
+                let scaleText = "";
+                let predikatTitle = "";
+                let predikatDesc = "";
+                let predikatBoxClass = "";
+
+                if (jenjang === 'SMA') {
+                    // Skala 200 hingga 800 (Syarat Predikat Istimewa: Nilai ≥ 725,00)
+                    finalScore = Math.round(200 + (correctCount / totalQ) * 600);
+                    scaleText = "Skala Penilaian: 200 hingga 800 (Standar TKA SMA)";
+
+                    if (finalScore >= 725) {
+                        predikatTitle = "🌟 Predikat Istimewa (Nilai ≥ 725,00)";
+                        predikatDesc = "Luar biasa! Skor Anda memenuhi kriteria Predikat Istimewa standar TKA Kemendikdasmen (Sangat potensial untuk pertimbangan seleksi SNBP & Mandiri PTN/PTS).";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-amber-50 text-amber-900 border-2 border-amber-400 mb-6 text-center max-w-sm mx-auto shadow-sm";
+                    } else if (finalScore >= 600) {
+                        predikatTitle = "Kategori: Baik";
+                        predikatDesc = "Capaian kemampuan akademik Anda berada pada kategori Baik dan melampaui standar pemetaan mutu.";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-300 mb-6 text-center max-w-sm mx-auto";
+                    } else if (finalScore >= 450) {
+                        predikatTitle = "Kategori: Memadai";
+                        predikatDesc = "Memenuhi standar kecukupan pemetaan kompetensi akademik Kemendikdasmen.";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto";
+                    } else {
+                        predikatTitle = "Kategori: Kurang";
+                        predikatDesc = "Perlu penguatan penalaran literasi, numerasi analitis, dan latihan soal secara berkelanjutan.";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-rose-50 text-rose-800 border border-rose-200 mb-6 text-center max-w-sm mx-auto";
+                    }
+                } else {
+                    // SD & SMP: Skala 0 hingga 100 (Syarat Predikat Istimewa: Nilai ≥ 95,00)
+                    finalScore = Math.round((correctCount / totalQ) * 100);
+                    scaleText = `Skala Penilaian: 0 hingga 100 (Standar TKA ${jenjang})`;
+
+                    if (finalScore >= 95) {
+                        predikatTitle = `🌟 Predikat Istimewa (Nilai ≥ 95,00)`;
+                        predikatDesc = `Luar biasa! Skor Anda memenuhi kriteria Predikat Istimewa standar TKA Kemendikdasmen untuk jenjang ${jenjang}.`;
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-amber-50 text-amber-900 border-2 border-amber-400 mb-6 text-center max-w-sm mx-auto shadow-sm";
+                    } else if (finalScore >= 75) {
+                        predikatTitle = "Kategori: Baik";
+                        predikatDesc = "Capaian kompetensi pemetaan mutu akademik Anda tergolong Baik dan tuntas.";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-300 mb-6 text-center max-w-sm mx-auto";
+                    } else if (finalScore >= 55) {
+                        predikatTitle = "Kategori: Memadai";
+                        predikatDesc = "Memenuhi capaian standar pemetaan kompetensi akademik.";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto";
+                    } else {
+                        predikatTitle = "Kategori: Kurang";
+                        predikatDesc = "Perlu bimbingan dan penguatan konsep materi dasar secara bertahap.";
+                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-rose-50 text-rose-800 border border-rose-200 mb-6 text-center max-w-sm mx-auto";
+                    }
+                }
+
+                document.getElementById('final-score').innerText = finalScore;
+                document.getElementById('score-scale-info').innerText = scaleText;
+                document.getElementById('score-detail-info').innerText = `Benar: ${correctCount} dari ${totalQ} Soal (${Math.round((correctCount/totalQ)*100)}%)`;
+
+                const predikatBox = document.getElementById('predikat-box');
+                const predikatTitleEl = document.getElementById('predikat-title');
+                const predikatDescEl = document.getElementById('predikat-desc');
+
+                if (predikatBox) predikatBox.className = predikatBoxClass;
+                if (predikatTitleEl) predikatTitleEl.innerText = predikatTitle;
+                if (predikatDescEl) predikatDescEl.innerText = predikatDesc;
+
+                if(!isGuestMode && currentUser) {
+                    addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), { 
+                        userId: currentUser.uid, 
+                        userName: userProfileData.displayName, 
+                        jenjang: jenjang, 
+                        mapel: document.getElementById('u-mapel').value, 
+                        score: finalScore, 
+                        correctCount: correctCount,
+                        totalCount: totalQ,
+                        timestamp: new Date().toLocaleString('id-ID') 
+                    });
+                }
             }
         };
 
