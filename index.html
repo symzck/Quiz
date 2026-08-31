@@ -477,16 +477,19 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js';
-        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';
 
-        let firebaseConfig = {};
+        let firebaseConfig = { apiKey: "dummy", authDomain: "dummy.firebaseapp.com", projectId: "dummy" };
         let appId = 'quiz_tka_default';
         try {
-            const rawConfig = '___FIREBASE_CONFIG___';
-            firebaseConfig = JSON.parse(rawConfig);
-            appId = '___APP_ID___' || 'quiz_tka_default';
+            const res = await fetch('/api/firebase-config');
+            const data = await res.json();
+            if (data.config) {
+                firebaseConfig = data.config;
+                appId = data.appId || 'quiz_tka_default';
+            }
         } catch (e) {
-            firebaseConfig = { apiKey: "dummy", authDomain: "dummy.firebaseapp.com", projectId: "dummy" };
+            console.warn("Failed to load Firebase config");
         }
 
         const app = initializeApp(firebaseConfig);
@@ -671,9 +674,32 @@
                 const jurusanEl = document.getElementById(`${prefix}-jurusan`);
                 const jurusan = (jurusanEl ? jurusanEl.value : 'Wajib') || 'Wajib';
                 daftarMapel = TKA_MAPEL.SMA[jurusan] || TKA_MAPEL.SMA.Wajib;
+                
+                // Show option E for SMA
+                if (prefix === 'f') {
+                    const pilE = document.getElementById('f-pil-E');
+                    if (pilE) pilE.classList.remove('hidden');
+                    const fKunci = document.getElementById('f-kunci');
+                    if (fKunci) {
+                        const optE = fKunci.querySelector('option[value="4"]');
+                        if (!optE) fKunci.insertAdjacentHTML('beforeend', '<option value="4">Kunci: E</option>');
+                    }
+                }
             } else {
                 if (jurusanWrap) jurusanWrap.classList.add('hidden');
                 daftarMapel = TKA_MAPEL[jenjang] || [];
+                
+                // Hide option E for SD and SMP
+                if (prefix === 'f') {
+                    const pilE = document.getElementById('f-pil-E');
+                    if (pilE) pilE.classList.add('hidden');
+                    const fKunci = document.getElementById('f-kunci');
+                    if (fKunci) {
+                        const optE = fKunci.querySelector('option[value="4"]');
+                        if (optE) optE.remove();
+                        if (fKunci.value === "4") fKunci.value = "3"; // Reset to D if E was selected
+                    }
+                }
             }
             mapelSelect.innerHTML = daftarMapel.map(m => `<option value="${m}">${m}</option>`).join('');
         };
@@ -888,26 +914,31 @@
             document.getElementById('tab-laporan').className = !isSoal ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
         }
         window.simpanSoalCloud = async function() {
+            const jenjang = document.getElementById('f-jenjang').value;
             const pilihan = [
                 document.getElementById('f-pil-A').value.trim(),
                 document.getElementById('f-pil-B').value.trim(),
                 document.getElementById('f-pil-C').value.trim(),
                 document.getElementById('f-pil-D').value.trim()
             ];
-            const pilE = document.getElementById('f-pil-E').value.trim();
-            if (pilE) pilihan.push(pilE);
+            
+            if (jenjang === 'SMA') {
+                const pilE = document.getElementById('f-pil-E').value.trim();
+                if (!pilE) return window.showToast("Wajib mengisi opsi E untuk tingkat SMA!", "error");
+                pilihan.push(pilE);
+            }
 
             const data = {
-                jenjang: document.getElementById('f-jenjang').value,
+                jenjang: jenjang,
                 tingkat: document.getElementById('f-tingkat').value,
                 mapel: document.getElementById('f-mapel').value,
-                subtes: `TKA ${document.getElementById('f-mapel').value}`,
+                subtes: `TKA ${jenjang} - ${document.getElementById('f-mapel').value}`,
                 soal: document.getElementById('f-soal').value.trim(),
                 pilihan: pilihan,
                 jawaban: parseInt(document.getElementById('f-kunci').value),
                 pembahasan: "Pembahasan konsep terstruktur dari pengajar."
             };
-            if(!data.soal || pilihan.slice(0, 4).includes('')) return window.showToast("Wajib mengisi soal dan minimal 4 pilihan opsi!", "error");
+            if(!data.soal || pilihan.slice(0, 4).includes('')) return window.showToast("Wajib mengisi soal dan minimal 4 pilihan opsi (A-D)!", "error");
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka'), data);
                 window.showToast("Soal standar TKA berhasil disimpan!", "success");
@@ -956,12 +987,31 @@
             }
         };
 
+        window.hapusSoalCloud = async function(docId) {
+            if (!confirm("Apakah Anda yakin ingin menghapus soal TKA ini dari database?")) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'soal_tka', docId));
+                window.showToast("Soal berhasil dihapus.", "success");
+            } catch (e) {
+                window.showToast("Gagal menghapus: " + e.message, "error");
+            }
+        };
+
         function renderAdminSoalList() {
             const container = document.getElementById('admin-db-list');
             const list = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
             document.getElementById('count-db-cloud').innerText = list.length;
             if(!container) return;
-            container.innerHTML = list.map((q, i) => `<div class="bg-slate-50 border border-slate-200 p-3 rounded-xl"><div class="flex justify-between text-[11px] font-bold text-indigo-600 mb-1"><span>${q.jenjang} - ${q.mapel}</span><span>${q.tingkat || 'HOTS'}</span></div><p class="text-xs font-bold text-slate-800 line-clamp-3">${i+1}. ${q.soal}</p></div>`).join('');
+            container.innerHTML = list.map((q, i) => `
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl relative group">
+                    <div class="flex justify-between items-start text-[11px] font-bold text-indigo-600 mb-1 pr-6">
+                        <span>${q.jenjang || 'SMA'} - ${q.mapel || 'Mapel'}</span>
+                        <span>${q.tingkat || 'HOTS'}</span>
+                    </div>
+                    <p class="text-xs font-bold text-slate-800 line-clamp-3 pr-2">${i+1}. ${q.soal}</p>
+                    ${q.id && !q.id.startsWith('tka_') ? `<button onclick="hapusSoalCloud('${q.id}')" class="absolute top-2 right-2 text-rose-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition" title="Hapus Soal"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                </div>
+            `).join('');
         }
         function updateQuotaDisplay() {
             if(!userProfileData) return;

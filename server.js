@@ -376,9 +376,21 @@ function generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih = [], r
     const generatorFn = pool[(i + seed) % pool.length];
     const generated = generatorFn(seed + i * 43, i + 1);
 
+    // Ambil opsi dari generator
+    let rawOptions = [...generated.pilihan];
+    let correctIdx = generated.jawaban;
+
+    // Sesuaikan jumlah opsi untuk SD dan SMP (maks 4 opsi)
+    if ((jenjang === 'SD' || jenjang === 'SMP') && rawOptions.length > 4) {
+      const correctText = rawOptions[correctIdx];
+      rawOptions.splice(correctIdx, 1); 
+      rawOptions = rawOptions.slice(0, 3); // Ambil 3 distraktor
+      rawOptions.push(correctText); // Kembalikan jawaban benar
+      correctIdx = 3;
+    }
+
     // Acak urutan pilihan jawaban
-    const rawOptions = [...generated.pilihan];
-    const correctAnswerText = rawOptions[generated.jawaban];
+    const correctAnswerText = rawOptions[correctIdx];
 
     const shuffledOptions = [...rawOptions];
     for (let j = shuffledOptions.length - 1; j > 0; j--) {
@@ -566,6 +578,15 @@ PEDOMAN BAKU PENULISAN SOAL STANDAR TKA:
       let choices = Array.isArray(item.pilihan) && item.pilihan.length >= 4 ? item.pilihan : ["Opsi A", "Opsi B", "Opsi C", "Opsi D"];
       let answerIdx = typeof item.jawaban === 'number' && item.jawaban >= 0 && item.jawaban < choices.length ? item.jawaban : 0;
       
+      // Sesuaikan opsi jika AI berhalusinasi memberikan 5 opsi untuk SD/SMP
+      if ((jenjang === 'SD' || jenjang === 'SMP') && choices.length > 4) {
+        const correctText = choices[answerIdx];
+        choices.splice(answerIdx, 1);
+        choices = choices.slice(0, 3);
+        choices.push(correctText);
+        answerIdx = 3;
+      }
+      
       let fullSoal = item.soal || `Soal HOTS ${idx + 1}`;
       if (item.stimulus && !fullSoal.includes(item.stimulus)) {
         fullSoal = `[STIMULUS WACANA KASUS]\n${item.stimulus}\n\n[PERTANYAAN ANALITIS]\n${fullSoal}`;
@@ -602,7 +623,7 @@ PEDOMAN BAKU PENULISAN SOAL STANDAR TKA:
     });
 
   } catch (error) {
-    console.error('Error in /api/generate-soal with Gemini:', error);
+    console.warn('Gemini API quota exceeded or unavailable. Using fallback engine.', error.message);
     const { jenjang = 'SMA', mapel = 'Matematika', jurusan = null, topikTerpilih = [], riwayat = [], count = 10, jumlahSoal = 10 } = req.body || {};
     const targetCount = Math.max(5, Math.min(30, parseInt(jumlahSoal || count) || 10));
     const fallbackList = generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih, riwayat, targetCount);
@@ -626,8 +647,24 @@ app.get('/api/health', (req, res) => {
 // Serve static files from root
 app.use(express.static(process.cwd()));
 
+// Provide Firebase Config dynamically
+app.get('/api/firebase-config', (req, res) => {
+  try {
+    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+    if (fs.existsSync(configPath)) {
+      const configRaw = fs.readFileSync(configPath, 'utf-8');
+      const config = JSON.parse(configRaw);
+      return res.json({ config, appId: "2bc4c10c-f0c1-41a6-a167-c736dab537e7" });
+    }
+    res.json({ config: null });
+  } catch (err) {
+    res.json({ config: null });
+  }
+});
+
 // Fallback to index.html
 app.get('*', (req, res) => {
+
   res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
