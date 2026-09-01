@@ -1,0 +1,63 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile data for TKA quiz application",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "quizAttempts": { "type": "number", "description": "Number of quiz attempts used today" },
+        "lastAttemptDate": { "type": "string", "description": "Date string of last attempt" }
+      },
+      "required": ["uid", "displayName"]
+    },
+    "SoalTKA": {
+      "title": "SoalTKA",
+      "description": "Question bank item for TKA",
+      "type": "object",
+      "properties": {
+        "jenjang": { "type": "string", "enum": ["SD", "SMP", "SMA"] },
+        "tingkat": { "type": "string" },
+        "mapel": { "type": "string" },
+        "subtes": { "type": "string" },
+        "soal": { "type": "string" },
+        "pilihan": { "type": "array", "description": "Answer options" },
+        "jawaban": { "type": "number", "description": "Index of correct answer" },
+        "pembahasan": { "type": "string" }
+      },
+      "required": ["jenjang", "mapel", "soal", "pilihan", "jawaban"]
+    },
+    "LaporanSiswa": {
+      "title": "LaporanSiswa",
+      "description": "Student activity test result report",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "jenjang": { "type": "string" },
+        "mapel": { "type": "string" },
+        "score": { "type": "number" },
+        "correctCount": { "type": "number" },
+        "totalCount": { "type": "number" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["userId", "userName", "jenjang", "mapel", "score"]
+    }
+  },
+  "firestore": {
+    "/artifacts/{appId}/users/{userId}/profile/data": {
+      "schema": "UserProfile",
+      "description": "Stores user personal profile and daily attempt limits"
+    },
+    "/artifacts/{appId}/public/data/soal_tka/{soalId}": {
+      "schema": "SoalTKA",
+      "description": "Question bank collection managed by teachers/administrators"
+    },
+    "/artifacts/{appId}/public/data/laporan_siswa/{laporanId}": {
+      "schema": "LaporanSiswa",
+      "description": "Student quiz results and performance scores"
+    }
+  }
+}

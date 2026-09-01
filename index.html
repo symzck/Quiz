@@ -475,24 +475,24 @@
 
     <!-- Script Logika Aplikasi & Firebase -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js';
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js';
-        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
+        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
-        let firebaseConfig = { apiKey: "dummy", authDomain: "dummy.firebaseapp.com", projectId: "dummy" };
-        let appId = 'quiz_tka_default';
-        try {
-            const res = await fetch('/api/firebase-config');
-            const data = await res.json();
-            if (data.config) {
-                firebaseConfig = data.config;
-                appId = data.appId || 'quiz_tka_default';
-            }
-        } catch (e) {
-            console.warn("Failed to load Firebase config");
-        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOHslpDrbf7dubS6MiX4Qcj2Nbr4W3CkY",
+            authDomain: "quiz-tka.firebaseapp.com",
+            projectId: "quiz-tka",
+            storageBucket: "quiz-tka.firebasestorage.app",
+            messagingSenderId: "1032541943520",
+            appId: "1:1032541943520:web:1c85ca43ba7171636bc285",
+            measurementId: "G-QFB5TDMBFC"
+        };
+        const appId = 'quiz_tka_default';
 
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
@@ -867,6 +867,8 @@
                 bankSoalCloud = [];
                 snapshot.forEach(docSnap => bankSoalCloud.push({ id: docSnap.id, ...docSnap.data() }));
                 renderAdminSoalList();
+            }, (err) => {
+                console.warn("Snapshot error (soal_tka):", err);
             });
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'laporan_siswa'), (snapshot) => {
                 const tbody = document.getElementById('table-body-laporan');
@@ -877,6 +879,8 @@
                     rows += `<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-semibold">${d.userName}</td><td class="px-4 py-3 text-xs">${d.timestamp || '-'}</td><td class="px-4 py-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[11px] font-bold">${d.jenjang} - ${d.mapel}</span></td><td class="px-4 py-3 text-center font-black text-emerald-600">${d.score}</td></tr>`;
                 });
                 tbody.innerHTML = rows || `<tr><td colspan="4" class="text-center py-6 text-slate-400">Belum ada laporan.</td></tr>`;
+            }, (err) => {
+                console.warn("Snapshot error (laporan_siswa):", err);
             });
         }
 

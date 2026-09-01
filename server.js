@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { GoogleGenAI } from '@google/genai';
 
 const app = express();
@@ -644,9 +645,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve static files from root
-app.use(express.static(process.cwd()));
-
 // Provide Firebase Config dynamically
 app.get('/api/firebase-config', (req, res) => {
   try {
@@ -662,9 +660,11 @@ app.get('/api/firebase-config', (req, res) => {
   }
 });
 
+// Serve static files from root
+app.use(express.static(process.cwd()));
+
 // Fallback to index.html
 app.get('*', (req, res) => {
-
   res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
