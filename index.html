@@ -4,22 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuis Cerdas TKA - Cloud & AI</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
-                    colors: {
-                        founder: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' }
-                    }
-                }
-            }
-        }
-    </script>
     <style>
         body {
             background-color: #f8fafc;
@@ -55,7 +43,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <div id="user-info-badge" class="hidden text-xs font-bold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full flex items-center gap-2">
-                    <img id="user-avatar" src="https://placehold.co/32" class="w-5 h-5 rounded-full" alt="Avatar">
+                    <img id="user-avatar" src="https://placehold.co/32" loading="lazy" class="w-5 h-5 rounded-full" alt="Avatar">
                     <span id="user-name-display">Tamu</span>
                 </div>
                 <button id="btn-ganti-peran" onclick="window.kembaliKePortal()" class="hidden text-xs font-bold text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full">
