@@ -151,6 +151,7 @@
         <section id="founder-page" class="hidden w-full">
             <div class="flex gap-2 mb-6 justify-center">
                 <button onclick="window.switchAdminTab('soal')" id="tab-soal" class="px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition">Manajemen Soal</button>
+                <button onclick="window.switchAdminTab('import')" id="tab-import" class="px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition">Import Spreadsheet</button>
                 <button onclick="window.switchAdminTab('laporan')" id="tab-laporan" class="px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition">Laporan Siswa</button>
             </div>
 
@@ -204,6 +205,33 @@
                 </div>
             </div>
 
+            <div id="admin-view-import" class="hidden glass-card rounded-3xl p-6 mb-6">
+                <h2 class="font-bold text-lg text-slate-800 mb-4"><i class="fa-solid fa-file-excel text-emerald-600"></i> Import Soal dari Spreadsheet</h2>
+                <p class="text-xs text-slate-500 mb-4">Pilih parameter default di bawah, lalu paste data dari Excel atau Google Sheets. Format kolom: <b>Soal [Tab] Opsi A [Tab] Opsi B [Tab] Opsi C [Tab] Opsi D [Tab] Opsi E (Opsional) [Tab] Kunci (A/B/C/D/E) [Tab] Pembahasan</b></p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                    <select id="import-jenjang" onchange="window.updateMapelOptions('import')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
+                        <option value="SD">SD / MI (Kelas 6)</option>
+                        <option value="SMP">SMP / MTs (Kelas 9)</option>
+                        <option value="SMA" selected>SMA / MA / SMK</option>
+                    </select>
+                    <select id="import-tingkat" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"><option value="Mudah">Mudah</option><option value="Sedang" selected>Sedang</option><option value="Sulit / HOTS">Sulit / HOTS</option></select>
+                    <div id="import-jurusan-wrap" class="col-span-2 md:col-span-1">
+                        <select id="import-jurusan" onchange="window.updateMapelOptions('import')" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-amber-50 outline-none">
+                            <option value="Wajib">Mata Uji Wajib</option>
+                            <option value="Saintek">Pilihan Saintek</option>
+                            <option value="Bahasa">Pilihan Bahasa</option>
+                        </select>
+                    </div>
+                    <select id="import-mapel" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none col-span-2 md:col-span-1"></select>
+                </div>
+                <textarea id="import-data" rows="8" class="w-full text-sm p-4 border border-slate-200 rounded-xl bg-slate-50 outline-none font-mono whitespace-pre text-[11px]" placeholder="Copy dari Excel/Sheets dan Paste di sini..."></textarea>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="window.prosesImportSpreadsheet()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl transition text-sm shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Import & Simpan
+                    </button>
+                </div>
+            </div>
+
             <div id="admin-view-laporan" class="hidden glass-card rounded-3xl p-6">
                 <h2 class="font-bold text-lg text-slate-800 mb-4"><i class="fa-solid fa-chart-line text-emerald-500"></i> Laporan Aktivitas Siswa</h2>
                 <div class="overflow-x-auto">
@@ -226,7 +254,7 @@
             <p id="u-desc-header" class="text-slate-500 text-sm max-w-2xl mx-auto mb-4">Penilaian standar nasional untuk pemetaan mutu dan penyetaraan capaian (bersifat opsional/tidak menentukan kelulusan).</p>
             
             <!-- Banner Info Standar TKA Kemendikdasmen per Jenjang yang Aktif -->
-            <div id="info-standar-banner" class="bg-slate-50 border border-indigo-100 rounded-2xl p-4 mb-6 text-left text-xs text-slate-700">
+            <div id="info-standar-banner" class="bg-slate-50 border border-indigo-100 rounded-2xl p-4 mb-6 text-left text-xs text-slate-700 hidden">
                 <div class="flex items-center justify-between gap-2 mb-2 font-bold text-indigo-900 border-b border-indigo-100 pb-2">
                     <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-indigo-600"></i> <span id="banner-jenjang-nama">Jenjang SMA / MA / SMK (Kelas 12 & 13 SMK)</span></span>
                     <span id="banner-durasi-badge" class="bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full text-[11px]">Durasi: 2 Hari</span>
@@ -248,7 +276,7 @@
             </div>
 
             <!-- Tabel Komparasi Standar TKA Resmi Kemendikdasmen (Collapsible) -->
-            <details class="mb-6 text-left group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <details class="mb-6 text-left group bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hidden">
                 <summary class="cursor-pointer font-bold text-xs p-3.5 text-slate-700 flex items-center justify-between select-none hover:bg-slate-50">
                     <span class="flex items-center gap-2"><i class="fa-solid fa-table-list text-indigo-500"></i> Lihat Tabel Perbandingan Standar TKA (SD, SMP, SMA)</span>
                     <i class="fa-solid fa-chevron-down text-slate-400 transition-transform group-open:rotate-180"></i>
@@ -319,9 +347,9 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Jenjang Pendidikan TKA</label>
                     <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
-                        <option value="SMA" selected>SMA / MA / SMK (Kelas 12/13 · Skala 200–800)</option>
-                        <option value="SMP">SMP / MTs (Kelas 9 · Skala 0–100)</option>
-                        <option value="SD">SD / MI (Kelas 6 · Skala 0–100)</option>
+                        <option value="SMA" selected>SMA / MA / SMK (Kelas 12/13)</option>
+                        <option value="SMP">SMP / MTs (Kelas 9)</option>
+                        <option value="SD">SD / MI (Kelas 6)</option>
                     </select>
                 </div>
                 <div id="u-jurusan-wrap">
@@ -356,7 +384,7 @@
                     <i class="fa-brands fa-google text-amber-300"></i> Buat via AI + Riset Google Search
                 </button>
                 <button onclick="window.mulaiKuis(false)" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-xl transition text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-database text-indigo-400"></i> Ambil dari Bank Soal TKA
+                    <i class="fa-solid fa-infinity text-indigo-400"></i> Generator TKA (Tanpa Kuota AI)
                 </button>
             </div>
         </section>
@@ -431,7 +459,7 @@
             <h2 class="text-2xl font-extrabold text-slate-900 mb-1">Evaluasi TKA Selesai!</h2>
             <p class="text-slate-500 text-xs mb-6">Hasil simulasi dan capaian kompetensi akademik Anda telah dicatat ke sistem.</p>
             
-            <div class="bg-slate-50 p-5 rounded-2xl max-w-xs mx-auto mb-4 border border-slate-200 shadow-sm">
+            <div class="bg-slate-50 p-5 rounded-2xl max-w-xs mx-auto mb-4 border border-slate-200 shadow-sm hidden">
                 <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider block mb-1">Skor Perolehan TKA</span>
                 <span id="final-score" class="text-4xl font-black text-indigo-600">0</span>
                 <span id="score-scale-info" class="text-xs text-slate-400 font-medium block mt-1">Skala Penilaian: 200 hingga 800</span>
@@ -440,7 +468,7 @@
                 </div>
             </div>
 
-            <div id="predikat-box" class="text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto">
+            <div id="predikat-box" class="text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto hidden">
                 <div id="predikat-title" class="font-extrabold text-sm mb-1">Kategori: Memadai</div>
                 <div id="predikat-desc" class="text-[11px] font-normal leading-relaxed text-slate-600">Memenuhi capaian standar pemetaan kompetensi akademik.</div>
             </div>
@@ -491,6 +519,8 @@
 
         let currentUser = null;
         let userProfileData = null;
+        let serverUserData = null;
+        let isLoading = true;
         let bankSoalCloud = [];
         let activeQuestions = [];
         let currentIndex = 0;
@@ -542,6 +572,5102 @@
         };
 
         const DEFAULT_QUESTIONS = [
+...[
+    {
+        "id": "tka_smp_indo_1",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna kata artistik pada teks tersebut adalah",
+        "pilihan": [
+            "memiliki nilai seni",
+            "bermotif sederhana",
+            "seorang seniman/seniwat",
+            "berhubungan dengan artis"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_2",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Dalam proses membatik tersebut, mengapa kain perlu direndam pada larutan pengunci warna?",
+        "pilihan": [
+            "Untuk membuat kain menjadi lebih lembut dan halus.",
+            "Untuk mempercepat malam lebih cepat menempel pada kain.",
+            "Untuk mengikat warna secara permanen dan tidak mudah pudar.",
+            "Untuk memastikan hasil pewarnaan tetap awet dan warna tahan lama."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_3",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jika seorang siswa ingin mempraktikkan langkah nomor 6, manakah pernyataan berikut yang menunjukkan kesesuaian antara daftar alat bahan dengan langkah-langkah yang harus ia siapkan?",
+        "pilihan": [
+            "Siswa dapat menggunakan canting dan wadah besar untuk mengalirkan air mendidih...",
+            "Siswa memerlukan panci besar untuk memanaskan malam...",
+            "Siswa membutuhkan panci besar untuk merebus air agar malam...",
+            "Siswa harus memastikan telah menyiapkan kompor dan wajan..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_4",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Informasi yang tepat berdasarkan teks berita 'Safari Gemarikan' tersebut adalah...",
+        "pilihan": [
+            "Program Safari digalakkan sebagai upaya mencegah stunting.",
+            "Diselenggarakan Sabtu, 12 Desember 2025.",
+            "Masyarakat perlu konsumsi ikan sumber protein.",
+            "Pemerintah menyalurkan 500 paket bantuan..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_5",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Apabila anak-anak rajin mengonsumsi ikan, maka hal yang akan terjadi adalah (Benar/Salah)",
+        "pilihan": [
+            "Penglihatan mata anak menjadi lebih tajam.",
+            "Kecerdasan dan daya tahan tubuh anak meningkat.",
+            "Pertumbuhan psikis anak meningkat signifikan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_6",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penilaian yang tepat terhadap berita 'Safari Gemarikan' tersebut adalah...",
+        "pilihan": [
+            "Mengandung kalimat langsung untuk memperkuat informasi.",
+            "Memiliki relevansi kuat dengan isu stunting.",
+            "Menyebutkan pihak-pihak yang hadir sebagai bentuk dukungan.",
+            "Tidak menjelaskan alasan pemerintah menyelenggarakan kegiatan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_7",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan yang tepat sesuai pokok-pokok isi teks 'Pelari Kalcer' adalah...",
+        "pilihan": [
+            "Perubahan fenomena lari -> Dampak positif/negatif -> Aktivitas meningkat",
+            "Fenomena Pelari Kalcer -> Dampak positif/negatif -> Simbol transformasi",
+            "Fenomena Pelari Modern -> Dampak positif/negatif -> Kata kalcer berasal",
+            "Perubahan fenomena -> Dampak positif/negatif -> Aktivitas meningkat"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_8",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Ide pokok paragraf pertama teks 'Pelari Kalcer' adalah...",
+        "pilihan": [
+            "pandangan olahraga lari bagi sebagian orang",
+            "fenomena pelari yang sedang menjamur di Indonesia",
+            "asal usul kata kalcer yang sering digunakan anak muda",
+            "perubahan citra olahraga lari dari adanya fenomena pelari kalcer"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_9",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Berdasarkan teks, manakah fenomena yang relevan menggambarkan kategori pelari kalcer?",
+        "pilihan": [
+            "Atlet lari profesional melakukan latihan fisik.",
+            "Bella bergabung ke komunitas lari memakai pakaian kekinian.",
+            "Andi membeli sepatu terbaru dan mengunggah foto ke media sosial.",
+            "Shafa rutin lari di dalam rumah tanpa pakaian khusus."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_10",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pernyataan yang tepat mengenai latar tempat dan suasana pada puisi 'Gadis Peminta-minta' (Benar/Salah)",
+        "pilihan": [
+            "Frasa bawah jembatan menunjukkan tempat tinggal.",
+            "Larik kotaku jadi hilang menggambarkan latar menyedihkan.",
+            "Larik melintas di atas air kotor menggambarkan latar sepi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_11",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna kias pada larik 'gadis kecil berkaleng kecil' adalah...",
+        "pilihan": [
+            "Anak perempuan yang gemar menabung.",
+            "Seorang anak perempuan yang hidup menjadi pengemis.",
+            "Anak perempuan yang mencari nafkah menjadi pengamen.",
+            "Gambaran anak yang rajin membantu orang tuanya bekerja."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_12",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pendapat siapa yang tepat untuk menggambarkan rasa empati setelah membaca puisi?",
+        "pilihan": [
+            "Luna karena menunjukkan rasa emosional haru.",
+            "Luthfi karena mengungkapkan pendapat semangat bekerja.",
+            "Naufal karena sependapat dengan Luna dan prihatin.",
+            "Cinta karena mengungkapkan persetujuan atas Luthfi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_13",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kerangka cerita secara runtut sesuai isi teks 'Panggung untuk Sena' adalah...",
+        "pilihan": [
+            "Gugup -> Senar putus -> Fajar meminjamkan gitar -> Tampil memukau",
+            "Gugup -> Senar putus -> Enggan menerima pinjaman -> Tampil",
+            "Gugup -> Nama dipanggil -> Tampil percaya diri -> Memukau",
+            "Gugup -> Senar putus -> Bingung -> Pinjaman guru"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_14",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kemungkinan yang akan terjadi pada hubungan Sena dan Fajar setelah festival berakhir...",
+        "pilihan": [
+            "Sena dan Fajar akan mulai sering berlatih musik bersama.",
+            "Fajar akan meminta bayaran sewa gitar.",
+            "Sena dan Fajar menjadi musuh dan adu kehebatan.",
+            "Sena akan membeli gitar Fajar karena bagus."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_15",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Manakah peristiwa dalam cerita yang relevan dengan kehidupan sehari-hari? (Benar/Salah)",
+        "pilihan": [
+            "Rasa gugup saat tampil adalah hal wajar.",
+            "Seharusnya Sena tidak mudah menerima bantuan musuh.",
+            "Tindakan Fajar menunjukkan sikap peduli diutamakan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_16",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kata istilah bidang sejarah yang tepat berdasarkan teks 'Goa Selarong' adalah...",
+        "pilihan": [
+            "perang",
+            "kolonial",
+            "gerilya",
+            "bangsa"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_17",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pernyataan yang sesuai dengan kondisi Goa Selarong saat ini adalah (Benar/Salah)",
+        "pilihan": [
+            "Menjadi salah satu markas Diponegoro.",
+            "Dilengkapi fasilitas area parkir dan warung makan.",
+            "Sering dikunjungi pelajar untuk belajar di luar kelas."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_18",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola pengembangan paragraf kedua teks 'Goa Selarong' adalah....",
+        "pilihan": [
+            "urutan waktu",
+            "sebab akibat",
+            "urutan ruang",
+            "perbandingan"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_19",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Berdasarkan teks 'Jam Koma', kondisi kelelahan dan menurunnya konsentrasi menunjuk pada....",
+        "pilihan": [
+            "penurunan prestasi akademik",
+            "dampak penggunaan gawai",
+            "peristiwa ngantuk di kelas",
+            "fenomena jam koma"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_20",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penyebab terjadinya fenomena Jam Koma pada pelajar adalah...",
+        "pilihan": [
+            "Siswa menunjukkan perilaku mengantuk di kelas.",
+            "Guru selalu menggunakan metode bervariasi.",
+            "Jadwal sangat padat tanpa jeda istirahat cukup.",
+            "Penggunaan gawai hingga larut malam."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_21",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Relevansi isi teks Jam Koma dengan kehidupan sehari-hari (Benar/Salah)",
+        "pilihan": [
+            "Mengatur waktu tidur membantu fokus.",
+            "Hanya disebabkan jadwal siang hari.",
+            "Metode bervariasi membuat semangat."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_22",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penggunaan istilah bidang kesehatan yang tidak tepat dalam teks 'Gaya Hidup Sehat' adalah....",
+        "pilihan": [
+            "Kata nutrisi pada paragraf 2.",
+            "Kata imunitas pada paragraf 2.",
+            "Kata metabolisme pada paragraf 3.",
+            "Kata biologis pada paragraf 5."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_23",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gagasan yang mendukung bahwa nutrisi sangat penting bagi tubuh remaja adalah....",
+        "pilihan": [
+            "Gaya hidup sehat saling berkaitan.",
+            "Makanan bergizi berfungsi penyokong energi dan pelindung.",
+            "Remaja disarankan membatasi makanan cepat saji.",
+            "Ikan dan telur sumber protein mudah ditemukan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_24",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mengapa judul dalam teks tersebut sudah sesuai dengan isi teks?",
+        "pilihan": [
+            "Merangkum berbagai pilar kesehatan fisik, istirahat, mental.",
+            "Memaparkan rincian jenis makanan bergizi.",
+            "Menekankan dampak negatif di masa depan.",
+            "Menyajikan solusi praktis mengatasi gangguan konsentrasi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_25",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Fakta dalam teks 'Ulasan Konser NDX' adalah...",
+        "pilihan": [
+            "Konser berlangsung di Stadion Mandala Krida.",
+            "Penampilan NDX dinilai sangat energik.",
+            "Lagu yang dibawakan Nemen dan Sayang.",
+            "Konser memberikan kesan positif layak diapresiasi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_26",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Simpulan yang paling tepat mengenai jalannya acara tersebut adalah...",
+        "pilihan": [
+            "Hanya dinikmati warga Yogyakarta.",
+            "Penampilan kurang maksimal karena interaksi kurang.",
+            "Walau padat di depan, secara keseluruhan berkesan positif.",
+            "Konser dianggap gagal karena ribuan penonton tidak puas."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_27",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penggunaan konjungsi yang tidak tepat pada paragraf keempat adalah....",
+        "pilihan": [
+            "namun",
+            "sehingga",
+            "karena",
+            "dan"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_28",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kalimat yang menunjukkan latar waktu dalam teks 'Chronos' (Benar/Salah)",
+        "pilihan": [
+            "Cahaya temaram menyelinap di antara sela-sela jendela...",
+            "Saat itu, gunung dapat runtuh dalam sehari...",
+            "Dengan keberanian dan keikhlasan, Arka..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_29",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Nilai-nilai yang dapat dipelajari dari tokoh Arka adalah....",
+        "pilihan": [
+            "Kesadaran tanggung jawab memulihkan keseimbangan.",
+            "Keinginan mengumpulkan benda antik.",
+            "Pentingnya keberanian dan ketulusan hati menolong.",
+            "Keharusan memiliki kekuatan fisik besar."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_30",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pengaruh penggunaan benda jam kecil terhadap kekuatan alur cerita (Benar/Salah)",
+        "pilihan": [
+            "Memperlemah alur karena membingungkan.",
+            "Bukti fisik memperkuat resolusi dampak nyata.",
+            "Simbol yang memperkuat tema penutup mendalam."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_31",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna kata antioksidan pada paragraf keempat kalimat ketiga adalah",
+        "pilihan": [
+            "Zat aditif untuk mencegah oksidasi...",
+            "Zat dari luar tubuh seperti asap rokok...",
+            "Senyawa dari dalam tubuh sisa metabolisme...",
+            "Sifat senyawa yang mampu melindungi sel dari radikal bebas..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_32",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Fakta atau opini untuk pernyataan (Fakta/Opini)",
+        "pilihan": [
+            "Telur rebus mengandung protein lengkap...",
+            "Menurut Journal of Clinical Nutrition...",
+            "Kombinasi protein dan lemak membantu..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_33",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kesimpulan dari teks tersebut adalah...",
+        "pilihan": [
+            "Mengonsumsi telur rebus sangat penting...",
+            "Membiasakan makan telur rebus dapat mengelola energi.",
+            "Telur membantu menjaga daya tahan tubuh...",
+            "Telur rebus praktis dan mendukung kesehatan tubuh..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_34",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan yang sesuai teks Lumba-lumba adalah...",
+        "pilihan": [
+            "Kecerdasan -> Sosial -> Komunikasi -> Kecepatan -> Kepopuleran",
+            "Kecerdasan -> Sosial -> Komunikasi -> Keahlian -> Pelestarian",
+            "Keterkenalan -> Sosial -> Komunikasi -> Keahlian -> Kepopuleran",
+            "Kecerdasan -> Sosial -> Suara -> Tarik -> Pelestarian"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_35",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gagasan pendukung paragraf pertama adalah...",
+        "pilihan": [
+            "Kecerdasan lumba-lumba yang luar biasa.",
+            "Lumba-lumba memiliki otak yang sangat cerdas.",
+            "Mereka memiliki kemampuan untuk memahami perintah.",
+            "Lumba-lumba sangat terkenal untuk atraksi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_36",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pernyataan yang sesuai dengan teks tersebut adalah...",
+        "pilihan": [
+            "Taman hiburan memanfaatkan atraksi lumba-lumba.",
+            "Kemampuan memahami saat ada pelatihnya.",
+            "Interaksi sosial dengan gerakan sinkron menakjubkan.",
+            "Bahasa kompleks menyulitkan pemahaman satu sama lain."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_37",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Komentar yang sesuai dengan kutipan teks adab adalah...",
+        "pilihan": [
+            "Ilmu di tangan orang tidak beretika berbahaya, solusinya nomorsatukan ilmu.",
+            "Tanpa adab proses transfer ilmu tidak efektif/harmonis.",
+            "Adab diperoleh lewat studi, ilmu lewat pelatihan.",
+            "Ilmu tinggi minim adab pasti disalahgunakan merusak."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_38",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Karakter tokoh aku yang pantang menyerah dan bersyukur disampaikan melalui...",
+        "pilihan": [
+            "kebiasaan tokoh",
+            "dialog antartokoh",
+            "sikap dan perbuatan tokoh",
+            "diceritakan langsung oleh pengarang"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_39",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Nilai kehidupan yang terdapat dalam kutipan cerpen tersebut bernomor...",
+        "pilihan": [
+            "(1) dan (3)",
+            "(1) dan (4)",
+            "(2) dan (3)",
+            "(2) dan (4)"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_40",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Objek atau latar yang paling mungkin dalam kutipan cerpen adalah...",
+        "pilihan": [
+            "di sungai",
+            "di kampung",
+            "di pegunungan",
+            "di tepi sungai"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_41",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Akibat konflik yang dialami tokoh Mia adalah...",
+        "pilihan": [
+            "Terbiasa dengan pertengkaran.",
+            "Menyadari bakat musiknya sebagai sumber kekuatan.",
+            "Memilih menjauh dari orang tuanya.",
+            "Merasa konflik wajar dan tidak perlu diselesaikan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_42",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Struktur kutipan cerita pendek tersebut (Benar/Salah)",
+        "pilihan": [
+            "Paragraf pertama merupakan orientasi.",
+            "Paragraf 2,3,4 merupakan komplikasi.",
+            "Paragraf terakhir merupakan resolusi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_43",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kutipan cerita pendek tersebut menggunakan sudut pandang...",
+        "pilihan": [
+            "orang pertama pelaku utama",
+            "orang pertama pelaku sampingan",
+            "orang ketiga sebagai pengamat",
+            "orang ketiga serba tahu"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_44",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Urutan prosedur mengirim email yang tepat adalah...",
+        "pilihan": [
+            "(3), (2), (1), (5), (6), (4)",
+            "(3), (5), (2), (1), (6), (4)",
+            "(3), (1), (2), (5), (6), (4)",
+            "(3), (6), (2), (5), (1), (4)"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_45",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hubungan logis antarparagraf dalam teks berita KRI Prabu Siliwangi adalah...",
+        "pilihan": [
+            "Paragraf 1 umum, paragraf 2 spesifik.",
+            "Paragraf 1 kesimpulan, 2 pendapat pribadi.",
+            "Paragraf 4 sebab, 5 akibat.",
+            "Paragraf 4 akibat, 5 sebab."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_46",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Konjungsi kronologis pada paragraf 7 sampai 9 adalah...",
+        "pilihan": [
+            "sejak",
+            "setelah",
+            "kemudian",
+            "serta"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_47",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Unsur berita kutipan teks tersebut (Sesuai/Tidak)",
+        "pilihan": [
+            "Paragraf ke-1 memuat unsur apa dan bagaimana.",
+            "Paragraf ke-2 memuat unsur apa, siapa, dan kapan.",
+            "Paragraf ke-3 memuat unsur apa, di mana, kapan, bagaimana."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_48",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Larik 'Cahaya hidup-Malaikat pelindung' menggambarkan ibu sebagai sosok yang...",
+        "pilihan": [
+            "memberikan ketenangan dan rasa aman.",
+            "memiliki kekuatan mengatur anak.",
+            "mengharapkan balasan pengorbanan.",
+            "berperan pusat perhatian keluarga."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_49",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tema puisi 'Ibu' tersebut adalah...",
+        "pilihan": [
+            "penyesalan seorang anak.",
+            "perjuangan hidup ibu yang hebat.",
+            "rasa sayang dan rasa terima kasih kepada ibu.",
+            "kesedihan hati ibu."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_50",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Amanat penyair (Sesuai/Tidak Sesuai)",
+        "pilihan": [
+            "Anak menuruti semua keinginan ibu.",
+            "Anak menghargai dan berterima kasih pengorbanan ibu.",
+            "Anak menyayangi dan menghormati ibu."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_51",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Abrasi di pantai diprediksi menyebabkan...",
+        "pilihan": [
+            "Nelayan sulit menjangkau pantai.",
+            "Kehilangan lahan pekarangan/tambak.",
+            "Bangunan/akses jalan nelayan rusak.",
+            "Kehilangan mata pencaharian."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_52",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Relevansi peristiwa abrasi dengan kehidupan sehari-hari adalah...",
+        "pilihan": [
+            "Pencegahan mustahil.",
+            "Hanya merusak pasir tidak bangunan.",
+            "Dampak besar tanpa upaya sesuai yang dirasakan.",
+            "Informasi pencegahan penting bagi masyarakat pesisir."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_53",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penggunaan kata depan pada teks abrasi (Tepat/Tidak)",
+        "pilihan": [
+            "Penggunaan 'di' pada kalimat 1 tepat.",
+            "Penulisan 'di daerah' dipisah karena kata depan.",
+            "Kata oleh tidak tepat seharusnya dari."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_54",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna ungkapan 'bagai pelita membakar diri' adalah...",
+        "pilihan": [
+            "pantang menyerah demi kebenaran",
+            "ikhlas menerangi orang membutuhkan",
+            "berjuang mendapatkan kebaikan",
+            "rela berkorban demi kebaikan orang lain"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_55",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Relevansi cerita Luna dan Stroberi dengan kehidupan sehari-hari...",
+        "pilihan": [
+            "Membuat stroberi warna pelangi era digital.",
+            "Menularkan keterampilan pewarnaan stroberi.",
+            "Keikhlasan berbagi rezeki patut diterapkan.",
+            "Rela tidak dapat penghasilan ciri masyarakat saat ini."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_56",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penilaian teks ulasan film (Tepat/Tidak)",
+        "pilihan": [
+            "Data identitas cukup tapi tidak ada info jenis film.",
+            "Tidak terdapat penjelasan masalah tokoh.",
+            "Tidak dijelaskan kelemahannya kurang objektif."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_57",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penilaian kalimat: Penggunaan berbagai kata-kata yang tepat dan kostum...",
+        "pilihan": [
+            "Kata 'Penggunaan' diganti 'Menggunakan'.",
+            "Kata 'berbagai' tidak efektif dihilangkan.",
+            "Kata 'dan' diganti 'atau'.",
+            "Kata 'bagus' diganti 'mahal'."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_58",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penilaian teks prosedur Keripik Pisang...",
+        "pilihan": [
+            "Lengkap tapi tak ada langkah kerja.",
+            "Pembuka 2 paragraf, penutup tidak ada.",
+            "Bahan dijelaskan, alat tidak.",
+            "Bahan lengkap tapi tidak disertai ukuran."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_59",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tanggapan yang tepat terhadap teks prosedur (Tepat/Tidak)",
+        "pilihan": [
+            "Perlu penjelasan cara membuat aneka rasa sesuai judul.",
+            "Akan menghasilkan keripik rasa asin saja (bumbu garam).",
+            "Langkah tidak jelas dan tidak imperatif."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_60",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tindak lanjut pembaca setelah membaca teks tersebut adalah...",
+        "pilihan": [
+            "membuat jumlah besar tanpa batas",
+            "mencoba mempraktikkan langkah-langkah",
+            "membuat usaha omset langsung besar",
+            "mewawancarai penjual keripik"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_61",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kosakata yang tepat menggambarkan letak Museum Sonobudoyo?",
+        "pilihan": [
+            "Dekat Titik Nol Kilometer.",
+            "Dalam kawasan Malioboro.",
+            "Barat laut Alun-Alun Utara.",
+            "Seberang Keraton Yogyakarta."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_62",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan yang tepat menggambarkan informasi penting dalam teks Museum Sonobudoyo?",
+        "pilihan": [
+            "Arsitektur bergaya Bali...",
+            "Arsitektur bergaya Madura...",
+            "Arsitektur bergaya Jawa, 40.000 koleksi tematik, wayang kulit...",
+            "Arsitektur bergaya Arab..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_63",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mengapa Museum Sonobudoyo dijuluki Permata Budaya?",
+        "pilihan": [
+            "Keberagaman koleksi perkembangan Jawa.",
+            "Letak strategis jantung kota.",
+            "Merepresentasikan seni dan jati diri masyarakat Jawa.",
+            "Latar sejarah menciptakan magis khas."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_64",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pendapat tentang gaya bahasa pada teks (Benar/Salah)",
+        "pilihan": [
+            "Ninik lugas sederhana.",
+            "Pinta majas personifikasi.",
+            "Bram ungkapan permata budaya kata kias."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_65",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bahan yang digunakan untuk mencangkok berdasarkan teks adalah...",
+        "pilihan": [
+            "batang mangga, tanah gembur, pupuk, sabut kelapa",
+            "bibit mangga, campuran tanah, pupuk, air",
+            "campuran tanah gembur, pupuk, plastik bening",
+            "batang sehat, air, pupuk, pisau, polybag"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_66",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tujuan media cangkokan tidak boleh terpapar sinar matahari?",
+        "pilihan": [
+            "Batang tetap kesat.",
+            "Akar cepat tumbuh.",
+            "Media tetap lembap.",
+            "Terbebas dari hama."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_67",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mengapa prosedur mudah diikuti Dina? (Benar/Salah)",
+        "pilihan": [
+            "Tahapan disusun secara urut.",
+            "Bahan disertai ukuran yang rinci.",
+            "Alat dan bahan dijelaskan terpisah."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_68",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Upaya apa yang dapat dilakukan untuk memperkuat ketahanan pangan?",
+        "pilihan": [
+            "Mendorong produksi sumber daya alam.",
+            "Meningkatkan pengetahuan generasi muda di bidang pangan.",
+            "Menguatkan kemampuan membaca menulis.",
+            "Mengasah kemampuan berpikir kritis."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_69",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan yang paling sesuai teks berita Sekolah Garuda...",
+        "pilihan": [
+            "Keseimbangan akses, Pembangunan 20 baru 80 transformasi...",
+            "Kemdiktisaintek, Program Nomor 4...",
+            "Program mewujudkan keseimbangan, Kemdiktisaintek...",
+            "Program Cepat No 4, Pembangunan 20 baru 80 transformasi..."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_70",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Perbedaan informasi pada kedua teks tentang program pemerintah...",
+        "pilihan": [
+            "tujuan program",
+            "tahun peristiwa",
+            "manfaat program",
+            "pihak penyelenggara"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_71",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kaidah kebahasaan kedua teks (Sesuai/Tidak)",
+        "pilihan": [
+            "Keterangan waktu.",
+            "Kalimat langsung menambah keakuratan.",
+            "Kata teknis bidang literasi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_72",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna kata omzet dalam teks Rojali Rohana...",
+        "pilihan": [
+            "total pendapatan penjualan produk",
+            "jumlah modal penjualan",
+            "total keuntungan belanja",
+            "jumlah uang hasil penjualan"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_73",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mengapa masyarakat mengalami perubahan pola konsumsi pascapandemi?",
+        "pilihan": [
+            "Enggan membeli langsung fasilitas kurang.",
+            "Perbedaan harga besar belanja daring vs langsung.",
+            "Harga bahan pokok terus meningkat enggan belanja.",
+            "Inflasi harga memaksa membeli daring."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_74",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Teks disajikan runtut (Benar/Salah)",
+        "pilihan": [
+            "Diawali penjelasan umum fenomena.",
+            "Faktor penyebab dijelaskan kronologi.",
+            "Akhir berisi riset solusi fenomena."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_75",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pernyataan mendukung usaha kopi keliling sedang tren...",
+        "pilihan": [
+            "Peluang usaha anak muda modal kecil.",
+            "Konsep penjual racikan di kedai.",
+            "Keterbatasan tempat duduk tantangan.",
+            "Dampak budaya nongkrong lupa waktu."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_76",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Daftar kata menggambarkan laundry self service...",
+        "pilihan": [
+            "Mencuci pakaian, higienis, bantuan pegawai.",
+            "Cuci otomatis, bantuan karyawan, lapangan kerja.",
+            "Lapangan kerja, praktis, gaya hidup.",
+            "Inovasi populer, cuci otomatis, layanan mandiri."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_77",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kelebihan laundry self service...",
+        "pilihan": [
+            "Meminimalisasi kebutuhan tenaga.",
+            "Membuka peluang teknisi.",
+            "Mengurangi kesalahan pengoperasian.",
+            "Kenyamanan pelanggan bersantai saat mencuci."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_78",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Teks 1 lebih akurat dari Teks 2 (Benar/Salah)",
+        "pilihan": [
+            "Penilaian pribadi penulis disertai data.",
+            "Banyak memuat asumsi membujuk pembaca.",
+            "Relevan untuk semua usia."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_79",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kosakata menggambarkan latar suasana khusyuk...",
+        "pilihan": [
+            "bait 1 larik 3",
+            "bait 2 larik 2",
+            "bait 7 larik 1",
+            "bait 8 larik 3"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_80",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hal yang dapat dipelajari dari puisi 'Doa'...",
+        "pilihan": [
+            "Semangat menjalani takdir!",
+            "Percayalah pada Tuhan!",
+            "Berdoalah agar tidak tersesat!",
+            "Dekatkanlah diri pada Tuhan!"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_81",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna kias 'tinggal kerdip lilin di kelam sunyi'...",
+        "pilihan": [
+            "Keimanan tinggal sedikit di hati.",
+            "Kegelapan yang membuat takut.",
+            "Keputusasaan karena masa lalu.",
+            "Kehancuran membuat kehilangan semangat."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_82",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pendapat menggambarkan penyerahan hamba kepada Tuhan (Sesuai/Tidak)",
+        "pilihan": [
+            "Helmi memotivasi berbuat kebaikan.",
+            "Abram menyesal perbuatan.",
+            "Rida kepasrahan diri pada Tuhan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_83",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hans akhirnya memilih bersekolah di SMK karena...",
+        "pilihan": [
+            "merasa kasihan kepada Ibunya",
+            "terpaksa memenuhi keinginan Bapak",
+            "mendapat beasiswa dari perguruan tinggi",
+            "ingin membuat bengkel Bapak berkembang"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_84",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan tepat peristiwa penting dalam cerita Hans...",
+        "pilihan": [
+            "Hans ingin SMA -> Ibu tidak setuju -> Nasihat SMK -> SMK & berhasil",
+            "Hans ingin SMA -> Ibu menasihati -> Ibu ketidaksetujuan Bapak -> Terpaksa SMK",
+            "Hans ingin SMA -> Nasihat SMK -> Ibu ketidaksetujuan Bapak -> Terpaksa SMK",
+            "Hans ingin SMA -> Nasihat SMK -> Ibu ketidaksetujuan -> SMK & berhasil"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_85",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Perubahan sikap Hans setelah masuk SMK...",
+        "pilihan": [
+            "Gigih mencari beasiswa.",
+            "Cinta dengan bidang pekerjaan.",
+            "Tekun mempelajari otomotif.",
+            "Semangat melanjutkan perguruan tinggi."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_86",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Respons pembaca setelah Hans tidak dapat melanjutkan SMA (Sesuai/Tidak)",
+        "pilihan": [
+            "Sedih tidak mewujudkan keinginan.",
+            "Kecewa tidak bisa menjadi montir.",
+            "Kasihan harus menuruti ayah."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_87",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Apa yang dilakukan Danu ketika melawan Bayangan Kegelapan?",
+        "pilihan": [
+            "Memanggil hewan-hewan hutan.",
+            "Menciptakan jalur sinar di langit.",
+            "Menembakkan panah cahaya.",
+            "Membaca mantra pengunci."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_88",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kondisi Negeri Arunika jika akhir pertarungan tidak bersatu?",
+        "pilihan": [
+            "Menjadi sunyi tanpa warna.",
+            "Bayangan Kegelapan menguasai langit.",
+            "Kristal cahaya retak.",
+            "Cahaya tetap bersinar tanpa kekuatan."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_89",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penggunaan kata 'jantung kehidupan' untuk kristal cahaya bertujuan...",
+        "pilihan": [
+            "Menguatkan peran kristal penopang kehidupan.",
+            "Pusat keberlangsungan kesejahteraan.",
+            "Hubungan emosional memberi harapan.",
+            "Lambang kebanggaan identitas."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_90",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Contoh kejadian sehari-hari serupa aksi Penjaga Bintang (Benar/Salah)",
+        "pilihan": [
+            "Redy mengajak kerja sama tugas.",
+            "Rafi mengerjakan tugas teman semua.",
+            "Septi dan teman saling mendukung lomba."
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_1",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Diberikan beberapa bilangan pecahan: 1,65 ; 7/5 ; 175% ; 1 3/5. Urutan terkecil ke terbesar adalah",
+        "pilihan": [
+            "1 3/5 ; 1,65 ; 7/5 ; 175%",
+            "7/5 ; 1 3/5 ; 1,65 ; 175%",
+            "7/5 ; 1 3/5 ; 1,65 ; 175%",
+            "7/5 ; 1 3/5 ; 175% ; 1,65"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_2",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Olimpiade Skor: Benar(5), Salah(-2), Kosong(0). Candra 41B 3K; Zakki 39B 6K; Aan 42B 2K; Salwa 40B 4K. Pernyataan benar...",
+        "pilihan": [
+            "Aan skor 198",
+            "Candra lebih tinggi dari Aan",
+            "Selisih Candra Salwa 6",
+            "Zakki di bawah Salwa"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_3",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Harga baju diskon: Toko Salwa 50%, Jenna 40%+10%, Alif 30%+20% dari Rp120.000 (Benar/Salah)",
+        "pilihan": [
+            "Jenna = Rp64.800",
+            "Salwa = Rp50.000",
+            "Alif paling mahal"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_4",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Segitiga ABC keliling akar(512). AB=4akar(2), AC=akar(50). Panjang BC adalah...",
+        "pilihan": [
+            "6 akar 2",
+            "7 akar 2",
+            "8 akar 2",
+            "9 akar 2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_5",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Taksiran pesanan barang seminggu dalam ribuan: 67210, 56910, 25315, 15860, 67456, 23678, 32506",
+        "pilihan": [
+            "286.000",
+            "288.000",
+            "289.000",
+            "290.000"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_6",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "3 bilangan: 48, 60, 72. Pernyataan benar...",
+        "pilihan": [
+            "Faktorisasi 60 = 2^2 x 3 x 5",
+            "Faktorisasi 72 = 2^2 x 3",
+            "Faktor persekutuan = 2 x 3",
+            "FPB = 2^2 x 3"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_7",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jarak 60km. Waktu 06.00-07.30. Jika dipercepat 30 menit, kecepatan adalah...",
+        "pilihan": [
+            "120 km/jam",
+            "90 km/jam",
+            "60 km/jam",
+            "45 km/jam"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_8",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Berdasarkan denah rumah skala 1:100...",
+        "pilihan": [
+            "Keliling kamar tidur 1 pada gambar 15cm",
+            "Luas kamar 2 sebenarnya 14 m^2",
+            "Keliling teras depan 12cm",
+            "Luas teras samping 4,5 m^2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_9",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "5 orang + Pak Bimo (total 6) selesai 90 hari. Agar selesai 60 hari butuh tambahan pekerja...",
+        "pilihan": [
+            "3 orang",
+            "4 orang",
+            "6 orang",
+            "9 orang"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_10",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola segitiga... Pernyataan benar...",
+        "pilihan": [
+            "Segitiga merah pola ke-8 adalah 36",
+            "Segitiga putih pola ke-8 adalah 30",
+            "Jumlah pola ke-8 adalah 81",
+            "Selisih pola ke-8 adalah 8"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_11",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Barisan aritmetika, U5=6, U11=24. (Benar/Salah)",
+        "pilihan": [
+            "Beda adalah 3",
+            "U32 adalah 88",
+            "Selisih U32 dan U11 adalah 63"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_12",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Baris kursi: 14, 16, 18,... ada 25 baris. Jumlah seluruh kursi...",
+        "pilihan": [
+            "62 kursi",
+            "475 kursi",
+            "950 kursi",
+            "1900 kursi"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_13",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Diketahui 3(2x-5) = 1/2 (x+3). Nilai 6x-1 adalah...",
+        "pilihan": [
+            "3",
+            "11",
+            "17",
+            "19"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_14",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kapasitas 8 kuintal. Kardus A(30kg), B(25kg). Sopir(85kg). Sudah isi 15 kardus A. Maks kardus B...",
+        "pilihan": [
+            "9 kardus",
+            "10 kardus",
+            "11 kardus",
+            "12 kardus"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_15",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "3kg salak + 5kg jeruk = 130.000. 4kg salak + 3kg jeruk = 100.000. Pernyataan...",
+        "pilihan": [
+            "Salak 12.000",
+            "Jeruk 20.000",
+            "2kg salak + 2kg jeruk = 64.000",
+            "Harga jeruk dua kali harga salak"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_16",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas sawah Pak Adams (3a-b) dan (5a+3b)...",
+        "pilihan": [
+            "15a^2 - 3b^2 + 4ab",
+            "15a^2 + 3b^2 - 4ab",
+            "15a^2 - 3b^2 - 4ab",
+            "15a^2 + 3b^2 + 4ab"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_17",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Fungsi linear f(x)=ax+b, f(-3)=-18, f(2)=7. Pernyataan...",
+        "pilihan": [
+            "a = 5",
+            "b = 3",
+            "f(x) = 5x - 3",
+            "f(6) = 27"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_18",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gambar sudut x=60, y+65 dll. Pernyataan...",
+        "pilihan": [
+            "x = 55",
+            "y = 125",
+            "Penyiku x = 30",
+            "x+y = 180"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_19",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Posisi sepeda Syafiq, Nathan, Akhtar...",
+        "pilihan": [
+            "Syafiq - Nathan 1200m",
+            "Syafiq - Akhtar 3900m",
+            "Nathan - Akhtar 2700m",
+            "Nathan hampiri Syafiq = 2100m"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_20",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Segitiga ABC kongruen XYZ (Benar/Salah)",
+        "pilihan": [
+            "Sudut XYZ = ACB",
+            "Sudut ABC = XZY",
+            "Panjang AC = XZ"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_21",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Lukisan dan bingkai sebangun. Lebar sisa atas kiri kanan 6cm. (Benar/Salah)",
+        "pilihan": [
+            "Bawah 6cm",
+            "Keliling 224cm",
+            "Luas bingkai 2940 cm^2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_22",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bangun kubus yang dibentuk dari jaring-jaring di atas...",
+        "pilihan": [
+            "Gambar A",
+            "Gambar B",
+            "Gambar C",
+            "Gambar D"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_23",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Segitiga ABC rotasi 90 berlawanan jarum jam (Benar/Salah)",
+        "pilihan": [
+            "A'(-2,-1)",
+            "B'(-4,1)",
+            "C'(-2,-3)"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_24",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "AD=28, EF=CE=16. Keliling ABCDEF...",
+        "pilihan": [
+            "82 cm",
+            "80 cm",
+            "78 cm",
+            "72 cm"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_25",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Lahan luas di luar 2 buah setengah lingkaran.",
+        "pilihan": [
+            "119 m^2",
+            "154 m^2",
+            "196 m^2",
+            "273 m^2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_26",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Adonan tabung besar r=28 t=40 ke cetakan kecil r=7 t=5. Banyak cetakan...",
+        "pilihan": [
+            "192 buah",
+            "128 buah",
+            "108 buah",
+            "96 buah"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_27",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Volume bangun prisma/balok gabungan (24, 12, 10)...",
+        "pilihan": [
+            "1200 cm^3",
+            "1500 cm^3",
+            "1600 cm^3",
+            "1800 cm^3"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_28",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Rata-rata 32 siswa = 75. Laki 24. Selisih rata 4 (Benar/Salah)",
+        "pilihan": [
+            "Laki 73",
+            "Perempuan 78",
+            "Jumlah nilai perempuan 624"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_29",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Peluang dadu faktor dari 4...",
+        "pilihan": [
+            "2/3",
+            "1/2",
+            "1/3",
+            "1/6"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_30",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Bantul",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Infografis TKA (Benar/Salah)",
+        "pilihan": [
+            "Median = 37",
+            "Rata-rata = 41",
+            "Jangkauan = 29"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_31",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Liga sepakbola: Menang 3, Seri 1, Kalah 0. P(11,1,3), Q(9,5,1), R(10,1,4)",
+        "pilihan": [
+            "Point tertinggi P",
+            "Jumlah tertinggi dan terendah 66",
+            "Point terendah Q"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_32",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hasil (-10) + 8 x 5 - 18 : (-3) adalah",
+        "pilihan": [
+            "-54",
+            "-4",
+            "24",
+            "36"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_33",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "7 kg gula dibagi 3/4 kg. Sisa gula adalah",
+        "pilihan": [
+            "1/8 kg",
+            "1/4 kg",
+            "1/2 kg",
+            "3/4 kg"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_34",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "KPK dari 6, 4, 8 hari, mulai 28 Januari.",
+        "pilihan": [
+            "19 Februari",
+            "20 Februari",
+            "21 Februari",
+            "22 Februari"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_35",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas kamar tidur C sebenarnya (skala 1:100)...",
+        "pilihan": [
+            "6,25 m^2",
+            "7,5 m^2",
+            "9 m^2",
+            "10,5 m^2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_36",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pengamatan cabai: A 9cm/3minggu, B 12cm/4minggu...",
+        "pilihan": [
+            "A lebih cepat",
+            "B lebih cepat",
+            "Laju sama",
+            "Tidak cukup data"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_37",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "100 ekor -> 12kg. Tambah 25 ekor, butuh pakan...",
+        "pilihan": [
+            "14 kg",
+            "15 kg",
+            "18 kg",
+            "20 kg"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_38",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Grafik kecepatan, waktu 2,5 jam, kecepatan adalah...",
+        "pilihan": [
+            "46 km/jam",
+            "48 km/jam",
+            "50 km/jam",
+            "52 km/jam"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_39",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Persegi panjang, p, 2x-1. Keliling 14x-6. p = ...",
+        "pilihan": [
+            "5x+1",
+            "5x-2",
+            "9x+4",
+            "9x-2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_40",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kebun 3x+5 dan x. Keliling <= 58...",
+        "pilihan": [
+            "x = 1,2,3,4,5",
+            "Lebar > 6m",
+            "Panjang <= 23m",
+            "Luas <= 138 m^2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_41",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Nota ATK A, B, C (Benar/Salah)",
+        "pilihan": [
+            "Harga C 15.000",
+            "Harga B dua kali C",
+            "Kembalian 35.000 (lima puluhan)"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_42",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "A = x-5, B = 2x+3. Nilai A x B = ...",
+        "pilihan": [
+            "2x^2 - 7x - 15",
+            "3x^2 - 15x - 15",
+            "2x^2 - 13x - 15",
+            "2x^2 - 7x - 7"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_43",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "f(x)=ax+b, f(2)=2, f(-3)=-8, nilai f(0)...",
+        "pilihan": [
+            "-2",
+            "0",
+            "-4",
+            "-8"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_44",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Amoeba membelah jadi dua per 10 menit. 6 ekor setelah setengah jam...",
+        "pilihan": [
+            "16",
+            "32",
+            "64",
+            "128"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_45",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola lingkaran (Merah/Biru)...",
+        "pilihan": [
+            "Merah pola 8 = 36",
+            "Biru pola 8 = 10",
+            "Selisih pola 9 = 35",
+            "Jumlah pola 9 = 52"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_46",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Sudut x, y, z (Benar/Salah)",
+        "pilihan": [
+            "Nilai x 50",
+            "Nilai y 120",
+            "Selisih x dan z 20"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_47",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kapal barat 90, utara 40, barat 30, utara 50. Jarak terdekat...",
+        "pilihan": [
+            "150 km",
+            "170 km",
+            "210 km",
+            "250 km"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_48",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Sebangun trapesium ABCD EFGH...",
+        "pilihan": [
+            "GH=10",
+            "DH=5",
+            "DH:DG = 1:2",
+            "DG=15"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_49",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Prisma segi enam (Benar/Salah)",
+        "pilihan": [
+            "Lima bidang kongruen",
+            "Dua segi enam berhadapan",
+            "Enam persegi panjang"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_50",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Transformasi titik A...",
+        "pilihan": [
+            "A'(-1,6) translasi",
+            "Refleksi x=-1 jadi A'(0,1)",
+            "Rotasi 90 jadi (-1,-2)",
+            "Translasi (2,-3) jadi (0,3)"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_51",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Keliling kebun paman...",
+        "pilihan": [
+            "82 m",
+            "94 m",
+            "100 m",
+            "104 m"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_52",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas kolam renang Kenzi...",
+        "pilihan": [
+            "72 cm^2",
+            "115,5 cm^2",
+            "199,5 cm^2",
+            "189 cm^2"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_53",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Volume limas T.ABCD dalam kubus 6x...",
+        "pilihan": [
+            "6x^3",
+            "24x^3",
+            "30x^3",
+            "36x^3"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_54",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Volume ruang kosong antara 3 bola dalam tabung...",
+        "pilihan": [
+            "10/3 pi r^3",
+            "3/2 pi r^3",
+            "5 pi r^3",
+            "7 pi r^3"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_55",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Data mudik Nataru...",
+        "pilihan": [
+            "Bali paling ramai",
+            "Yogya ketiga",
+            "Jateng > 2x Yogya",
+            "NTT + Lampung > Jakarta"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_56",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Data panen produksi padi...",
+        "pilihan": [
+            "Sep diprediksi naik",
+            "Tertinggi Maret-April",
+            "Juli naik 0,79",
+            "Oktober turun 0,27"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_57",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tabel nilai frekuensi (Benar/Salah)",
+        "pilihan": [
+            "Modus 7",
+            "Di atas rata-rata 9 siswa",
+            "Di bawah rata-rata 6 siswa"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_58",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Rata-rata 20 = 60. Tambah rata 70 jadi 62. Banyak tambahan...",
+        "pilihan": [
+            "2",
+            "4",
+            "5",
+            "6"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_59",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Peluang kecelakaan 0,02. Dari 200 sopir...",
+        "pilihan": [
+            "4",
+            "6",
+            "8",
+            "10"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_60",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Dua dadu, peluang berjumlah 4...",
+        "pilihan": [
+            "1/12",
+            "1/18",
+            "1/9",
+            "5/36"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_61",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Skor: Benar(4), Salah(-1), Kosong(0). 38 jawab, 33 benar. Skor...",
+        "pilihan": [
+            "127",
+            "132",
+            "137",
+            "152"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_62",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Cupcake resep (6 porsi): Terigu 0,75, Gula 1/2, Mentega 125. Punya: 4kg, 2,5kg, 1,5kg. Porsi dibuat...",
+        "pilihan": [
+            "24 porsi",
+            "27 porsi",
+            "30 porsi",
+            "48 porsi"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_63",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "45 botol jeruk, 72 stroberi. Maksimal rak FPB...",
+        "pilihan": [
+            "7 rak",
+            "9 rak",
+            "14 rak",
+            "21 rak"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_64",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Dinding 4,6 x 2,8. Cat cover 7 1/5. Kaleng cat...",
+        "pilihan": [
+            "1 kaleng",
+            "2 kaleng",
+            "3 kaleng",
+            "4 kaleng"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_65",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Denah rumah...",
+        "pilihan": [
+            "Keliling halaman 28,5m",
+            "Keliling garasi 13,5cm",
+            "Luas kamar 1: 16,25m2",
+            "Luas kamar 2: 18,56cm2",
+            "Kombinasi Jawaban: 1,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_66",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "10 pekerja 18 hari. Ingin 12 hari, tambahan pekerja...",
+        "pilihan": [
+            "15 orang",
+            "12 orang",
+            "8 orang",
+            "5 orang"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_67",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "5 hari x 5 donor x 0,5 liter. 7,5x10^8 per ml. Total sel darah...",
+        "pilihan": [
+            "3,75x10^11",
+            "4,875x10^11",
+            "5,125x10^12",
+            "9,375x10^12"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_68",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bangun AF=2akar98 dll (Benar/Salah)",
+        "pilihan": [
+            "DC = 4 akar 2",
+            "ED = 8 akar 2",
+            "Keliling 46 akar 2",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_69",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Diskon sepatu ABCD...",
+        "pilihan": [
+            "Diskon C 75rb",
+            "Bayar B 93.600",
+            "Bayar tertinggi B",
+            "Bayar terendah A",
+            "Kombinasi Jawaban: 2,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_70",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mobil max 1 ton. 15 kotak naga(30kg). Jeruk(50kg). Maks total kotak...",
+        "pilihan": [
+            "11 kotak",
+            "16 kotak",
+            "26 kotak",
+            "30 kotak"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_71",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Belanja sayur/telur...",
+        "pilihan": [
+            "2 telur 6000",
+            "1 brokoli 12000",
+            "Ibu bayar 54000",
+            "Mirna bayar 16000",
+            "Kombinasi Jawaban: 2,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_72",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas arsir (aljabar persegi panjang)...",
+        "pilihan": [
+            "20x^2 - 23x - 6",
+            "20x^2 - 7x - 6",
+            "20x^2 - 6",
+            "20x^2 + 6"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_73",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "f(x)=px+q, f(-4)=19, f(5)=-8...",
+        "pilihan": [
+            "p = 3",
+            "q = 7",
+            "f(x) = -3x+7",
+            "f(-7) = 28",
+            "Kombinasi Jawaban: 2,3,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_74",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Selisih persegi hitam dan putih pola ke-7...",
+        "pilihan": [
+            "47",
+            "42",
+            "36",
+            "34"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_75",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tabungan aritmetika Agust=50rb, tambah 5rb. S.d. April 2025...",
+        "pilihan": [
+            "Rp490.000",
+            "Rp495.000",
+            "Rp630.000",
+            "Rp680.000"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_76",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Sudut b=18, c=14, sudut a...",
+        "pilihan": [
+            "22 derajat",
+            "24 derajat",
+            "30 derajat",
+            "32 derajat"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_77",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Lintasan AB=120, BC=210, CD=80. Jarak AD...",
+        "pilihan": [
+            "200 m",
+            "290 m",
+            "310 m",
+            "360 m"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_78",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Segitiga ABC kongruen PQR (Benar/Salah)",
+        "pilihan": [
+            "AB = 5cm",
+            "Sudut R = 81,9",
+            "Sudut P = 54,5",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_79",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Lukisan ABCD ditempel PQRS sebangun... Keliling ABCD...",
+        "pilihan": [
+            "210 cm",
+            "220 cm",
+            "250 cm",
+            "280 cm"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_80",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Adi bayangan 190, tinggi 160, jarak 200. Tinggi lampu...",
+        "pilihan": [
+            "320 cm",
+            "300 cm",
+            "240 cm",
+            "177 cm"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_81",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Transformasi geometri...",
+        "pilihan": [
+            "Translasi (-2,1) oleh (3,-5)",
+            "Dilatasi (-3,-2) k=4 jadi (-12,-8)",
+            "Refleksi sumbu x",
+            "Rotasi 90",
+            "Kombinasi Jawaban: 2,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_82",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Keliling gabungan belah ketupat dan jajargenjang...",
+        "pilihan": [
+            "79 cm",
+            "92 cm",
+            "105 cm",
+            "109 cm"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_83",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas arsir lingkaran dan persegi...",
+        "pilihan": [
+            "304 cm^2",
+            "784 cm^2",
+            "1092 cm^2",
+            "1246 cm^2"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_84",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jaring-jaring A, B, C (Benar/Salah)",
+        "pilihan": [
+            "Jaring kubus",
+            "Jaring prisma segi 5",
+            "Jaring limas segi 4",
+            "Kombinasi Jawaban: B,B,C"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_85",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Volume gabungan balok dan limas...",
+        "pilihan": [
+            "2400 cm^3",
+            "3360 cm^3",
+            "3520 cm^3",
+            "5760 cm^3"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_86",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pelampung setengah bola dan kerucut dicat, luas...",
+        "pilihan": [
+            "440 pi cm^2",
+            "460 pi cm^2",
+            "540 pi cm^2",
+            "560 pi cm^2"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_87",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Volume bandul setengah bola dan tabung...",
+        "pilihan": [
+            "1080 pi cm^3",
+            "1008 pi cm^3",
+            "864 pi cm^3",
+            "792 pi cm^3"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_88",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Diagram penjualan gula (Benar/Salah)",
+        "pilihan": [
+            "Jangkauan 16",
+            "Penurunan tertinggi jumat-sabtu",
+            "Tiga hari di atas rata-rata",
+            "Kombinasi Jawaban: B,B,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_89",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Rata-rata 15 data = 22... Data ke-15...",
+        "pilihan": [
+            "24",
+            "30",
+            "35",
+            "40"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_90",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kota Yogyakarta",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Dadu jumlah 5 peluang...",
+        "pilihan": [
+            "5/18",
+            "1/6",
+            "1/9",
+            "1/12"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_91",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Olimpiade Skor: Benar(3), Salah(-1), Kosong(0). 37 dijawab, 32 benar. Skor...",
+        "pilihan": [
+            "111",
+            "96",
+            "91",
+            "88"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_92",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bilangan 4/5, 1,25, 1 1/5, 90% pada garis bilangan...",
+        "pilihan": [
+            "(gambar)",
+            "(gambar)",
+            "(gambar)",
+            "(gambar)"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_93",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "180, 360, 540. FPB...",
+        "pilihan": [
+            "2^2 x 3^2 x 5^2",
+            "2^2 x 3^2 x 5",
+            "2 x 3^2 x 5",
+            "2 x 3 x 5"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_94",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Dinding 5m x 4m, 9m x 10m. Kemasan A(10 m^2/kg, 2kg, Rp50rb), B(15 m^2/kg, 1kg, Rp30rb)... biaya minimum",
+        "pilihan": [
+            "1 B dan 3 A",
+            "2 B dan 2 A",
+            "3 B dan 1 A",
+            "4 B dan 1 A"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_95",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Denah rumah skala 1:50...",
+        "pilihan": [
+            "Luas carport sebenarnya 24 m^2",
+            "Luas seluruh lahan 104 m^2",
+            "Keliling lahan 84m",
+            "Keliling taman depan 28m",
+            "Kombinasi Jawaban: 1,2"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_96",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "250 ekor -> pakan 30 hari. 9 hari jalan, sisa 150 ekor. Pakan habis...",
+        "pilihan": [
+            "21 hari",
+            "30 hari",
+            "35 hari",
+            "36 hari"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_97",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "6kg = Rp132.000. Uang Rp250.000, beli 11kg, kembali...",
+        "pilihan": [
+            "Rp8.000",
+            "Rp12.000",
+            "Rp18.000",
+            "Rp30.000"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_98",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "P = 3 akar(3) - 4, Q = 4 akar(3) + 5... (Benar/Salah)",
+        "pilihan": [
+            "P+Q = 7 akar(3) + 9",
+            "P-Q = -akar(3) - 9",
+            "PxQ = 16 - akar(3)",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_99",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Beli 3 baju, toko termurah (Amarta 40%, Astina beli2 gratis 1, dll)...",
+        "pilihan": [
+            "Toko Amarta",
+            "Toko Astina",
+            "Toko Pancala",
+            "Toko Wirata"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_100",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "3(3x+4)-19 = 4x+13. Nilai 3x-4...",
+        "pilihan": [
+            "16",
+            "12",
+            "8",
+            "4"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_101",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Uang Rp120.000, ongkos Rp9.000. Buku Rp8.000, pulpen Rp6.000. Beli 4 pulpen, maks buku...",
+        "pilihan": [
+            "9",
+            "10",
+            "11",
+            "12"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_102",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "3 anggur + 4 kiwi = 460rb, 1 anggur + 2 kiwi = 200rb...",
+        "pilihan": [
+            "Anggur Rp60.000",
+            "Kiwi Rp80.000",
+            "2 anggur + 1 kiwi = Rp190.000",
+            "Kiwi lebih mahal Rp10.000 dari anggur",
+            "Kombinasi Jawaban: 1,3,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_103",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Trapesium. Luas daerah trapesium (aljabar)...",
+        "pilihan": [
+            "(3x^2 + 16x + 16)",
+            "(3x^2 + 16x + 32)",
+            "(6x^2 + 16x + 16)",
+            "(6x^2 + 16x + 32)"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_104",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Fungsi f(x) = ax+b, dll (Benar/Salah)",
+        "pilihan": [
+            "f(x) = 2x-2",
+            "Daerah hasil {0,4,8}",
+            "a+b=4",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_105",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Barisan 10, 12, 14, 16... U72 - U15 = ...",
+        "pilihan": [
+            "114",
+            "118",
+            "120",
+            "125"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_106",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola batang korek api... s.d. pola 55...",
+        "pilihan": [
+            "7533",
+            "7810",
+            "7947",
+            "8092"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_107",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Sudut a, b, c (Benar/Salah)",
+        "pilihan": [
+            "a = 55",
+            "b = 35",
+            "c-b = 10",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_108",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jarak gedung (Benar/Salah)",
+        "pilihan": [
+            "Jarak A-D = 60m",
+            "Jarak B-D = 160m",
+            "Jarak A-B = 90m",
+            "Kombinasi Jawaban: B,S,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_109",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kongruen AABC = APQR, RPQ...",
+        "pilihan": [
+            "51",
+            "52",
+            "60",
+            "77"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_110",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Lukisan ABCD dan PQRS sebangun...",
+        "pilihan": [
+            "PS = 54cm",
+            "Keliling ABCD 280cm",
+            "Keliling PQRS 126cm",
+            "Selisih 28cm",
+            "Kombinasi Jawaban: 1,2,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_111",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Titik A... Transformasi...",
+        "pilihan": [
+            "Rotasi 90 A'(-3,2)",
+            "Refleksi x A'(-2,3)",
+            "Dilatasi -4 A'(-8,-12)",
+            "Translasi A'(3,7)",
+            "Kombinasi Jawaban: 1,3"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_112",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Belah ketupat dan trapesium samakaki. Keliling gabungan...",
+        "pilihan": [
+            "68 cm",
+            "72 cm",
+            "78 cm",
+            "88 cm"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_113",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas daerah arsir lingkaran dan persegi...",
+        "pilihan": [
+            "140 m^2",
+            "154 m^2",
+            "217 m^2",
+            "231 m^2"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_114",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jaring-jaring 1,2,3 (Benar/Salah)",
+        "pilihan": [
+            "Jaring kubus",
+            "Jaring prisma segi 7",
+            "Jaring limas segi 6",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_115",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Balok + limas, TK=22, Vol gabungan...",
+        "pilihan": [
+            "4080",
+            "4440",
+            "5040",
+            "6480"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_116",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bola d=21m, tabung r=1,5 t=7m. Jumlah truk...",
+        "pilihan": [
+            "343",
+            "147",
+            "98",
+            "49"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_117",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gula A vs Gula B... Selisih rata-rata...",
+        "pilihan": [
+            "2 kg",
+            "4 kg",
+            "6 kg",
+            "8 kg"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_118",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tinggi badan siswa (Tabel)...",
+        "pilihan": [
+            "Median 157",
+            "Modus 155",
+            "Rata-rata 159",
+            "Di atas rata-rata 10 orang",
+            "Kombinasi Jawaban: 2,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_119",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Peluang dadu lebih dari 4...",
+        "pilihan": [
+            "1/6",
+            "1/3",
+            "1/2",
+            "2/3"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_120",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mesin penetas Alpha Beta dll...",
+        "pilihan": [
+            "Alpha",
+            "Beta",
+            "Gamma",
+            "Delta"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_121",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Olimpiade Skor: Benar(4), Salah(-1), Kosong(0). 27 dijawab, 24 benar. Skor...",
+        "pilihan": [
+            "90",
+            "93",
+            "96",
+            "108"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_122",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bilangan 1/2, 1,2, 1 1/4, 70% pada garis bilangan...",
+        "pilihan": [
+            "(gambar)",
+            "(gambar)",
+            "(gambar)",
+            "(gambar)"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_123",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "240, 360, 450. FPB...",
+        "pilihan": [
+            "2^2 x 3^2 x 5^2",
+            "2^2 x 3^2 x 5",
+            "2 x 3^2 x 5",
+            "2 x 3 x 5"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_124",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Dinding 8m x 4m, 12m x 5m. Kemasan A(10 m^2/kg, 2kg, Rp50rb), B(15 m^2/kg, 1kg, Rp30rb)... biaya minimum",
+        "pilihan": [
+            "4 B dan 1 A",
+            "3 B dan 2 A",
+            "2 B dan 3 A",
+            "1 B dan 3 A"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_125",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Denah rumah skala 1:50...",
+        "pilihan": [
+            "Luas Kamar 1 & 2 = 18 m^2",
+            "Luas lahan 400 m^2",
+            "Keliling lahan 41m",
+            "Keliling garasi 38m",
+            "Kombinasi Jawaban: 1,3"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_126",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "200 ekor -> pakan 30 hari. 12 hari jalan, sisa 150 ekor. Pakan habis...",
+        "pilihan": [
+            "18 hari",
+            "24 hari",
+            "30 hari",
+            "32 hari"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_127",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "5kg = Rp120.000. Uang Rp250.000, beli 9kg, kembali...",
+        "pilihan": [
+            "Rp34.000",
+            "Rp32.000",
+            "Rp25.000",
+            "Rp10.000"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_128",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "A = 3 akar(2) + 5, B = 2 akar(2) - 3... (Benar/Salah)",
+        "pilihan": [
+            "A+B = 5 akar(2) + 2",
+            "A-B = akar(2) + 2",
+            "AxB = akar(2) - 3",
+            "Kombinasi Jawaban: B,S,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_129",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Beli 3 baju, toko termurah (Merapi 60%, Merbabu beli2 gratis 1, dll)...",
+        "pilihan": [
+            "Toko Merapi",
+            "Toko Merbabu",
+            "Toko Himalaya",
+            "Toko Suralaya"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_130",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "4(2x+3)-13 = 5x+8. Nilai 6x+5...",
+        "pilihan": [
+            "3",
+            "13",
+            "21",
+            "23"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_131",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Uang Rp100.000, ongkos Rp8.000. Buku Rp9.000, pulpen Rp7.000. Beli 3 pulpen, maks buku...",
+        "pilihan": [
+            "6",
+            "7",
+            "8",
+            "9"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_132",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "4 bawang + 3 cabai = 360rb, 2 bawang + 5 cabai = 390rb...",
+        "pilihan": [
+            "Bawang Rp47.000",
+            "Cabai Rp60.000",
+            "1 bawang + 2 cabai = Rp165.000",
+            "Selisih Rp15.000",
+            "Kombinasi Jawaban: 2,3,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_133",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Trapesium. Luas daerah trapesium (aljabar)...",
+        "pilihan": [
+            "(2x^2 + 7x + 6)",
+            "(2x^2 + 8x + 8)",
+            "(2x^2 + 12x + 16)",
+            "(4x^2 + 8x + 16)"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_134",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Fungsi f(x) = ax+b, dll (Benar/Salah)",
+        "pilihan": [
+            "f(x) = 2x+1",
+            "Daerah hasil {5,9,13}",
+            "a+b=4",
+            "Kombinasi Jawaban: B,B,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_135",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Barisan 8, 11, 14, 17... U60 - U12 = ...",
+        "pilihan": [
+            "96",
+            "120",
+            "144",
+            "156"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_136",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola batang korek api... s.d. pola 55...",
+        "pilihan": [
+            "7452",
+            "7590",
+            "7755",
+            "8036"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_137",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Sudut x, y (Benar/Salah)",
+        "pilihan": [
+            "x = 97",
+            "y = 45",
+            "x-y = 42",
+            "Kombinasi Jawaban: B,S,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_138",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jarak gedung (Benar/Salah)",
+        "pilihan": [
+            "Jarak A-D = 60m",
+            "Jarak B-D = 90m",
+            "Jarak A-B = 40m",
+            "Kombinasi Jawaban: S,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_139",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kongruen AABC = APQR, PQ...",
+        "pilihan": [
+            "1,3 cm",
+            "1,5 cm",
+            "2,0 cm",
+            "3,0 cm"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_140",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Lukisan ABCD dan PQRS sebangun...",
+        "pilihan": [
+            "QR = 54cm",
+            "Luas ABCD 4800 cm^2",
+            "Luas PQRS 3672 cm^2",
+            "Luas tak tertutup 912 cm^2",
+            "Kombinasi Jawaban: 1,2,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_141",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Titik A... Transformasi...",
+        "pilihan": [
+            "Translasi (-1,4) jadi A'(4,6)",
+            "Rotasi 90 A'(-2,3)",
+            "Refleksi x A'(-3,2)",
+            "Dilatasi -4 A'(-12,-8)",
+            "Kombinasi Jawaban: 2,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_142",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Belah ketupat dan trapesium samakaki. Keliling gabungan...",
+        "pilihan": [
+            "80 cm",
+            "89 cm",
+            "92 cm",
+            "105 cm"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_143",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Luas daerah arsir lingkaran dan persegi...",
+        "pilihan": [
+            "157 m^2",
+            "286 m^2",
+            "372 m^2",
+            "443 m^2"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_144",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Jaring-jaring 1,2,3 (Benar/Salah)",
+        "pilihan": [
+            "Jaring kubus",
+            "Jaring prisma segi 6",
+            "Jaring limas segi 4",
+            "Kombinasi Jawaban: B,B,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_145",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Balok + limas, TK=22, Vol gabungan...",
+        "pilihan": [
+            "9200",
+            "9620",
+            "10020",
+            "10800"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_146",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bola d=12m, tabung r=1 t=4m. Jumlah truk...",
+        "pilihan": [
+            "144",
+            "72",
+            "48",
+            "36"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_147",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gula A vs Gula B... Selisih rata-rata...",
+        "pilihan": [
+            "4 kg",
+            "6 kg",
+            "8 kg",
+            "10 kg"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_148",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tinggi badan siswa (Tabel)...",
+        "pilihan": [
+            "Modus 155",
+            "Median 156",
+            "Rata-rata 158",
+            "Di bawah rata-rata 10 orang",
+            "Kombinasi Jawaban: 1,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_149",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Peluang dadu kurang dari 5...",
+        "pilihan": [
+            "1/6",
+            "1/3",
+            "1/2",
+            "2/3"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_mtk_150",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Mesin penetas Alpha Beta dll...",
+        "pilihan": [
+            "Mesin A",
+            "Mesin B",
+            "Mesin C",
+            "Mesin D"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_91",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penggunaan kata rumah menekankan bahwa Raja Ampat berfungsi sebagai...",
+        "pilihan": [
+            "kawasan wisata",
+            "wilayah perlindungan",
+            "tempat menyediakan makanan dan kondisi laut",
+            "lokasi penelitian"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_92",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tentukan kesesuaian pernyataan (Sesuai/Tidak Sesuai)",
+        "pilihan": [
+            "Pabrik spesies karena arus laut nutrisi tinggi.",
+            "Terumbu karang penting bagi masyarakat.",
+            "Konservasi total masyarakat dilarang.",
+            "Kombinasi Jawaban: S,S,TS"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_93",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gagasan pendukung kawasan pusat keanekaragaman hayati...",
+        "pilihan": [
+            "Pulau kecil wisata",
+            "Arus laut nutrisi menopang kehidupan laut",
+            "Ekonomi perikanan laut",
+            "Transportasi laut"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_94",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Istilah media sosial yang sesuai dengan teks...",
+        "pilihan": [
+            "unggah",
+            "produk",
+            "konsep",
+            "reviu",
+            "Kombinasi Jawaban: 1,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_95",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Apa tujuan teks prosedur tersebut ditulis?",
+        "pilihan": [
+            "Menghibur reviu",
+            "Menjelaskan langkah-langkah membuat konten reviu",
+            "Membujuk menjadi youtuber",
+            "Mendeskripsikan kelebihan"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_96",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagian mana yang tidak sesuai pada teks prosedur...",
+        "pilihan": [
+            "Langkah tidak lengkap judul video",
+            "Alat bahan dijelaskan terpisah",
+            "Tahapan tidak urut",
+            "Langkah tidak mencerminkan isi konten"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_97",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pokok-pokok berita Borobudur Fun Run...",
+        "pilihan": [
+            "Diselenggarakan 16 Nov",
+            "Diselenggarakan 23 Nov seminggu setelah Marathon",
+            "Diikuti 11500",
+            "Diikuti ribuan peserta seminggu setelah Marathon",
+            "Kombinasi Jawaban: 2,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_98",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hal prioritas pemerintah daerah agar masyarakat gemar lari...",
+        "pilihan": [
+            "Lintasan gratis/murah",
+            "Pernak-pernik",
+            "Klub profesional",
+            "Lomba lari menggembirakan/prestasi hadiah menarik",
+            "Kombinasi Jawaban: 1,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_99",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penulisan kalimat yang belum akurat terdapat pada...",
+        "pilihan": [
+            "kalimat pertama paragraf pertama",
+            "kalimat kedua paragraf kedua",
+            "kalimat kedua paragraf ketiga",
+            "kalimat pertama paragraf keempat"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_100",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pihak yang menggunakan berbagai modus meyakinkan korban phising...",
+        "pilihan": [
+            "pelaku kejahatan phising",
+            "para korban",
+            "oknum penipuan",
+            "file yang dikirim"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_101",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Peristiwa yang terjadi pada kutipan teks tersebut adalah",
+        "pilihan": [
+            "pengiriman file",
+            "korban penipuan",
+            "imbauan polisi",
+            "meningkatnya kasus penipuan online"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_102",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tindakan yang relevan untuk mencegah peristiwa terulang adalah",
+        "pilihan": [
+            "bersikap hati-hati terhadap pesan mencurigakan",
+            "segera lapor polisi",
+            "biasa saja",
+            "mengusulkan hukuman berat"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_103",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kata istilah manakah yang tidak sesuai kaidah...",
+        "pilihan": [
+            "glikemik",
+            "fruktosa",
+            "nutrien",
+            "glaukoma",
+            "Kombinasi Jawaban: 3,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_104",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola pengembangan pada paragraf ketiga teks diabetes...",
+        "pilihan": [
+            "Kausalitas.",
+            "Deduktif.",
+            "Induktif.",
+            "Ilustrasi."
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_105",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Penggunaan konjungsi manakah yang tidak sesuai kaidah...",
+        "pilihan": [
+            "atau paragraf 2",
+            "namun paragraf 2",
+            "supaya paragraf 3",
+            "dan paragraf 1"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_106",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kebenaran opini (Benar/Salah) Novel Melangkah...",
+        "pilihan": [
+            "Diapresiasi banyak aspek, detail berlebihan kurangi kenyamanan.",
+            "Unsur budaya disebut sekilas.",
+            "Walau penokohan kurang, perpaduan aksi layak direkomendasikan.",
+            "Kombinasi Jawaban: B,S,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_107",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Simpulan paling tepat teks ulasan Melangkah...",
+        "pilihan": [
+            "Menonjolkan laga, budaya latar.",
+            "Gagal karena kritik sosial menutupi fantasi.",
+            "Keunggulan pada kejelasan motivasi.",
+            "Berhasil memadukan petualangan, walau penokohan kurang."
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_108",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Alasan paling tepat judul Melangkah sesuai adalah...",
+        "pilihan": [
+            "Penulis gambarkan Sumba detail.",
+            "Fokus konflik batin tokoh.",
+            "Perpaduan budaya, namun kedalaman karakter belum maksimal.",
+            "Detail panjang bebas kelemahan."
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_109",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan yang sesuai teks Pola Makan Remaja...",
+        "pilihan": [
+            "Penyebab -> Dampak Kurangnya Gizi -> Edukasi Gizi",
+            "Penyebab -> Kurangnya Asupan -> Dampak Jangka Panjang -> Solusi",
+            "Penyebab -> Dampak Jangka Panjang -> Kurangnya Asupan -> Solusi",
+            "Penyebab -> Makanan Bergizi -> Dampak -> Edukasi"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_110",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Ide pokok paragraf ketiga (Benar/Salah)...",
+        "pilihan": [
+            "Meningkatnya risiko berat badan.",
+            "Dampak jangka panjang pola makan tidak sehat.",
+            "Ancaman kurang aktivitas.",
+            "Kombinasi Jawaban: S,B,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_111",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hal positif yang mungkin terjadi setelah memahami teks...",
+        "pilihan": [
+            "Mendorong remaja memperhatikan gizi.",
+            "Tetap konsumsi cepat saji rutin.",
+            "Sadar dampak jangka panjang selektif memilih.",
+            "Anggapan praktis membuat konsumsi setiap hari.",
+            "Kombinasi Jawaban: 1,3"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_112",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Larik puisi cinta ibu terjadi...",
+        "pilihan": [
+            "saat hidup",
+            "waktu siang",
+            "sepanjang waktu",
+            "selama bekerja"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_113",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gambaran ibu menggendong masa depan...",
+        "pilihan": [
+            "ibu perjalanan jauh",
+            "ibu gendong anak lelah",
+            "ibu tahan sakit diam",
+            "ibu tabah perjuangkan masa depan"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_114",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Ungkapan perasaan sesuai isi puisi Dunia Ibu...",
+        "pilihan": [
+            "Adi: sedih penderitaan ibu",
+            "Budi: bahagia tak lapar",
+            "Edi: terharu ketabahan perjuangkan anak",
+            "Bedi: bangga ibu tak mengeluh"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_115",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pokok-pokok cerita Rayna pemulung...",
+        "pilihan": [
+            "Rayna kumpul gelas - pulang - ambil alat - karung penuh",
+            "Rayna pulang - ganti - ambil alat - jual - bahagia",
+            "Rayna pulang - ganti - ambil alat - kumpul gelas - jual",
+            "Rayna pulang - ganti - alat - kumpul semua - jual"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_116",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Prediksi peristiwa Rayna (Sesuai/Tidak Sesuai)...",
+        "pilihan": [
+            "Ayah memergoki memukul sakit.",
+            "Teman ayah menegur.",
+            "Rayna berhasil jual gembira.",
+            "Kombinasi Jawaban: S,TS,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_117",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pelajaran yang relevan Rayna memulung...",
+        "pilihan": [
+            "Ikut memulung.",
+            "Tidak ikut campur.",
+            "Mengusul tidak dilarang.",
+            "Membantu orang tua senang ikhlas."
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_118",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Latar tempat naga dikalahkan...",
+        "pilihan": [
+            "Sisik mampu menghidupkan tanah.",
+            "Di puncak Gunung Satam berhadapan naga.",
+            "Tanam sisik tanah desa.",
+            "Perjalanan puncak Gunung."
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_119",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Nilai moral cerita Satam...",
+        "pilihan": [
+            "Keseimbangan alam dijaga",
+            "Tanggung jawab",
+            "Kekuatan pemenang",
+            "Bijaksana keputusan"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_120",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket B",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Unsur intrinsik cerita Satam...",
+        "pilihan": [
+            "Latar nyata.",
+            "Tema pelestarian mendidik.",
+            "Tokoh pemberani layak ditiru.",
+            "Alur maju.",
+            "Kombinasi Jawaban: 2,3,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_121",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Makna istilah kapasitas...",
+        "pilihan": [
+            "kemampuan menampung",
+            "kewenangan jabatan",
+            "keterbatasan kemampuan",
+            "kemampuan mental"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_122",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kesesuaian pernyataan teks Lingkungan (Sesuai/Tidak Sesuai)",
+        "pilihan": [
+            "Penyediaan RTH terkendala lahan.",
+            "Kapasitas penanganan mampu mengatasi sampah.",
+            "Urbanisasi menyebabkan masalah lingkungan.",
+            "Kombinasi Jawaban: S,TS,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_123",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Gagasan pendukung paragraf pertama Lingkungan...",
+        "pilihan": [
+            "RTH 2,6 juta",
+            "Penumpukan sampah diakibatkan produksi melebihi kapasitas",
+            "Polusi udara sedang",
+            "Ketersediaan lahan berkurang karena RTH"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_124",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Istilah media sosial teks Shorts...",
+        "pilihan": [
+            "upload",
+            "relevan",
+            "konsep",
+            "audiens",
+            "Kombinasi Jawaban: 1,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_125",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tujuan teks Shorts...",
+        "pilihan": [
+            "Membujuk menjadi Youtuber",
+            "Mendeskripsikan kelebihan YT",
+            "Menghibur cerita",
+            "Menjelaskan langkah-langkah Shorts"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_126",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagian teks Shorts tidak sesuai...",
+        "pilihan": [
+            "Tahapan tidak urut",
+            "Pengaturan video diprivat tidak bisa ditonton",
+            "Alat bahan tidak dukung",
+            "Durasi 8 menit"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_127",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pokok berita Tangerang 10K...",
+        "pilihan": [
+            "Jumlah pelari 2500 berbagai negara",
+            "Dilaksanakan 7 Des Pasific Garden",
+            "Penyelenggara Pemkot dan Kompas",
+            "Peserta nulis pesan",
+            "Kombinasi Jawaban: 3,4"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_128",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hal pihak nonpemerintah menggiatkan olahraga...",
+        "pilihan": [
+            "finansial menguntungkan",
+            "klub murah/gratis",
+            "sponsor massal",
+            "danai pemerintah",
+            "Kombinasi Jawaban: 2,3"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_129",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kenapa teks Tangerang belum lengkap unsur berita?",
+        "pilihan": [
+            "Peristiwa belum",
+            "Tempat pelaksanaan",
+            "Siapa terlibat",
+            "Alasan penyelenggaraan belum"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_130",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Spons menyerap air...",
+        "pilihan": [
+            "hutan DAS",
+            "hutan Kalimantan",
+            "hutan Sumatera",
+            "deforestasi"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_131",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Peristiwa teks bencana...",
+        "pilihan": [
+            "Deforestasi",
+            "Bencana hidrologis",
+            "Curah hujan tinggi",
+            "Bencana banjir longsor"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_132",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Tindakan mencegah peristiwa...",
+        "pilihan": [
+            "Mencintai lingkungan, melestarikan",
+            "Menghukum pelaku",
+            "Dukung kurikulum",
+            "Rancang UU"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_133",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kata tidak sesuai kaidah teks Ginjal...",
+        "pilihan": [
+            "fertilisasi",
+            "karbonasi",
+            "hipertensi",
+            "diabetes",
+            "Kombinasi Jawaban: 1,2"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_134",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pola pengembangan paragraf 2 Ginjal...",
+        "pilihan": [
+            "perbandingan",
+            "kronologis",
+            "kausalitas",
+            "ilustrasi"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_135",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Konjungsi tidak sesuai teks Ginjal...",
+        "pilihan": [
+            "sehingga paragraf 2",
+            "namun paragraf 1",
+            "dan paragraf 1",
+            "agar paragraf 4"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_136",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Opini Na Willa (Benar/Salah)",
+        "pilihan": [
+            "Memadukan alur emosional dan sinematografi.",
+            "Akting Willa natural.",
+            "Tokoh utamanya Willa berjuang hidup.",
+            "Kombinasi Jawaban: B,B,B"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_137",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Simpulan teks Na Willa...",
+        "pilihan": [
+            "Menekankan batin, lain kurang.",
+            "Menggabungkan cerita, visual, musik pengalaman bermakna.",
+            "Pentingnya karakter pendukung.",
+            "Sutradara fokus sinematografi abai emosi."
+        ],
+        "jawaban": 1,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_138",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Alasan judul Na Willa sesuai...",
+        "pilihan": [
+            "Hanya keindahan visual.",
+            "Musik dibanding cerita.",
+            "Di balik sinematografi ada konflik dan makna.",
+            "Film drama pasti inspirasi."
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_139",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Bagan teks Make Up...",
+        "pilihan": [
+            "Penyebab -> Kesehatan -> Jasmani",
+            "Tren -> Dampak -> Mental",
+            "Dampak -> Mata Kulit Mental",
+            "Penyebab -> Kulit Mata Mental"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_140",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Ide pokok paragraf 3 Make Up (Benar/Salah)",
+        "pilihan": [
+            "Alergi peradangan",
+            "Pengaruh make up berlebihan",
+            "Akibat kualitas",
+            "Kombinasi Jawaban: S,B,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_141",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Hal positif teks Make Up...",
+        "pilihan": [
+            "Remaja wajar make up",
+            "Wajib make up menarik",
+            "Sadar kebersihan dan kualitas kosmetik",
+            "Make up tak pengaruh mental",
+            "Kombinasi Jawaban: 1,3"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_142",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Puisi Kartini lampu remang, bulu mata sayup... suasana...",
+        "pilihan": [
+            "muram",
+            "duka",
+            "hening",
+            "sepi"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_143",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "'ladang-ladang karang dirambah, disiangi kaki telanjang' ... citraan...",
+        "pilihan": [
+            "visual",
+            "audio",
+            "gerak",
+            "penciuman"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_144",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Ungkapan perasaan sesuai puisi Kartini...",
+        "pilihan": [
+            "Ari: prihatin berjuang keras",
+            "Ira: syukur nasib olah ladang",
+            "Eni: terharu perjuangan Kartini",
+            "Ani: biasa saja"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_145",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Kerangka cerita Maya...",
+        "pilihan": [
+            "Maya - Badai - Bangunan roboh - Maya bersih - Donasi",
+            "Badai - Roboh - Bersih - Kotak",
+            "Peduli - Badai - Pohon tumbang - Kotak bersih",
+            "Peduli - Badai - Tumbang roboh - Teman bersih - Kotak - Spanduk"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_146",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Prediksi Maya (Sesuai/Tidak Sesuai)",
+        "pilihan": [
+            "Warga ikut peduli",
+            "Maya diusir",
+            "Maya dapat apresiasi",
+            "Kombinasi Jawaban: S,TS,S"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_147",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Pelajaran relevan Maya di sekolah...",
+        "pilihan": [
+            "Bersih sekolah banjir",
+            "Peduli buang sampah tempat",
+            "Imbau OSIS program lingkungan",
+            "Pihak sekolah libatkan pihak lain"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_148",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Latar suasana Kapten Hitam Serindit...",
+        "pilihan": [
+            "Air gelombang",
+            "Angin kencang",
+            "Tanah mulai gersang",
+            "Dilimpahi matahari"
+        ],
+        "jawaban": 2,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_149",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Nilai moral Pelawan Serindit...",
+        "pilihan": [
+            "Berani membela kebenaran",
+            "Muda tangguh",
+            "Tanggung jawab",
+            "Kekuatan optimal"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    },
+    {
+        "id": "tka_smp_indo_150",
+        "jenjang": "SMP",
+        "mapel": "Bahasa Indonesia",
+        "subtes": "B.Indo - DIY Paket A",
+        "tingkat": "Sedang",
+        "topik": "Persiapan Ujian / TKA SMP",
+        "soal": "Unsur intrinsik Serindit...",
+        "pilihan": [
+            "Nyata",
+            "Pelestarian mendidik",
+            "Pemberani ditiru",
+            "Alur maju mudah",
+            "Kombinasi Jawaban: 2,3,2004"
+        ],
+        "jawaban": 4,
+        "pembahasan": "Pembahasan dapat didiskusikan dengan guru pembimbing."
+    }
+],
+
             {
                 id: "tka_sma_indo_1",
                 jenjang: "SMA",
@@ -899,12 +6025,86 @@
             } else window.showToast("PIN Salah!", "error");
         }
         window.switchAdminTab = function(tab) {
-            const isSoal = tab === 'soal';
-            document.getElementById('admin-view-soal').classList.toggle('hidden', !isSoal);
-            document.getElementById('admin-view-laporan').classList.toggle('hidden', isSoal);
-            document.getElementById('tab-soal').className = isSoal ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
-            document.getElementById('tab-laporan').className = !isSoal ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
+            document.getElementById('admin-view-soal').classList.toggle('hidden', tab !== 'soal');
+            document.getElementById('admin-view-import').classList.toggle('hidden', tab !== 'import');
+            document.getElementById('admin-view-laporan').classList.toggle('hidden', tab !== 'laporan');
+            
+            document.getElementById('tab-soal').className = tab === 'soal' ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
+            document.getElementById('tab-import').className = tab === 'import' ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
+            document.getElementById('tab-laporan').className = tab === 'laporan' ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
         }
+        
+        window.prosesImportSpreadsheet = async function() {
+            const rawData = document.getElementById('import-data').value.trim();
+            if (!rawData) return window.showToast("Data masih kosong!", "error");
+            
+            const jenjang = document.getElementById('import-jenjang').value;
+            const tingkat = document.getElementById('import-tingkat').value;
+            const mapel = document.getElementById('import-mapel').value;
+            const jurusan = jenjang === 'SMA' ? document.getElementById('import-jurusan').value : undefined;
+            const subtes = `TKA ${jenjang} - ${mapel}`;
+
+            const baris = rawData.split('\n');
+            let successCount = 0;
+            
+            window.showToast("Memproses import...", "info");
+            
+            for (let barisData of baris) {
+                const kolom = barisData.split('\t');
+                if (kolom.length < 5) continue; // Minimal Soal dan 4 Opsi
+                
+                const soalText = kolom[0].trim();
+                const opsiA = kolom[1]?.trim();
+                const opsiB = kolom[2]?.trim();
+                const opsiC = kolom[3]?.trim();
+                const opsiD = kolom[4]?.trim();
+                
+                let opsiE, kunciStr, pembahasan;
+                
+                if (jenjang === 'SMA') {
+                    if (kolom.length < 7) continue; // Butuh Opsi E dan Kunci
+                    opsiE = kolom[5]?.trim();
+                    kunciStr = kolom[6]?.trim().toUpperCase();
+                    pembahasan = kolom[7]?.trim() || '';
+                } else {
+                    kunciStr = kolom[5]?.trim().toUpperCase();
+                    pembahasan = kolom[6]?.trim() || '';
+                }
+
+                if (!soalText || !opsiA || !kunciStr) continue;
+                
+                const pilihan = jenjang === 'SMA' ? [opsiA, opsiB, opsiC, opsiD, opsiE] : [opsiA, opsiB, opsiC, opsiD];
+                
+                let jawabanIdx = 0;
+                if (kunciStr === 'A') jawabanIdx = 0;
+                else if (kunciStr === 'B') jawabanIdx = 1;
+                else if (kunciStr === 'C') jawabanIdx = 2;
+                else if (kunciStr === 'D') jawabanIdx = 3;
+                else if (kunciStr === 'E') jawabanIdx = 4;
+
+                const data = {
+                    jenjang, tingkat, mapel, jurusan, subtes,
+                    soal: soalText,
+                    pilihan,
+                    jawaban: jawabanIdx,
+                    pembahasan,
+                    dibuatOleh: "Admin (Import)",
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka'), data);
+                    successCount++;
+                } catch (e) {
+                    console.error("Gagal import baris", e);
+                }
+            }
+            
+            document.getElementById('import-data').value = '';
+            window.showToast(`Berhasil import ${successCount} soal!`, "success");
+            window.switchAdminTab('soal');
+        };
+        
         window.simpanSoalCloud = async function() {
             const jenjang = document.getElementById('f-jenjang').value;
             const pilihan = [
@@ -1012,7 +6212,7 @@
             document.getElementById('limit-info').innerText = `${sisa} / ${MAX_LIMIT_PER_DAY}`;
         }
 
-        async function generateSoalAI(jenjang, mapel, jurusan, jumlahSoal) {
+        async function generateSoalAI(jenjang, mapel, jurusan, jumlahSoal, useProceduralOnly = false) {
             const semuaTopik = TOPIK_MATERI[mapel] || ["konsep dan penalaran analitis"];
             const topikTerpilih = acakArray(semuaTopik).slice(0, 4);
             const riwayat = ambilRiwayatSoal(mapel).slice(-20);
@@ -1026,7 +6226,8 @@
                     jurusan,
                     topikTerpilih,
                     riwayat,
-                    jumlahSoal
+                    jumlahSoal,
+                    useProceduralOnly
                 })
             });
 
@@ -1099,11 +6300,12 @@
 
             if(!pakaiAI) {
                 const gabungan = [...DEFAULT_QUESTIONS, ...bankSoalCloud];
-                let cocok = acakArray(gabungan.filter(q => q.mapel === mapel || q.jenjang === jenjang));
+                let cocok = acakArray(gabungan.filter(q => q.mapel === mapel && q.jenjang === jenjang));
                 if (cocok.length < jumlahSoal) {
                     try {
-                        const extra = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal);
-                        activeQuestions = extra;
+                        const extra = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal - cocok.length, true); // Force Procedural
+                        cocok = [...cocok, ...extra];
+                        activeQuestions = cocok;
                     } catch(err) {
                         activeQuestions = cocok.length > 0 ? cocok.slice(0, jumlahSoal) : DEFAULT_QUESTIONS.slice(0, jumlahSoal);
                     }
@@ -1220,7 +6422,7 @@
                 let scaleText = "";
                 let predikatTitle = "";
                 let predikatDesc = "";
-                let predikatBoxClass = "";
+                let predikatBoxClass = "hidden";
 
                 if (jenjang === 'SMA') {
                     // Skala 200 hingga 800 (Syarat Predikat Istimewa: Nilai ≥ 725,00)
@@ -1230,19 +6432,19 @@
                     if (finalScore >= 725) {
                         predikatTitle = "🌟 Predikat Istimewa (Nilai ≥ 725,00)";
                         predikatDesc = "Luar biasa! Skor Anda memenuhi kriteria Predikat Istimewa standar TKA Kemendikdasmen (Sangat potensial untuk pertimbangan seleksi SNBP & Mandiri PTN/PTS).";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-amber-50 text-amber-900 border-2 border-amber-400 mb-6 text-center max-w-sm mx-auto shadow-sm";
+                        predikatBoxClass = "hidden";
                     } else if (finalScore >= 600) {
                         predikatTitle = "Kategori: Baik";
                         predikatDesc = "Capaian kemampuan akademik Anda berada pada kategori Baik dan melampaui standar pemetaan mutu.";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-300 mb-6 text-center max-w-sm mx-auto";
+                        predikatBoxClass = "hidden";
                     } else if (finalScore >= 450) {
                         predikatTitle = "Kategori: Memadai";
                         predikatDesc = "Memenuhi standar kecukupan pemetaan kompetensi akademik Kemendikdasmen.";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto";
+                        predikatBoxClass = "hidden";
                     } else {
                         predikatTitle = "Kategori: Kurang";
                         predikatDesc = "Perlu penguatan penalaran literasi, numerasi analitis, dan latihan soal secara berkelanjutan.";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-rose-50 text-rose-800 border border-rose-200 mb-6 text-center max-w-sm mx-auto";
+                        predikatBoxClass = "hidden";
                     }
                 } else {
                     // SD & SMP: Skala 0 hingga 100 (Syarat Predikat Istimewa: Nilai ≥ 95,00)
@@ -1252,19 +6454,19 @@
                     if (finalScore >= 95) {
                         predikatTitle = `🌟 Predikat Istimewa (Nilai ≥ 95,00)`;
                         predikatDesc = `Luar biasa! Skor Anda memenuhi kriteria Predikat Istimewa standar TKA Kemendikdasmen untuk jenjang ${jenjang}.`;
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-amber-50 text-amber-900 border-2 border-amber-400 mb-6 text-center max-w-sm mx-auto shadow-sm";
+                        predikatBoxClass = "hidden";
                     } else if (finalScore >= 75) {
                         predikatTitle = "Kategori: Baik";
                         predikatDesc = "Capaian kompetensi pemetaan mutu akademik Anda tergolong Baik dan tuntas.";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-300 mb-6 text-center max-w-sm mx-auto";
+                        predikatBoxClass = "hidden";
                     } else if (finalScore >= 55) {
                         predikatTitle = "Kategori: Memadai";
                         predikatDesc = "Memenuhi capaian standar pemetaan kompetensi akademik.";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-indigo-50 text-indigo-800 border border-indigo-200 mb-6 text-center max-w-sm mx-auto";
+                        predikatBoxClass = "hidden";
                     } else {
                         predikatTitle = "Kategori: Kurang";
                         predikatDesc = "Perlu bimbingan dan penguatan konsep materi dasar secara bertahap.";
-                        predikatBoxClass = "text-xs font-bold p-4 rounded-2xl bg-rose-50 text-rose-800 border border-rose-200 mb-6 text-center max-w-sm mx-auto";
+                        predikatBoxClass = "hidden";
                     }
                 }
 
@@ -1294,6 +6496,18 @@
                 }
             }
         };
+
+        // Fetch status sistem & user config saat inisialisasi
+        fetch('/api/user-status')
+            .then(res => res.json())
+            .then(data => {
+                serverUserData = data;
+                isLoading = false;
+            })
+            .catch(error => {
+                console.error("Gagal memuat status user:", error);
+                isLoading = false;
+            });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {

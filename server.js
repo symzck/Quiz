@@ -11,7 +11,16 @@ app.use(express.json());
 // Server-side Gemini initialization
 let aiClient = null;
 function getAI() {
-  const apiKey = process.env.GEMINI_API_KEY;
+      if (req.body.useProceduralOnly) {
+      const fallbackList = generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih, riwayat, targetCount);
+      return res.json({ 
+        soal_list: fallbackList,
+        source: 'dynamic_engine',
+        message: `Kuis TKA berhasil dibuat (${fallbackList.length} butir soal penalaran prosedural).`
+      });
+    }
+    
+const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return null;
   }
@@ -30,401 +39,130 @@ function getAI() {
 
 // Kompilasi generator soal prosedural dinamis berstandar TKA (Tes Kemampuan Akademik & UTBK-SNBT)
 function generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih = [], riwayat = [], count = 10) {
-  const seed = Date.now() + Math.floor(Math.random() * 100000);
   const targetCount = Math.max(5, Math.min(30, parseInt(count) || 10));
-
-  const standardBank = {
-    "Penalaran Matematika": [
-      (s, idx) => {
-        const tarifDasar = 10000 + (s % 5) * 2000;
-        const tarifPerKm = 3000 + (s % 4) * 500;
-        const diskonPersen = 20 + (s % 3) * 5;
-        const jarak = 12 + (s % 8);
-        const biayaAwal = tarifDasar + (jarak * tarifPerKm);
-        const potongan = Math.round(biayaAwal * (diskonPersen / 100));
-        const biayaAkhir = biayaAwal - potongan;
-        return {
-          subtes: "Penalaran Matematika",
-          stimulus: `Sebuah platform transportasi online menerapkan skema tarif perjalanan: Tarif awal (buka pintu) sebesar Rp${tarifDasar.toLocaleString('id-ID')} dan tarif per kilometer sebesar Rp${tarifPerKm.toLocaleString('id-ID')}. Dalam rangka promosi hari pendidikan, diberikan voucher diskon sebesar ${diskonPersen}% dari total biaya perjalanan sebelum biaya layanan tambahan.`,
-          soal: `Seorang siswa menempuh perjalanan sejauh ${jarak} km dari rumah menuju lokasi ujian TKA dengan menggunakan voucher promosi tersebut. Berapakah total biaya yang harus dibayar siswa setelah diskon?`,
-          pilihan: [
-            `Rp${biayaAkhir.toLocaleString('id-ID')}`,
-            `Rp${biayaAwal.toLocaleString('id-ID')}`,
-            `Rp${(biayaAkhir + 4000).toLocaleString('id-ID')}`,
-            `Rp${(biayaAkhir - 3000).toLocaleString('id-ID')}`,
-            `Rp${(biayaAwal - 10000).toLocaleString('id-ID')}`
-          ],
-          jawaban: 0,
-          pembahasan: `Langkah 1: Biaya normal = Tarif Dasar + (Jarak × Tarif/km) = ${tarifDasar} + (${jarak} × ${tarifPerKm}) = Rp${biayaAwal.toLocaleString('id-ID')}.\nLangkah 2: Potongan diskon = ${diskonPersen}% × Rp${biayaAwal.toLocaleString('id-ID')} = Rp${potongan.toLocaleString('id-ID')}.\nLangkah 3: Biaya akhir = Rp${biayaAwal.toLocaleString('id-ID')} - Rp${potongan.toLocaleString('id-ID')} = Rp${biayaAkhir.toLocaleString('id-ID')}.`,
-          topik: "Pemodelan Aljabar & Fungsi Tarif Linier",
-          tingkat: "Sulit / HOTS"
-        };
-      },
-      (s, idx) => {
-        const kapasitas = 1200 + (s % 6) * 200;
-        const debitMasuk = 40 + (s % 5) * 10;
-        const debitKeluar = 15 + (s % 3) * 5;
-        const netDebit = debitMasuk - debitKeluar;
-        const waktuMenit = Math.round(kapasitas / netDebit);
-        return {
-          subtes: "Penalaran Matematika",
-          stimulus: `Sebuah bak penampungan air cadangan di laboratorium sekolah berkapasitas ${kapasitas} liter mula-mula dalam keadaan kosong. Keran pengisi air dibuka dengan debit konstan ${debitMasuk} liter/menit, namun pada saat bersamaan terdapat pipa distribusi yang mengeluarkan air dengan debit ${debitKeluar} liter/menit.`,
-          soal: `Berapakah waktu yang dibutuhkan agar bak penampungan tersebut terisi penuh sampai batas maksimum kapasitasnya?`,
-          pilihan: [
-            `${waktuMenit} menit`,
-            `${Math.round(kapasitas / debitMasuk)} menit`,
-            `${waktuMenit + 12} menit`,
-            `${waktuMenit - 8} menit`,
-            `${Math.round(kapasitas / debitKeluar)} menit`
-          ],
-          jawaban: 0,
-          pembahasan: `Debit pengisian neto = Debit Masuk - Debit Keluar = ${debitMasuk} - ${debitKeluar} = ${netDebit} liter/menit.\nWaktu pengisian t = Kapasitas / Debit Neto = ${kapasitas} / ${netDebit} = ${waktuMenit} menit.`,
-          topik: "Laju Perubahan & Perbandingan Terbalik",
-          tingkat: "Sedang"
-        };
-      },
-      (s, idx) => {
-        const modal = 10000000;
-        const marginUntung = 25;
-        const hargaJualTotal = modal * (1 + marginUntung/100);
-        const jumlahUnit = 50 + (s % 4) * 10;
-        const hargaPerUnit = hargaJualTotal / jumlahUnit;
-        return {
-          subtes: "Penalaran Matematika",
-          stimulus: `Koperasi unit produksi siswa mengeluarkan modal produksi sebesar Rp${modal.toLocaleString('id-ID')} untuk memproduksi ${jumlahUnit} buah seragam batik khas nusantara. Koperasi menargetkan perolehan keuntungan bersih sebesar ${marginUntung}% dari seluruh modal produksi yang telah dikeluarkan.`,
-          soal: `Berapakah harga jual minimum untuk setiap satu stel seragam batik agar target laba tercapai jika seluruh produk terjual habis?`,
-          pilihan: [
-            `Rp${hargaPerUnit.toLocaleString('id-ID')}`,
-            `Rp${(hargaPerUnit - 25000).toLocaleString('id-ID')}`,
-            `Rp${(hargaPerUnit + 30000).toLocaleString('id-ID')}`,
-            `Rp${(modal / jumlahUnit).toLocaleString('id-ID')}`,
-            `Rp${(hargaPerUnit + 50000).toLocaleString('id-ID')}`
-          ],
-          jawaban: 0,
-          pembahasan: `Total penerimaan yang diharapkan = Modal × (1 + 25%) = Rp${hargaJualTotal.toLocaleString('id-ID')}.\nHarga per unit = Rp${hargaJualTotal.toLocaleString('id-ID')} / ${jumlahUnit} = Rp${hargaPerUnit.toLocaleString('id-ID')}.`,
-          topik: "Aritmatika Sosial & Target Titik Impas",
-          tingkat: "Sedang"
-        };
-      },
-      (s, idx) => {
-        const pAwal = 80 + (s % 4) * 5;
-        const pKenaikan = 10;
-        const pPenurunan = 10;
-        const pAkhir = pAwal * (1 + pKenaikan/100) * (1 - pPenurunan/100);
-        return {
-          subtes: "Penalaran Matematika",
-          stimulus: `Pada kuartal I, nilai indeks kepuasan pelayanan perpustakaan digital tercatat sebesar ${pAwal} poin. Pada kuartal II indeks tersebut mengalami kenaikan sebesar ${pKenaikan}%, namun pada kuartal III mengalami penurunan sebesar ${pPenurunan}% dari posisi kuartal II akibat gangguan server.`,
-          soal: `Pernyataan yang paling tepat mengenai perbandingan indeks kepuasan pada kuartal III terhadap kondisi awal kuartal I adalah...`,
-          pilihan: [
-            `Indeks pada kuartal III lebih rendah 1% dibanding nilai awal kuartal I (menjadi ${pAkhir.toFixed(2)} poin).`,
-            `Indeks pada kuartal III tepat sama dengan nilai awal kuartal I karena kenaikan dan penurunan persentase bernilai sama (10%).`,
-            `Indeks pada kuartal III lebih tinggi 1% dibanding nilai awal kuartal I.`,
-            `Indeks pada kuartal III mengalami penurunan drastis sebesar 10% dari kuartal I.`,
-            `Indeks pada kuartal III tidak dapat ditentukan tanpa data jumlah responden.`
-          ],
-          jawaban: 0,
-          pembahasan: `Nilai Kuartal II = ${pAwal} × 1.10 = ${(pAwal * 1.1).toFixed(2)}.\nNilai Kuartal III = ${(pAwal * 1.1).toFixed(2)} × 0.90 = ${pAkhir.toFixed(2)}.\nSecara persentase: (1 + 0.10) × (1 - 0.10) = 1 - 0.01 = 99% dari nilai awal (turun 1%).`,
-          topik: "Persentase Perubahan Kumulatif",
-          tingkat: "Sulit / HOTS"
-        };
-      }
-    ],
-    "Literasi Bahasa Indonesia": [
-      (s, idx) => ({
-        subtes: "Literasi Bahasa Indonesia",
-        stimulus: `Wacana:\n"Penerapan teknologi kecerdasan buatan generatif di lingkungan akademik perguruan tinggi di Indonesia menimbulkan perdebatan dikotomis. Di satu sisi, AI mempercepat sintesis riset pustaka, pemodelan data empiris, dan koreksi tata bahasa bagi mahasiswa. Namun, survei Asosiasi Akademisi 2025 menunjukkan 48% dosen mengkhawatirkan erosi integritas akademik dan matinya kemampuan berpikir kritis-orisinil akibat ketergantungan berlebih terhadap luaran otomatis mesin tanpa verifikasi silang."`,
-        soal: `Berdasarkan kutipan teks di atas, sikap objektif yang paling tepat untuk menjembatani persoalan pemanfaatan kecerdasan buatan dalam dunia akademik adalah...`,
-        pilihan: [
-          "Menerapkan regulasi etika pemanfaatan AI yang mewajibkan transparansi deklarasi penggunaan serta pengujian penalaran orisinil mahasiswa secara lisan/analisis kritis.",
-          "Melarang penggunaan kecerdasan buatan sepenuhnya di lingkungan kampus guna melindungi keaslian karya tulis.",
-          "Membiarkan mahasiswa menggunakan AI secara bebas tanpa batasan karena tuntutan perkembangan industri 5.0.",
-          "Menghapus tugas karya tulis ilmiah dan menggantinya hanya dengan ujian tertulis pilihan ganda.",
-          "Menjadikan AI sebagai penilai tunggal seluruh tugas akademik tanpa melibatkan dosen."
-        ],
-        jawaban: 0,
-        pembahasan: "Solusi yang menjembatani kedua sisi pro dan kontra adalah regulasi etis dan penguatan verifikasi penalaran orisinil tanpa mematikan kemajuan teknologi.",
-        topik: "Evaluasi Argumen & Sikap Kritis Wacana",
-        tingkat: "Sulit / HOTS"
-      }),
-      (s, idx) => ({
-        subtes: "Literasi Bahasa Indonesia",
-        stimulus: `Wacana:\n"Kajian Pusat Konservasi Keanekaragaman Hayati menemukan bahwa hilangnya 30% kanopi hutan hujan tropis di lereng pegunungan memicu lonjakan limpasan air hujan hingga 4 kali lipat, yang pada gilirannya menyebabkan erosi hara permukaan tanah dan sedimentasi di waduk pembangkit listrik tenaga air (PLTA) di bagian hilir."`,
-        soal: `Hubungan sebab-akibat (kausalitas bertingkat) yang paling akurat dari fenomena lingkungan pada bacaan tersebut adalah...`,
-        pilihan: [
-          "Deforestasi kanopi hutan → Peningkatan debit limpasan air → Erosi tanah & sedimentasi waduk hilir.",
-          "Sedimentasi waduk hilir → Kerusakan turbin PLTA → Penurunan curah hujan pegunungan.",
-          "Erosi tanah pegunungan → Pertumbuhan kanopi hutan baru → Peningkatan efisiensi PLTA.",
-          "Pembangunan waduk PLTA → Hilangnya kanopi hutan pegunungan → Terjadinya gempa bumi.",
-          "Ketiadaan hara tanah → Kenaikan kanopi hutan → Penurunan daya tampung air."
-        ],
-        jawaban: 0,
-        pembahasan: "Rantai kausalitas bertingkat: Pengurangan tutupan kanopi menyebabkan air hujan langsung menjadi limpasan permukaan, memicu erosi hara tanah, lalu mengendap di waduk hilir.",
-        topik: "Analisis Logika Kausalitas Teks Sains",
-        tingkat: "Sedang"
-      }),
-      (s, idx) => ({
-        subtes: "Literasi Bahasa Indonesia",
-        stimulus: `Kutipan Teks:\n"Meskipun pemerintah telah meluncurkan berbagai program subsidi pupuk, tetapi produktivitas sebagian petani padi di pedalaman masih belum optimal karena keterbatasan akses terhadap benih unggul tahan kekeringan dan sistem irigasi teknis."`,
-        soal: `Perbaikan kalimat di atas agar menjadi kalimat baku dan efektif sesuai kaidah EYD V adalah...`,
-        pilihan: [
-          "Menghilangkan konjungsi 'tetapi' karena konjungsi intrakalimat pertentangan tidak boleh dirangkap dengan konjungsi subordinatif konsesif 'meskipun'.",
-          "Mengganti kata 'meskipun' dengan kata 'walau bagaimanapun juga'.",
-          "Menambahkan tanda koma setelah kata 'pemerintah' dan 'produktivitas'.",
-          "Mengubah kata 'keterbatasan' menjadi 'dibatasi'.",
-          "Menghapus kata 'karena' dan menggantinya dengan kata 'sehingga'."
-        ],
-        jawaban: 0,
-        pembahasan: "Penggabungan 'Meskipun ... tetapi ...' merupakan kesalahan struktur sintaksis (anak kalimat ganda tanpa induk kalimat). Konjungsi 'tetapi' harus dihilangkan.",
-        topik: "Sintaksis & Kalimat Efektif EYD V",
-        tingkat: "Sedang"
-      })
-    ],
-    "Literasi Bahasa Inggris": [
-      (s, idx) => ({
-        subtes: "Literasi Bahasa Inggris",
-        stimulus: `Passage:\n"Global transitions toward circular economy models have prompted manufacturing giants to redesign consumer electronics for modularity and reparability. By creating standardized snap-in components and providing open-source schematics, companies reduce electronic waste (e-waste) by an estimated 35%. Nonetheless, commercial barriers persist, as planned obsolescence historically generated consistent repeat-purchase revenue streams."`,
-        soal: `According to the passage, why do some electronic manufacturers hesitate to fully adopt circular modular designs?`,
-        pilihan: [
-          "Because legacy business models relied heavily on planned obsolescence to secure recurring sales revenues.",
-          "Because open-source schematics are legally prohibited in international trade.",
-          "Because modular components are scientifically proven to increase toxic e-waste volume.",
-          "Because consumer demand for repaired electronics has completely vanished worldwide.",
-          "Because snap-in components require rare metals that are currently unavailable."
-        ],
-        jawaban: 0,
-        pembahasan: "The passage explicitly mentions 'commercial barriers persist, as planned obsolescence historically generated consistent repeat-purchase revenue streams.'",
-        topik: "Reading Comprehension & Critical Inference",
-        tingkat: "Sulit / HOTS"
-      }),
-      (s, idx) => ({
-        subtes: "Literasi Bahasa Inggris",
-        stimulus: `Passage:\n"Recent oceanic satellite telemetry indicates an unprecedented 1.8°C thermal anomaly across tropical coral reef belts. Marine biologists warn that sustained thermal stress induces mass expulsion of photosynthetic zooxanthellae endosymbionts, precipitating coral bleaching events and jeopardizing pelagic nursery habitats."`,
-        soal: `The author's primary purpose in writing this paragraph is to...`,
-        pilihan: [
-          "Explain the scientific mechanism linking rising sea temperatures to coral ecosystem degradation.",
-          "Criticize the engineering flaws of oceanic satellite telemetry systems.",
-          "Promote commercial deep-sea tourism in coral reef belts.",
-          "Argue that photosynthetic zooxanthellae are harmful parasites to coral organisms.",
-          "Demonstrate that marine species easily adapt to abrupt thermal shifts."
-        ],
-        jawaban: 0,
-        pembahasan: "The text explains how elevated temperatures (thermal stress) cause algae expulsion, leading to coral bleaching and habitat loss.",
-        topik: "Author Purpose & Textual Function",
-        tingkat: "Sedang"
-      })
-    ],
-    "TPS - Penalaran Umum (PU)": [
-      (s, idx) => ({
-        subtes: "TPS - Penalaran Umum",
-        stimulus: `Premis:\n1. Semua peserta seleksi yang memiliki sertifikat keahlian digital ATAU memenangkan olimpiade sains nasional berhak mengikuti wawancara tahap akhir.\n2. Sebagian mahasiswa berprestasi yang berhak mengikuti wawancara tahap akhir mendapatkan tawaran beasiswa ikatan dinas.\n3. Arya memenangkan medali emas olimpiade sains nasional bidang astronomi.`,
-        soal: `Berdasarkan tiga premis di atas, simpulan logis yang PASTI BENAR adalah...`,
-        pilihan: [
-          "Arya berhak mengikuti wawancara tahap akhir seleksi.",
-          "Arya pasti mendapatkan tawaran beasiswa ikatan dinas.",
-          "Arya pasti memiliki sertifikat keahlian digital.",
-          "Arya menolak tawaran wawancara tahap akhir.",
-          "Semua mahasiswa berprestasi pasti memenangkan olimpiade sains."
-        ],
-        jawaban: 0,
-        pembahasan: "Premis 1 menggunakan disjungsi (ATAU). Karena Arya menang olimpiade sains (Premis 3), syarat cukup terpenuhi, maka Arya PASTI berhak mengikuti wawancara tahap akhir. Mengenai beasiswa (Premis 2) hanya berlaku untuk 'sebagian', sehingga tidak pasti untuk Arya.",
-        topik: "Logika Deduktif & Silogisme Disjungtif",
-        tingkat: "Sulit / HOTS"
-      }),
-      (s, idx) => {
-        const a1 = 3 + (s % 3);
-        const a2 = a1 * 2 + 1;
-        const a3 = a2 * 2 + 1;
-        const a4 = a3 * 2 + 1;
-        const a5 = a4 * 2 + 1;
-        const a6 = a5 * 2 + 1;
-        return {
-          subtes: "TPS - Penalaran Umum",
-          stimulus: `Perhatikan barisan pola bilangan berikut: ${a1}, ${a2}, ${a3}, ${a4}, ${a5}, ...`,
-          soal: `Angka yang tepat untuk mengisi suku berikutnya pada pola barisan tersebut adalah...`,
-          pilihan: [
-            `${a6}`,
-            `${a5 * 2}`,
-            `${a6 + 2}`,
-            `${a6 - 4}`,
-            `${a5 + 32}`
-          ],
-          jawaban: 0,
-          pembahasan: `Pola barisan adalah U(n) = 2 × U(n-1) + 1.\nSuku berikutnya = 2 × ${a5} + 1 = ${a6}.`,
-          topik: "Penalaran Induktif & Deret Logika Angka",
-          tingkat: "Sedang"
-        };
-      }
-    ],
-    "TPS - Pengetahuan Kuantitatif (PK)": [
-      (s, idx) => {
-        const xVal = 3 + (s % 4);
-        const yVal = 2 + (s % 3);
-        const eq1 = 2 * xVal + 3 * yVal;
-        const eq2 = 3 * xVal - yVal;
-        const targetVal = 4 * xVal + 2 * yVal;
-        return {
-          subtes: "TPS - Pengetahuan Kuantitatif",
-          stimulus: `Diketahui sistem persamaan linier dua variabel:\n2x + 3y = ${eq1}\n3x - y = ${eq2}`,
-          soal: `Berdasarkan sistem persamaan tersebut, berapakah nilai dari ekspresi aljabar 4x + 2y?`,
-          pilihan: [
-            `${targetVal}`,
-            `${targetVal + 6}`,
-            `${targetVal - 4}`,
-            `${targetVal * 2}`,
-            `${targetVal - 10}`
-          ],
-          jawaban: 0,
-          pembahasan: `Dengan eliminasi/substitusi didapatkan x = ${xVal} dan y = ${yVal}.\nMaka 4x + 2y = 4(${xVal}) + 2(${yVal}) = ${4 * xVal} + ${2 * yVal} = ${targetVal}.`,
-          topik: "Sistem Persamaan Linier Dua Variabel",
-          tingkat: "Sedang"
-        };
-      },
-      (s, idx) => ({
-        subtes: "TPS - Pengetahuan Kuantitatif",
-        stimulus: `Soal Kecukupan Data:\nApakah nilai x > y?\n(1) x + y = 14\n(2) x - y = 4`,
-        soal: `Tentukan apakah informasi pada pernyataan (1) dan (2) cukup untuk menjawab pertanyaan tersebut!`,
-        pilihan: [
-          "Pernyataan (2) SAJA cukup untuk menjawab pertanyaan, tetapi pernyataan (1) SAJA tidak cukup.",
-          "Pernyataan (1) SAJA cukup untuk menjawab pertanyaan, tetapi pernyataan (2) SAJA tidak cukup.",
-          "DUA pernyataan BERSAMA-SAMA cukup untuk menjawab pertanyaan, tetapi SATU pernyataan SAJA tidak cukup.",
-          "Pernyataan (1) SAJA cukup dan pernyataan (2) SAJA cukup.",
-          "Pernyataan (1) dan pernyataan (2) tidak cukup untuk menjawab pertanyaan."
-        ],
-        jawaban: 0,
-        pembahasan: "Dari pernyataan (2): x - y = 4 → x = y + 4. Karena 4 > 0, maka x pasti lebih besar dari y (x > y terjawab PASTI YA). Pernyataan (2) SAJA sudah cukup tanpa perlu tahu nilai mutlak x dan y.",
-        topik: "Analisis Kecukupan Data (Data Sufficiency)",
-        tingkat: "Sulit / HOTS"
-      })
-    ],
-    "TKA Saintek (Fisika, Kimia, Biologi)": [
-      (s, idx) => ({
-        subtes: "TKA Saintek - Fisika",
-        stimulus: `Studi Kasus Fisika:\nSebuah balok bermassa 5 kg ditarik dengan gaya konstan F = 40 N yang membentuk sudut elevasi 37° terhadap lantai mendatar yang kasar. Koefisien gesek kinetik antara balok dan lantai adalah μk = 0,2. (Gunakan sin 37° = 0,6; cos 37° = 0,8; g = 10 m/s²)`,
-        soal: `Berapakah besar percepatan yang dialami balok saat bergerak mendatar?`,
-        pilihan: [
-          "5,36 m/s²",
-          "4,80 m/s²",
-          "6,40 m/s²",
-          "3,20 m/s²",
-          "2,50 m/s²"
-        ],
-        jawaban: 0,
-        pembahasan: `Fx = F cos 37° = 40 × 0,8 = 32 N.\nFy = F sin 37° = 40 × 0,6 = 24 N.\nGaya Normal N = W - Fy = (5 × 10) - 24 = 26 N.\nGaya Gesek f_k = μk × N = 0,2 × 26 = 5,2 N.\nPercepatan a = (Fx - f_k) / m = (32 - 5,2) / 5 = 26,8 / 5 = 5,36 m/s².`,
-        topik: "Dinamika Gerak & Hukum II Newton Bidang Datar",
-        tingkat: "Sulit / HOTS"
-      }),
-      (s, idx) => ({
-        subtes: "TKA Saintek - Kimia",
-        stimulus: `Studi Kasus Kimia Analitik:\nSebanyak 100 mL larutan CH3COOH 0,1 M (Ka = 10^-5) dicampurkan dengan 50 mL larutan NaOH 0,1 M hingga membentuk larutan penyangga (buffer).`,
-        soal: `Berapakah nilai pH dari larutan penyangga yang terbentuk setelah reaksi sempurna?`,
-        pilihan: [
-          "5",
-          "4",
-          "6",
-          "9",
-          "8 - log 2"
-        ],
-        jawaban: 0,
-        pembahasan: `Mol CH3COOH = 100 mL × 0,1 M = 10 mmol.\nMol NaOH = 50 mL × 0,1 M = 5 mmol.\nSisa asam lemah CH3COOH = 10 - 5 = 5 mmol.\nTerbentuk garam CH3COONa = 5 mmol.\n[H+] = Ka × (sisa asam / garam) = 10^-5 × (5 / 5) = 10^-5 M.\npH = -log(10^-5) = 5.`,
-        topik: "Larutan Penyangga & Stoikiometri Asam-Basa",
-        tingkat: "Sedang"
-      }),
-      (s, idx) => ({
-        subtes: "TKA Saintek - Biologi",
-        stimulus: `Fenomena Genetika Molekuler:\nPada proses transkripsi sintesis protein, sekuens rantai DNA antisense memiliki urutan basa: 3'- TAC - CGA - TTT - ACT - 5'.`,
-        soal: `Urutan kodon pada mRNA hasil transkripsi dan antikodon pada tRNA yang membawa asam amino pertama secara berurutan adalah...`,
-        pilihan: [
-          "mRNA: 5'- AUG - GCU - AAA - UGA - 3' ; Antikodon tRNA pertama: 3'- UAC - 5'",
-          "mRNA: 5'- UAC - GCU - AAA - UGA - 3' ; Antikodon tRNA pertama: 3'- AUG - 5'",
-          "mRNA: 3'- AUG - GCU - AAA - UGA - 5' ; Antikodon tRNA pertama: 5'- TAC - 3'",
-          "mRNA: 5'- ATG - GCT - AAA - TGA - 3' ; Antikodon tRNA pertama: 3'- UAC - 5'",
-          "mRNA: 5'- TAC - CGA - TTT - ACT - 3' ; Antikodon tRNA pertama: 3'- ATG - 5'"
-        ],
-        jawaban: 0,
-        pembahasan: `Transkripsi dari antisense (3' ke 5') menghasilkan mRNA komplementer (5' ke 3'):\nTAC → AUG, CGA → GCU, TTT → AAA, ACT → UGA.\nKodon pertama mRNA adalah 5'-AUG-3' (kodon start metionin). Antikodon komplementer pada tRNA adalah 3'-UAC-5'.`,
-        topik: "Sintesis Protein & Dogma Sentral Biologi",
-        tingkat: "Sulit / HOTS"
-      })
-    ]
-  };
-
-  // Pilih pool yang relevan berdasarkan mapel/jenjang
-  let pool = [];
-  if (mapel.includes("Matematika") || mapel.includes("Kuantitatif") || mapel.includes("Numerasi")) {
-    pool = [...standardBank["Penalaran Matematika"], ...standardBank["TPS - Pengetahuan Kuantitatif (PK)"]];
-  } else if (mapel.includes("Indonesia") || mapel.includes("Literasi")) {
-    pool = [...standardBank["Literasi Bahasa Indonesia"]];
-  } else if (mapel.includes("Inggris")) {
-    pool = [...standardBank["Literasi Bahasa Inggris"]];
-  } else if (mapel.includes("Fisika") || mapel.includes("Kimia") || mapel.includes("Biologi") || mapel.includes("IPA") || mapel.includes("IPAS")) {
-    pool = [...standardBank["TKA Saintek (Fisika, Kimia, Biologi)"]];
-  } else if (mapel.includes("Penalaran") || mapel.includes("TPS")) {
-    pool = [...standardBank["TPS - Penalaran Umum (PU)"], ...standardBank["TPS - Pengetahuan Kuantitatif (PK)"]];
-  } else {
-    // Gabungan komprehensif
-    pool = [
-      ...standardBank["Penalaran Matematika"],
-      ...standardBank["Literasi Bahasa Indonesia"],
-      ...standardBank["Literasi Bahasa Inggris"],
-      ...standardBank["TPS - Penalaran Umum (PU)"],
-      ...standardBank["TPS - Pengetahuan Kuantitatif (PK)"],
-      ...standardBank["TKA Saintek (Fisika, Kimia, Biologi)"]
-    ];
-  }
-
   const list = [];
+  
   for (let i = 0; i < targetCount; i++) {
-    const generatorFn = pool[(i + seed) % pool.length];
-    const generated = generatorFn(seed + i * 43, i + 1);
+    // Generate true randomness to avoid repetition
+    const a = Math.floor(Math.random() * 50) + 10;
+    const b = Math.floor(Math.random() * 50) + 10;
+    const c = Math.floor(Math.random() * 20) + 2;
+    const isMath = mapel.toLowerCase().includes("matematika") || mapel.toLowerCase().includes("kuantitatif") || mapel.toLowerCase().includes("fisika") || mapel.toLowerCase().includes("kimia");
+    
+    let soal = "";
+    let stimulus = "";
+    let jawabanText = "";
+    let pilihan = [];
+    let pembahasan = "";
+    let topik = (topikTerpilih && topikTerpilih.length > 0) ? topikTerpilih[i % topikTerpilih.length] : "Analisis Akademik";
 
-    // Ambil opsi dari generator
-    let rawOptions = [...generated.pilihan];
-    let correctIdx = generated.jawaban;
-
-    // Sesuaikan jumlah opsi untuk SD dan SMP (maks 4 opsi)
-    if ((jenjang === 'SD' || jenjang === 'SMP') && rawOptions.length > 4) {
-      const correctText = rawOptions[correctIdx];
-      rawOptions.splice(correctIdx, 1); 
-      rawOptions = rawOptions.slice(0, 3); // Ambil 3 distraktor
-      rawOptions.push(correctText); // Kembalikan jawaban benar
-      correctIdx = 3;
+    if (isMath) {
+      const type = Math.floor(Math.random() * 4);
+      if (type === 0) {
+        stimulus = `Sebuah koperasi sekolah membeli ${a} lusin buku tulis dengan harga Rp${b * 1000} per lusin. Kemudian buku tersebut dijual eceran dengan keuntungan ${c}%.`;
+        soal = `Berapakah harga jual total seluruh buku tulis tersebut?`;
+        const modal = a * b * 1000;
+        const untung = modal * (c / 100);
+        const total = modal + untung;
+        jawabanText = `Rp${total.toLocaleString('id-ID')}`;
+        pilihan = [jawabanText, `Rp${(total + 5000).toLocaleString('id-ID')}`, `Rp${(total - 2000).toLocaleString('id-ID')}`, `Rp${(modal).toLocaleString('id-ID')}`, `Rp${(total + 12000).toLocaleString('id-ID')}`];
+        pembahasan = `Modal = ${a} × ${b * 1000} = ${modal}. Keuntungan = ${c}% × ${modal} = ${untung}. Total = ${total}.`;
+      } else if (type === 1) {
+        stimulus = `Dalam sebuah eksperimen laboratorium, suatu zat kimia bermassa ${a}00 gram meluruh sebesar ${c}% setiap jam.`;
+        soal = `Berapa sisa massa zat kimia tersebut setelah 1 jam?`;
+        const awal = a * 100;
+        const sisa = awal * (1 - c / 100);
+        jawabanText = `${sisa} gram`;
+        pilihan = [jawabanText, `${sisa + 10} gram`, `${sisa - 5} gram`, `${awal - (awal * (c+5)/100)} gram`, `${sisa + 15} gram`];
+        pembahasan = `Sisa = Massa Awal × (1 - persentase) = ${awal} × (1 - ${c / 100}) = ${sisa} gram.`;
+      } else if (type === 2) {
+        stimulus = `Sebuah bak penampungan air berbentuk balok memiliki panjang ${a} cm, lebar ${b} cm, dan tinggi ${c}0 cm.`;
+        soal = `Berapakah volume maksimal air yang dapat ditampung dalam bak tersebut (dalam liter)?`;
+        const volCm = a * b * (c * 10);
+        const volLiter = volCm / 1000;
+        jawabanText = `${volLiter} liter`;
+        pilihan = [jawabanText, `${volLiter * 10} liter`, `${volLiter / 10} liter`, `${volLiter + 5} liter`, `${volLiter + 12} liter`];
+        pembahasan = `Volume = ${a} × ${b} × ${c * 10} = ${volCm} cm³ = ${volLiter} liter.`;
+      } else {
+        stimulus = `Fungsi pendapatan harian sebuah usaha dirumuskan dengan f(x) = ${a}x - ${b}, dengan x adalah jumlah unit barang yang terjual.`;
+        soal = `Jika hari ini terjual sebanyak ${c} unit barang, berapakah pendapatan usaha tersebut?`;
+        const hasil = a * c - b;
+        jawabanText = `${hasil}`;
+        pilihan = [jawabanText, `${hasil + 10}`, `${hasil - a}`, `${hasil + b}`, `${hasil + 15}`];
+        pembahasan = `Substitusi x = ${c} ke dalam fungsi: f(${c}) = ${a}(${c}) - ${b} = ${hasil}.`;
+      }
+    } else {
+      const subjek = ["Pemerintah", "Kementerian", "Sekolah", "Masyarakat", "Ilmuwan", "Peneliti"][Math.floor(Math.random() * 6)];
+      const objek = ["program pelestarian lingkungan", "inovasi teknologi digital", "metode pembelajaran baru", "sistem daur ulang sampah", "kebijakan energi terbarukan"][Math.floor(Math.random() * 5)];
+      const dampak = ["meningkatkan efisiensi sebesar", "mengurangi emisi karbon hingga", "mempercepat proses adaptasi sekitar", "menurunkan tingkat polusi sebesar"][Math.floor(Math.random() * 4)];
+      
+      const type = Math.floor(Math.random() * 3);
+      if (type === 0) {
+        stimulus = `Wacana Teks ${i + 1}:
+Dalam laporan terbaru, ${subjek} telah menerapkan ${objek} yang diklaim dapat ${dampak} ${c}%. Kebijakan ini menuai respons positif, namun pelaksanaannya masih terhambat oleh kurangnya infrastruktur pendukung di wilayah pelosok.`;
+        soal = `Berdasarkan wacana di atas, apa gagasan pokok (ide utama) dari paragraf tersebut?`;
+        jawabanText = `Penerapan ${objek} oleh ${subjek} beserta dampak dan tantangannya.`;
+        pilihan = [jawabanText, `Kurangnya infrastruktur di wilayah pelosok.`, `Klaim penurunan sebesar ${c}% yang diragukan.`, `Dukungan penuh tanpa syarat terhadap ${subjek}.`, `Tidak ada gagasan pokok yang jelas.`];
+        pembahasan = `Gagasan pokok mencakup inti pembicaraan, yaitu inisiatif ${subjek} mengenai ${objek} dan tantangan infrastruktur yang menyertainya.`;
+      } else if (type === 1) {
+        stimulus = `Analisis Paragraf ${i + 1}:
+"Meskipun ${subjek} berhasil menginisiasi ${objek}, banyak ahli berpendapat bahwa persentase keberhasilan yang menyentuh ${c}% masih belum cukup untuk mengatasi masalah fundamental."`;
+        soal = `Kata hubung (konjungsi) 'Meskipun' pada awal kalimat di atas menunjukkan makna hubungan...`;
+        jawabanText = `Pertentangan atau konsesi (perlawanan kondisi).`;
+        pilihan = [jawabanText, `Penambahan informasi (aditif).`, `Sebab-akibat (kausalitas).`, `Pemilihan alternatif (disjungtif).`, `Syarat mutlak (kondisional).`];
+        pembahasan = `Konjungsi 'meskipun', 'walaupun', 'kendatipun' menyatakan hubungan pertentangan atau konsesif antara klausa utama dan anak kalimat.`;
+      } else {
+        stimulus = `Studi Kasus Kontekstual ${i + 1}:
+Laporan menunjukkan bahwa inisiatif ${objek} yang dipimpin ${subjek} mencatat ${b} kasus keberhasilan. Sayangnya, ada sekitar ${a} laporan kendala teknis.`;
+        soal = `Kesimpulan logis yang paling tepat berdasarkan premis-premis di atas adalah...`;
+        jawabanText = `Inisiatif tersebut menunjukkan hasil positif meskipun masih diwarnai oleh kendala teknis dalam pelaksanaannya.`;
+        pilihan = [jawabanText, `Inisiatif tersebut sepenuhnya gagal dan harus dihentikan.`, `${subjek} tidak kompeten dalam menjalankan ${objek}.`, `Kendala teknis sebanyak ${a} kasus adalah hal yang wajar dan diabaikan.`, `Tidak ada kesimpulan yang bisa ditarik secara pasti.`];
+        pembahasan = `Kesimpulan yang seimbang mengakui adanya rasio keberhasilan sekaligus mencatat adanya kendala tanpa mengambil lompatan logika ekstrem.`;
+      }
     }
 
-    // Acak urutan pilihan jawaban
-    const correctAnswerText = rawOptions[correctIdx];
-
+    // Shuffle options
+    let rawOptions = [...pilihan];
+    if (jenjang === 'SD' || jenjang === 'SMP') {
+      rawOptions = rawOptions.slice(0, 4); // Maksimal 4 opsi
+      if (!rawOptions.includes(jawabanText)) {
+        rawOptions[3] = jawabanText;
+      }
+    }
+    
     const shuffledOptions = [...rawOptions];
     for (let j = shuffledOptions.length - 1; j > 0; j--) {
       const k = Math.floor(Math.random() * (j + 1));
       [shuffledOptions[j], shuffledOptions[k]] = [shuffledOptions[k], shuffledOptions[j]];
     }
-    const newCorrectIndex = shuffledOptions.indexOf(correctAnswerText);
+    
+    let soalFormatted = soal;
+    if (stimulus) {
+      soalFormatted = `[STIMULUS WACANA KASUS]
+${stimulus}
 
-    // Format soal standar TKA dengan wacana/stimulus jelas
-    let soalFormatted = generated.soal;
-    if (generated.stimulus) {
-      soalFormatted = `[STIMULUS WACANA KASUS]\n${generated.stimulus}\n\n[PERTANYAAN ANALITIS]\n${generated.soal}`;
+[PERTANYAAN ANALITIS]
+${soal}`;
     }
 
     list.push({
-      id: `tka_${seed}_${i}`,
+      id: `tka_dyn_${Date.now()}_${i}_${Math.floor(Math.random()*1000)}`,
       jenjang,
       mapel,
       jurusan: jurusan || undefined,
-      subtes: generated.subtes || `TKA ${mapel}`,
+      subtes: `TKA ${jenjang} - ${mapel}`,
       soal: soalFormatted,
       pilihan: shuffledOptions,
-      jawaban: newCorrectIndex !== -1 ? newCorrectIndex : 0,
-      pembahasan: generated.pembahasan || "Pembahasan tertera pada konsep materi.",
-      topik: (topikTerpilih && topikTerpilih[i % (topikTerpilih.length || 1)]) || generated.topik || "Penalaran TKA HOTS",
-      tingkat: generated.tingkat || (i % 3 === 0 ? "Mudah" : (i % 3 === 1 ? "Sedang" : "Sulit / HOTS"))
+      jawaban: shuffledOptions.indexOf(jawabanText),
+      pembahasan: pembahasan,
+      topik: topik,
+      tingkat: (i % 3 === 0 ? "Mudah" : (i % 3 === 1 ? "Sedang" : "Sulit / HOTS"))
     });
   }
 
   return list;
 }
 
-// Helper to safely extract JSON from Gemini output
 function extractJsonFromText(text) {
   if (!text) return null;
   let clean = text.trim();
@@ -473,7 +211,7 @@ app.post('/api/generate-soal', async (req, res) => {
     
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.warn('GEMINI_API_KEY not configured, using rich dynamic TKA procedural engine.');
+      console.log('GEMINI_API_KEY not configured, using rich dynamic TKA procedural engine.');
       const fallbackList = generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih, riwayat, targetCount);
       return res.json({ 
         soal_list: fallbackList,
@@ -554,11 +292,12 @@ PEDOMAN BAKU PENULISAN SOAL STANDAR TKA:
 }`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.7-flash',
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }],
         temperature: 0.85,
+        responseMimeType: "application/json"
       }
     });
 
@@ -566,7 +305,7 @@ PEDOMAN BAKU PENULISAN SOAL STANDAR TKA:
     const parsed = extractJsonFromText(rawText);
 
     if (!parsed || !parsed.soal_list || !Array.isArray(parsed.soal_list) || parsed.soal_list.length === 0) {
-      console.warn('AI output could not be parsed as JSON, falling back to dynamic procedural questions.');
+      console.log('AI output could not be parsed as JSON, falling back to dynamic procedural questions.');
       const fallbackList = generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih, riwayat, targetCount);
       return res.json({ 
         soal_list: fallbackList, 
@@ -624,7 +363,7 @@ PEDOMAN BAKU PENULISAN SOAL STANDAR TKA:
     });
 
   } catch (error) {
-    console.warn('Gemini API quota exceeded or unavailable. Using fallback engine.', error.message);
+    console.log('Gemini API quota exceeded or unavailable. Using fallback engine.');
     const { jenjang = 'SMA', mapel = 'Matematika', jurusan = null, topikTerpilih = [], riwayat = [], count = 10, jumlahSoal = 10 } = req.body || {};
     const targetCount = Math.max(5, Math.min(30, parseInt(jumlahSoal || count) || 10));
     const fallbackList = generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih, riwayat, targetCount);
@@ -642,6 +381,19 @@ app.get('/api/health', (req, res) => {
     status: 'ok', 
     hasGeminiKey: !!process.env.GEMINI_API_KEY,
     grounding: 'googleSearch'
+  });
+});
+
+// User status & system configuration endpoint
+app.get('/api/user-status', (req, res) => {
+  res.json({
+    status: 'active',
+    maxLimitPerDay: 5,
+    serverTime: new Date().toISOString(),
+    features: {
+      aiGeneration: !!process.env.GEMINI_API_KEY,
+      cloudDatabase: true
+    }
   });
 });
 
