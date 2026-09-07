@@ -132,6 +132,72 @@
         </section>
 
         <!-- Modal PIN Admin -->
+        
+        <!-- Modal Edit Soal -->
+        <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative">
+                <button onclick="window.tutupModalEdit()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="font-bold text-lg text-slate-800 mb-4"><i class="fa-solid fa-pen-to-square text-indigo-500"></i> Edit Soal</h3>
+                
+                <input type="hidden" id="edit-id">
+                
+                <div class="mb-3">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Sumber Teks (Wacana/Stimulus) *Opsional</label>
+                    <textarea id="edit-stimulus" rows="3" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none" placeholder="Teks stimulus atau wacana..."></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">URL Sumber Gambar (Wacana/Stimulus) *Opsional</label>
+                    <input type="text" id="edit-stimulus-img" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Soal / Pertanyaan *Wajib</label>
+                    <textarea id="edit-soal" rows="3" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none" placeholder="Pertanyaan..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">Opsi A</label>
+                        <input type="text" id="edit-pil-0" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">Opsi B</label>
+                        <input type="text" id="edit-pil-1" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">Opsi C</label>
+                        <input type="text" id="edit-pil-2" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">Opsi D</label>
+                        <input type="text" id="edit-pil-3" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-xs font-bold text-slate-600 block mb-1">Opsi E (Hanya SMA/opsional)</label>
+                        <input type="text" id="edit-pil-4" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">Kunci Jawaban</label>
+                        <select id="edit-kunci" class="w-full text-sm p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-lg outline-none">
+                            <option value="0">A</option><option value="1">B</option>
+                            <option value="2">C</option><option value="3">D</option><option value="4">E</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">Pembahasan</label>
+                    <textarea id="edit-pembahasan" rows="3" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none"></textarea>
+                </div>
+
+                <button onclick="window.simpanModalEdit()" class="w-full py-3 text-sm font-bold text-white bg-indigo-600 rounded-xl shadow-md hover:bg-indigo-700 transition">Simpan Perubahan</button>
+            </div>
+        </div>
+
         <div id="modal-pin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
             <div class="bg-white rounded-3xl w-full max-w-sm p-8 text-center shadow-2xl">
                 <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-xl mx-auto mb-4">
@@ -367,24 +433,12 @@
                     <label id="u-mapel-label" class="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran (Mata Uji)</label>
                     <select id="u-mapel" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"></select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Jumlah Butir Soal</label>
-                    <select id="u-jumlah-soal" class="w-full p-3 bg-slate-50 border border-indigo-200 rounded-xl text-sm font-bold text-indigo-700 outline-none">
-                        <option value="5">5 Butir Soal (Latihan Cepat ⚡)</option>
-                        <option value="10" selected>10 Butir Soal (Standar Simulasi TKA 📝)</option>
-                        <option value="15">15 Butir Soal (Simulasi Menengah 🎯)</option>
-                        <option value="20">20 Butir Soal (Tryout TKA Penuh 🏆)</option>
-                        <option value="25">25 Butir Soal (Simulasi Marathon 🔥)</option>
-                    </select>
-                </div>
+                
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                <button onclick="window.mulaiKuis(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
-                    <i class="fa-brands fa-google text-amber-300"></i> Buat via AI + Riset Google Search
-                </button>
-                <button onclick="window.mulaiKuis(false)" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-xl transition text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-infinity text-indigo-400"></i> Generator TKA (Tanpa Kuota AI)
+            <div class="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+                <button onclick="window.mulaiKuis()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play text-amber-300"></i> Mulai Ujian TKA (30 Soal Acak)
                 </button>
             </div>
         </section>
@@ -425,6 +479,7 @@
                     <i class="fa-solid fa-file-lines"></i>
                     <span>Wacana / Stimulus Kasus TKA</span>
                 </div>
+                <img id="stimulus-img" class="w-full mt-2 mb-3 rounded-lg object-cover hidden" alt="Stimulus Gambar">
                 <p id="stimulus-text" class="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line"></p>
             </div>
 
@@ -532,30 +587,15 @@
 
         // Standar Resmi Mata Uji TKA Kemendikdasmen per Jenjang
         const TKA_MAPEL = {
-            SD: [
-                "Bahasa Indonesia",
-                "Matematika"
-            ],
+            SD: ["Paket Demo (Contoh Perkiraan)"],
             SMP: [
                 "Bahasa Indonesia",
                 "Matematika"
             ],
             SMA: {
-                Wajib: [
-                    "Bahasa Indonesia",
-                    "Matematika",
-                    "Bahasa Inggris"
-                ],
-                Saintek: [
-                    "Matematika Tingkat Lanjut",
-                    "Fisika",
-                    "Kimia",
-                    "Biologi"
-                ],
-                Bahasa: [
-                    "Sastra & Bahasa Indonesia",
-                    "Bahasa Inggris Lanjutan"
-                ]
+                Wajib: ["Paket Demo (Contoh Perkiraan)"],
+                Saintek: ["Paket Demo (Contoh Perkiraan)"],
+                Bahasa: ["Paket Demo (Contoh Perkiraan)"]
             }
         };
 
@@ -6191,7 +6231,8 @@
 
         function renderAdminSoalList() {
             const container = document.getElementById('admin-db-list');
-            const list = bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS;
+            const overriddenIds = new Set(bankSoalCloud.map(q => q.id));
+            const list = [...bankSoalCloud, ...DEFAULT_QUESTIONS.filter(q => !overriddenIds.has(q.id))];
             document.getElementById('count-db-cloud').innerText = list.length;
             if(!container) return;
             container.innerHTML = list.map((q, i) => `
@@ -6201,7 +6242,10 @@
                         <span>${q.tingkat || 'HOTS'}</span>
                     </div>
                     <p class="text-xs font-bold text-slate-800 line-clamp-3 pr-2">${i+1}. ${q.soal}</p>
-                    ${q.id && !q.id.startsWith('tka_') ? `<button onclick="hapusSoalCloud('${q.id}')" class="absolute top-2 right-2 text-rose-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition" title="Hapus Soal"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                    ${q.id ? `<div class="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                        <button onclick="window.bukaEditSoal('${q.id}')" class="text-indigo-400 hover:text-indigo-600" title="Edit Soal"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="hapusSoalCloud('${q.id}')" class="${!q.id.startsWith('tka_') ? 'text-rose-400 hover:text-rose-600' : 'hidden'}" title="Hapus Soal"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>` : ''}
                 </div>
             `).join('');
         }
@@ -6275,43 +6319,31 @@
             if (el) el.innerText = `${min}:${sec}`;
         }
 
-        window.mulaiKuis = async function(pakaiAI) {
+        window.mulaiKuis = async function() {
             if(!userProfileData) return;
-            if((userProfileData.quizAttempts || 0) >= MAX_LIMIT_PER_DAY) return window.showToast("Kuota harian Anda telah habis!", "error");
+            // Kouta limit dihapus untuk pengguna (login)
 
             const jenjang = document.getElementById('u-jenjang').value;
             const mapel = document.getElementById('u-mapel').value;
             const jurusan = jenjang === 'SMA' ? document.getElementById('u-jurusan').value : null;
-            const jumlahSoal = parseInt(document.getElementById('u-jumlah-soal').value || '10');
+            const jumlahSoal = 30; // Hardcoded to 30 as requested
 
             document.getElementById('user-home').classList.add('hidden');
             document.getElementById('loading-section').classList.remove('hidden');
 
-            if(pakaiAI) {
+            const overriddenIds = new Set(bankSoalCloud.map(q => q.id));
+            const gabungan = [...bankSoalCloud, ...DEFAULT_QUESTIONS.filter(q => !overriddenIds.has(q.id))];
+            let cocok = acakArray(gabungan.filter(q => q.mapel === mapel && q.jenjang === jenjang));
+            if (cocok.length < jumlahSoal) {
                 try {
-                    activeQuestions = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal);
-                    simpanRiwayatSoal(mapel, activeQuestions);
-                } catch(e) {
-                    console.error("Gagal AI:", e);
-                    window.showToast("Koneksi AI Sibuk, otomatis mengambil bank soal TKA.", "info");
-                    pakaiAI = false;
+                    const extra = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal - cocok.length, true); // Force Procedural
+                    cocok = [...cocok, ...extra];
+                    activeQuestions = cocok;
+                } catch(err) {
+                    activeQuestions = cocok.length > 0 ? cocok.slice(0, jumlahSoal) : DEFAULT_QUESTIONS.slice(0, jumlahSoal);
                 }
-            }
-
-            if(!pakaiAI) {
-                const gabungan = [...DEFAULT_QUESTIONS, ...bankSoalCloud];
-                let cocok = acakArray(gabungan.filter(q => q.mapel === mapel && q.jenjang === jenjang));
-                if (cocok.length < jumlahSoal) {
-                    try {
-                        const extra = await generateSoalAI(jenjang, mapel, jurusan, jumlahSoal - cocok.length, true); // Force Procedural
-                        cocok = [...cocok, ...extra];
-                        activeQuestions = cocok;
-                    } catch(err) {
-                        activeQuestions = cocok.length > 0 ? cocok.slice(0, jumlahSoal) : DEFAULT_QUESTIONS.slice(0, jumlahSoal);
-                    }
-                } else {
-                    activeQuestions = cocok.slice(0, jumlahSoal);
-                }
+            } else {
+                activeQuestions = cocok.slice(0, jumlahSoal);
             }
 
             activeQuestions = urutkanBerdasarkanTingkat(activeQuestions);
@@ -6358,8 +6390,15 @@
                 stimulusText.innerText = stimPart;
                 stimulusContainer.classList.remove('hidden');
                 questionText.innerText = qPart;
-            } else if (q.stimulus) {
-                stimulusText.innerText = q.stimulus;
+            } else if (q.stimulus || q.stimulus_img) {
+                const imgEl = document.getElementById('stimulus-img');
+                if (q.stimulus_img) {
+                    imgEl.src = q.stimulus_img;
+                    imgEl.classList.remove('hidden');
+                } else {
+                    imgEl.classList.add('hidden');
+                }
+                stimulusText.innerText = q.stimulus || '';
                 stimulusContainer.classList.remove('hidden');
                 questionText.innerText = fullText;
             } else {
