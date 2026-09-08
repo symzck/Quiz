@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kuis Cerdas TKA - Cloud & AI</title>
+    <meta name="description" content="Aplikasi kuis Tes Kemampuan Akademik (TKA) Kurikulum Merdeka dengan integrasi Cloud Firestore, Google Sheets, Google Drive, dan AI Gemini untuk pengelolaan dan sinkronisasi bank soal interaktif.">
     <!-- CSS Styles -->
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="./styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -215,10 +216,11 @@
 
         <!-- 2. DASBOR FOUNDER (ADMIN) -->
         <section id="founder-page" class="hidden w-full">
-            <div class="flex gap-2 mb-6 justify-center">
-                <button onclick="window.switchAdminTab('soal')" id="tab-soal" class="px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition">Manajemen Soal</button>
-                <button onclick="window.switchAdminTab('import')" id="tab-import" class="px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition">Import Spreadsheet</button>
-                <button onclick="window.switchAdminTab('laporan')" id="tab-laporan" class="px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition">Laporan Siswa</button>
+            <div class="flex gap-2 mb-6 justify-center flex-wrap">
+                <button onclick="window.switchAdminTab('soal')" id="tab-soal" class="px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Manajemen Soal</button>
+                <button onclick="window.switchAdminTab('sheets')" id="tab-sheets" class="px-5 py-2 rounded-full font-bold text-sm bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 transition flex items-center gap-2"><i class="fa-solid fa-table text-emerald-600"></i> Google Sheets & Drive</button>
+                <button onclick="window.switchAdminTab('import')" id="tab-import" class="px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition flex items-center gap-2"><i class="fa-solid fa-file-excel"></i> Import CSV/Paste</button>
+                <button onclick="window.switchAdminTab('laporan')" id="tab-laporan" class="px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition flex items-center gap-2"><i class="fa-solid fa-chart-line"></i> Laporan Siswa</button>
             </div>
 
             <div id="admin-view-soal" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -267,6 +269,196 @@
                     </div>
                     <div id="admin-db-list" class="flex-grow overflow-y-auto custom-scroll space-y-3 pr-2">
                         <div class="text-center text-slate-400 text-sm py-10">Memuat data dari database cloud...</div>
+                    </div>
+                </div>
+            </div>
+
+            
+            <!-- GOOGLE SHEETS & DRIVE CONTROL CENTER -->
+            <div id="admin-view-sheets" class="hidden space-y-6">
+                <!-- Status Koneksi Google Account & Drive -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-table"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-xl font-bold text-slate-900">Kontrol Kuis via Google Sheets & Drive</h2>
+                                    <span id="sheets-auth-badge" class="px-3 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Belum Terhubung
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Koneksikan spreadsheet Google Drive Anda untuk mengontrol bank soal, wacana stimulus, dan pengaturan ujian secara langsung.</p>
+                            </div>
+                        </div>
+                        <div id="sheets-auth-actions" class="flex items-center gap-2 shrink-0">
+                            <button onclick="window.connectGoogleWorkspace()" id="btn-connect-workspace" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2 text-xs">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                                Hubungkan Google Drive & Sheets
+                            </button>
+                            <div id="sheets-user-connected" class="hidden flex items-center gap-3">
+                                <img id="sheets-user-avatar" src="" alt="Google User" class="w-8 h-8 rounded-full border border-emerald-300">
+                                <div class="text-left leading-tight hidden md:block">
+                                    <div id="sheets-user-email" class="text-xs font-bold text-slate-800">user@gmail.com</div>
+                                    <span class="text-[10px] text-emerald-600 font-semibold">Google Workspace Aktif</span>
+                                </div>
+                                <button onclick="window.disconnectGoogleWorkspace()" class="text-xs text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg font-bold transition">
+                                    Putuskan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pemilihan Spreadsheet Google Drive -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Kolom Kiri: Pilih atau Buat File -->
+                        <div class="lg:col-span-7 space-y-4">
+                            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                                <div class="flex items-center justify-between mb-3">
+                                    <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                        <i class="fa-brands fa-google-drive text-amber-500"></i> Pilih Spreadsheet dari Google Drive
+                                    </label>
+                                    <button onclick="window.loadDriveSpreadsheets()" id="btn-refresh-drive" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                                        <i class="fa-solid fa-arrows-rotate"></i> Refresh File Drive
+                                    </button>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <select id="drive-sheets-select" onchange="window.handleDriveSelectChange()" class="w-full text-sm p-3 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+                                        <option value="">-- Klik 'Hubungkan Google' untuk melihat spreadsheet --</option>
+                                    </select>
+
+                                    <div class="flex items-center gap-2 text-xs text-slate-400">
+                                        <span class="h-px bg-slate-200 flex-grow"></span>
+                                        <span>atau masukkan ID / Link Google Sheet</span>
+                                        <span class="h-px bg-slate-200 flex-grow"></span>
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        <input type="text" id="manual-sheet-id" placeholder="Contoh: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms atau URL Sheets" class="flex-grow text-xs p-3 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                        <button onclick="window.hubungkanManualSheet()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition">
+                                            Gunakan
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                                    <span class="text-xs text-slate-500">Belum punya spreadsheet bank soal yang sesuai?</span>
+                                    <button onclick="window.buatSpreadsheetBaru()" id="btn-buat-sheet" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-md transition flex items-center gap-2">
+                                        <i class="fa-solid fa-plus-circle"></i> Buat Bank Soal Baru di Google Drive
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Spreadsheet Terkoneksi Saat Ini -->
+                            <div id="active-sheet-card" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 shadow-sm">
+                                <div class="flex items-start justify-between gap-3 mb-2">
+                                    <div>
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">Spreadsheet Pengendali Kuis</span>
+                                        <h3 id="active-sheet-title" class="font-bold text-base text-slate-900 mt-1.5">[TKA SMP] Bank Soal & Kontrol Kuis</h3>
+                                        <p id="active-sheet-id-disp" class="text-[11px] font-mono text-slate-500 truncate max-w-md">ID: -</p>
+                                    </div>
+                                    <a id="btn-buka-sheet" href="#" target="_blank" class="shrink-0 bg-white hover:bg-emerald-100 text-emerald-700 border border-emerald-300 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka di Google Sheets
+                                    </a>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-3 border-t border-emerald-200/60 text-center">
+                                    <div class="bg-white/80 p-2 rounded-lg">
+                                        <span class="text-[10px] text-slate-500 block font-bold">Soal Disinkronkan</span>
+                                        <span id="stat-sheet-soal" class="text-sm font-black text-emerald-700">0</span>
+                                    </div>
+                                    <div class="bg-white/80 p-2 rounded-lg">
+                                        <span class="text-[10px] text-slate-500 block font-bold">Durasi Ujian</span>
+                                        <span id="stat-sheet-durasi" class="text-sm font-black text-indigo-700">90 Menit</span>
+                                    </div>
+                                    <div class="bg-white/80 p-2 rounded-lg">
+                                        <span class="text-[10px] text-slate-500 block font-bold">Target Soal/Sesi</span>
+                                        <span id="stat-sheet-target" class="text-sm font-black text-slate-700">30 Butir</span>
+                                    </div>
+                                    <div class="bg-white/80 p-2 rounded-lg">
+                                        <span class="text-[10px] text-slate-500 block font-bold">Status Sinkron</span>
+                                        <span id="stat-sheet-status" class="text-xs font-bold text-emerald-600">Siap</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Kanan: Tombol Kontrol Sinkronisasi -->
+                        <div class="lg:col-span-5 space-y-4">
+                            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm h-full flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+                                        <i class="fa-solid fa-arrows-rotate text-emerald-600"></i> Aksi Sinkronisasi Dua Arah
+                                    </h3>
+                                    <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+                                        Anda dapat mengedit soal dan stimulus di Google Sheets lalu menarik perubahannya ke aplikasi, atau mengekspor soal aplikasi ke Google Sheets.
+                                    </p>
+
+                                    <div class="space-y-3">
+                                        <button onclick="window.tarikDariGoogleSheet()" id="btn-pull-sheets" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-xs">
+                                            <i class="fa-solid fa-cloud-arrow-down text-sm"></i> Tarik & Sinkronkan Soal dari Sheets
+                                        </button>
+                                        <button onclick="window.konfirmasiEksporKeSheets()" id="btn-push-sheets" class="w-full bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2 text-xs">
+                                            <i class="fa-solid fa-cloud-arrow-up text-indigo-600 text-sm"></i> Ekspor / Backup Soal ke Sheets
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl">
+                                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                                            <input type="checkbox" id="check-auto-sync" onchange="window.toggleAutoSyncSheets(this.checked)" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500">
+                                            <span class="text-xs font-bold text-slate-700">Auto-Sync saat Kuis Dimulai</span>
+                                        </label>
+                                        <p class="text-[11px] text-slate-500 mt-1 pl-6">
+                                            Jika dicentang, setiap kali siswa menekan "Mulai Simulasi", aplikasi otomatis menarik data butir soal dan parameter terbaru dari Google Sheet pengendali.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+                                    <i class="fa-solid fa-shield-halved text-emerald-500 mr-1"></i> Terotentikasi resmi via Google Workspace REST API v4.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Preview Soal dari Google Sheets -->
+                    <div class="mt-8 border-t border-slate-100 pt-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-table-list text-indigo-500"></i> Pratinjau Butir Soal Terkoneksi (<span id="count-sheet-preview">0</span> Butir)
+                                </h3>
+                                <p class="text-xs text-slate-500">Daftar soal yang saat ini aktif dikendalikan dari Google Sheets.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="filter-sheet-preview" oninput="window.renderSheetPreviewTable()" placeholder="Cari soal / topik..." class="text-xs px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none w-48">
+                                <select id="filter-sheet-mapel" onchange="window.renderSheetPreviewTable()" class="text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg outline-none">
+                                    <option value="ALL">Semua Mapel</option>
+                                    <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                    <option value="Matematika">Matematika</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto border border-slate-200 rounded-2xl max-h-[380px] custom-scroll">
+                            <table class="w-full text-left text-xs text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 z-10">
+                                    <tr>
+                                        <th class="p-3 w-12 text-center">No</th>
+                                        <th class="p-3 w-32">Mapel / Tingkat</th>
+                                        <th class="p-3 w-48">Stimulus (Wacana / Gambar)</th>
+                                        <th class="p-3">Pertanyaan & Opsi</th>
+                                        <th class="p-3 w-16 text-center">Kunci</th>
+                                        <th class="p-3 w-28">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body-sheets-preview" class="divide-y divide-slate-100 bg-white">
+                                    <tr><td colspan="6" class="text-center py-8 text-slate-400">Belum ada soal disinkronkan dari Google Sheets. Pilih spreadsheet di atas lalu klik "Tarik & Sinkronkan Soal".</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -320,6 +512,22 @@
             <p id="u-desc-header" class="text-slate-500 text-sm max-w-2xl mx-auto mb-4">Penilaian standar nasional untuk pemetaan mutu dan penyetaraan capaian (bersifat opsional/tidak menentukan kelulusan).</p>
             
             <!-- Banner Info Standar TKA Kemendikdasmen per Jenjang yang Aktif -->
+            <!-- Banner Pengumuman dari Google Sheets -->
+            <div id="sheets-announcement-banner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-6 text-left text-xs text-emerald-900 shadow-sm flex items-start gap-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-200 text-emerald-800 flex items-center justify-center shrink-0 text-sm">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div class="flex-grow">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="font-bold text-[11px] uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Pengumuman Ujian dari Google Sheets
+                        </span>
+                        <span id="sheets-announcement-source" class="text-[10px] text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full font-medium">Terkoneksi</span>
+                    </div>
+                    <p id="sheets-announcement-text" class="text-xs font-semibold text-emerald-950 mt-1 leading-relaxed">-</p>
+                </div>
+            </div>
+
             <div id="info-standar-banner" class="bg-slate-50 border border-indigo-100 rounded-2xl p-4 mb-6 text-left text-xs text-slate-700 hidden">
                 <div class="flex items-center justify-between gap-2 mb-2 font-bold text-indigo-900 border-b border-indigo-100 pb-2">
                     <span class="flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-indigo-600"></i> <span id="banner-jenjang-nama">Jenjang SMA / MA / SMK (Kelas 12 & 13 SMK)</span></span>
@@ -409,31 +617,19 @@
                 <i class="fa-solid fa-ticket"></i> Sisa Limit Kuis Hari Ini: <span id="sisa-kuota-text" class="text-base mx-1">3</span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 text-left">
+            <div id="u-form-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 text-left">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Jenjang Pendidikan TKA</label>
-                    <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
+                    <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Jenjang Pendidikan TKA</label>
+                    <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition-all cursor-pointer">
                         <option value="SMA" selected>SMA / MA / SMK (Kelas 12/13)</option>
                         <option value="SMP">SMP / MTs (Kelas 9)</option>
                         <option value="SD">SD / MI (Kelas 6)</option>
                     </select>
                 </div>
-                <div id="u-jurusan-wrap">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Kelompok Mata Uji SMA</label>
-                    <select id="u-jurusan" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none">
-                        <option value="Wajib" selected>Mata Uji Wajib (Kemampuan Dasar)</option>
-                        <option value="Saintek">Mata Uji Pilihan (Sains & Teknologi)</option>
-                        <option value="Bahasa">Mata Uji Pilihan (Bahasa & Budaya)</option>
-                    </select>
+                <div id="u-mapel-wrap" class="hidden">
+                    <label id="u-mapel-label" class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Mata Pelajaran (Mata Uji)</label>
+                    <select id="u-mapel" class="w-full p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition-all cursor-pointer"></select>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-left">
-                <div>
-                    <label id="u-mapel-label" class="block text-xs font-bold text-slate-700 mb-1">Mata Pelajaran (Mata Uji)</label>
-                    <select id="u-mapel" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold outline-none"></select>
-                </div>
-                
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 justify-center mt-4">
@@ -552,21 +748,41 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyAOHslpDrbf7dubS6MiX4Qcj2Nbr4W3CkY",
-            authDomain: "quiz-tka.firebaseapp.com",
-            projectId: "quiz-tka",
-            storageBucket: "quiz-tka.firebasestorage.app",
-            messagingSenderId: "1032541943520",
-            appId: "1:1032541943520:web:1c85ca43ba7171636bc285",
-            measurementId: "G-QFB5TDMBFC"
+            apiKey: "AIzaSyCxeoBZfZigelfMbgAZBdh8eUFuZYngYMw",
+            authDomain: "crypto-banner-tthv3.firebaseapp.com",
+            projectId: "crypto-banner-tthv3",
+            storageBucket: "crypto-banner-tthv3.firebasestorage.app",
+            messagingSenderId: "1015315511773",
+            appId: "1:1015315511773:web:d08fcfc89d4f6f1e5b9e34",
+            measurementId: ""
         };
-        const appId = 'quiz_tka_default';
+        const appId = "2bc4c10c-f0c1-41a6-a167-c736dab537e7";
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        
         const googleProvider = new GoogleAuthProvider();
+        const SCOPES = [
+            'https://www.googleapis.com/auth/spreadsheets',
+            'https://www.googleapis.com/auth/spreadsheets.readonly',
+            'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/drive.file',
+            'https://www.googleapis.com/auth/drive.readonly'
+        ];
+        SCOPES.forEach(scope => googleProvider.addScope(scope));
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+        // In-memory token caching for Google Workspace (Drive & Sheets)
+        let cachedAccessToken = null;
+        let activeGoogleSheetId = null;
+        let activeGoogleSheetName = null;
+        let activeGoogleSheetUrl = null;
+        let bankSoalSheets = [];
+        let autoSyncSheetsEnabled = false;
+        let sheetAnnouncementText = "";
+        let sheetQuizDurationMinutes = 90;
 
         const ADMIN_PIN = "1234";
         const MAX_LIMIT_PER_DAY = 5;
@@ -587,15 +803,15 @@
 
         // Standar Resmi Mata Uji TKA Kemendikdasmen per Jenjang
         const TKA_MAPEL = {
-            SD: ["Paket Demo (Contoh Perkiraan)"],
+            SD: ["Demo"],
             SMP: [
                 "Bahasa Indonesia",
                 "Matematika"
             ],
             SMA: {
-                Wajib: ["Paket Demo (Contoh Perkiraan)"],
-                Saintek: ["Paket Demo (Contoh Perkiraan)"],
-                Bahasa: ["Paket Demo (Contoh Perkiraan)"]
+                Wajib: ["Demo"],
+                Saintek: ["Demo"],
+                Bahasa: ["Demo"]
             }
         };
 
@@ -5823,6 +6039,17 @@
                 }
             }
 
+            const uMapelWrap = document.getElementById('u-mapel-wrap');
+            const uFormGrid = document.getElementById('u-form-grid');
+            if (prefix === 'u' && uMapelWrap && uFormGrid) {
+                if (jenjang === 'SMP') {
+                    uMapelWrap.classList.remove('hidden');
+                    uFormGrid.classList.add('sm:grid-cols-2');
+                } else {
+                    uMapelWrap.classList.add('hidden');
+                    uFormGrid.classList.remove('sm:grid-cols-2');
+                }
+            }
             if (jenjang === 'SMA') {
                 if (jurusanWrap) jurusanWrap.classList.remove('hidden');
                 const jurusanEl = document.getElementById(`${prefix}-jurusan`);
@@ -5938,7 +6165,12 @@
             try {
                 document.getElementById('global-loading').classList.remove('hidden');
                 document.getElementById('auth-page').classList.add('hidden');
-                await signInWithPopup(auth, googleProvider);
+                const result = await signInWithPopup(auth, googleProvider);
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                if (credential?.accessToken) {
+                    cachedAccessToken = credential.accessToken;
+                    updateSheetsUI();
+                }
             } catch (err) {
                 document.getElementById('global-loading').classList.add('hidden');
                 document.getElementById('auth-page').classList.remove('hidden');
@@ -6066,13 +6298,551 @@
         }
         window.switchAdminTab = function(tab) {
             document.getElementById('admin-view-soal').classList.toggle('hidden', tab !== 'soal');
+            document.getElementById('admin-view-sheets').classList.toggle('hidden', tab !== 'sheets');
             document.getElementById('admin-view-import').classList.toggle('hidden', tab !== 'import');
             document.getElementById('admin-view-laporan').classList.toggle('hidden', tab !== 'laporan');
             
-            document.getElementById('tab-soal').className = tab === 'soal' ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
-            document.getElementById('tab-import').className = tab === 'import' ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
-            document.getElementById('tab-laporan').className = tab === 'laporan' ? "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition" : "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition";
+            const activeClass = "px-5 py-2 rounded-full font-bold text-sm bg-founder-600 text-white shadow-md transition flex items-center gap-2";
+            const inactiveClass = "px-5 py-2 rounded-full font-bold text-sm bg-white text-slate-500 border border-slate-200 transition flex items-center gap-2";
+            
+            document.getElementById('tab-soal').className = tab === 'soal' ? activeClass : inactiveClass;
+            document.getElementById('tab-sheets').className = tab === 'sheets' ? "px-5 py-2 rounded-full font-bold text-sm bg-emerald-600 text-white shadow-md transition flex items-center gap-2" : "px-5 py-2 rounded-full font-bold text-sm bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 transition flex items-center gap-2";
+            document.getElementById('tab-import').className = tab === 'import' ? activeClass : inactiveClass;
+            document.getElementById('tab-laporan').className = tab === 'laporan' ? activeClass : inactiveClass;
+
+            if (tab === 'sheets') {
+                updateSheetsUI();
+                if (cachedAccessToken) {
+                    window.loadDriveSpreadsheets();
+                }
+            }
+        };
+
+        // --- GOOGLE WORKSPACE (DRIVE & SHEETS) INTEGRATION ---
+        function updateSheetsUI() {
+            const isConnected = !!cachedAccessToken;
+            const badge = document.getElementById('sheets-auth-badge');
+            const connectBtn = document.getElementById('btn-connect-workspace');
+            const connectedInfo = document.getElementById('sheets-user-connected');
+            
+            if (badge) {
+                if (isConnected) {
+                    badge.className = "px-3 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1.5";
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Terhubung ke Google Drive';
+                } else {
+                    badge.className = "px-3 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 flex items-center gap-1.5";
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Belum Terhubung';
+                }
+            }
+
+            if (connectBtn && connectedInfo) {
+                if (isConnected && currentUser) {
+                    connectBtn.classList.add('hidden');
+                    connectedInfo.classList.remove('hidden');
+                    const emailElem = document.getElementById('sheets-user-email');
+                    const avatarElem = document.getElementById('sheets-user-avatar');
+                    if (emailElem) emailElem.innerText = currentUser.email || "Akun Google Terhubung";
+                    if (avatarElem) avatarElem.src = currentUser.photoURL || 'https://placehold.co/32?text=G';
+                } else {
+                    connectBtn.classList.remove('hidden');
+                    connectedInfo.classList.add('hidden');
+                }
+            }
+
+            if (activeGoogleSheetId) {
+                document.getElementById('active-sheet-card')?.classList.remove('hidden');
+                document.getElementById('active-sheet-title').innerText = activeGoogleSheetName || "[TKA SMP] Bank Soal & Kontrol Kuis";
+                document.getElementById('active-sheet-id-disp').innerText = "ID: " + activeGoogleSheetId;
+                const linkBtn = document.getElementById('btn-buka-sheet');
+                if (linkBtn) linkBtn.href = activeGoogleSheetUrl || `https://docs.google.com/spreadsheets/d/${activeGoogleSheetId}/edit`;
+                document.getElementById('stat-sheet-soal').innerText = bankSoalSheets.length;
+                document.getElementById('stat-sheet-durasi').innerText = sheetQuizDurationMinutes + " Menit";
+            }
         }
+
+        window.connectGoogleWorkspace = async function() {
+            try {
+                window.showToast("Membuka otorisasi Google...", "info");
+                const result = await signInWithPopup(auth, googleProvider);
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                if (credential?.accessToken) {
+                    cachedAccessToken = credential.accessToken;
+                    window.showToast("Google Drive & Sheets berhasil terhubung!", "success");
+                    updateSheetsUI();
+                    await window.loadDriveSpreadsheets();
+                } else {
+                    window.showToast("Berhasil login Google. Mohon izinkan akses Drive & Sheets.", "info");
+                }
+            } catch(err) {
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    console.error("Google Auth error:", err);
+                    window.showToast("Gagal otorisasi: " + err.message, "error");
+                }
+            }
+        };
+
+        window.disconnectGoogleWorkspace = function() {
+            cachedAccessToken = null;
+            updateSheetsUI();
+            const select = document.getElementById('drive-sheets-select');
+            if (select) select.innerHTML = '<option value="">-- Akun terputus. Klik Hubungkan Google --</option>';
+            window.showToast("Koneksi Google Workspace dinonaktifkan.", "info");
+        };
+
+        window.loadDriveSpreadsheets = async function() {
+            if (!cachedAccessToken) {
+                window.showToast("Silakan hubungkan akun Google terlebih dahulu.", "info");
+                return;
+            }
+            const refreshBtn = document.getElementById('btn-refresh-drive');
+            if (refreshBtn) refreshBtn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> Memuat Drive...';
+            
+            try {
+                const q = encodeURIComponent("mimeType='application/vnd.google-apps.spreadsheet' and trashed=false");
+                const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,modifiedTime,webViewLink)&orderBy=modifiedTime desc&pageSize=25`;
+                
+                const res = await fetch(url, {
+                    headers: { Authorization: `Bearer ${cachedAccessToken}` }
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                        cachedAccessToken = null;
+                        updateSheetsUI();
+                        throw new Error("Sesi Google kedaluwarsa. Silakan klik 'Hubungkan Google Drive & Sheets' kembali.");
+                    }
+                    throw new Error(`Gagal memuat file Drive (${res.status}): ${res.statusText}`);
+                }
+
+                const data = await res.json();
+                const files = data.files || [];
+                const select = document.getElementById('drive-sheets-select');
+                if (select) {
+                    select.innerHTML = '<option value="">-- Pilih Spreadsheet Bank Soal dari Drive --</option>';
+                    files.forEach(f => {
+                        const opt = document.createElement('option');
+                        opt.value = f.id;
+                        opt.dataset.name = f.name;
+                        opt.dataset.url = f.webViewLink;
+                        opt.text = `📄 ${f.name} (${new Date(f.modifiedTime).toLocaleDateString('id-ID')})`;
+                        if (f.id === activeGoogleSheetId) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+                window.showToast(`Ditemukan ${files.length} spreadsheet di Google Drive.`, "info");
+            } catch(e) {
+                console.error("Gagal load Drive:", e);
+                window.showToast(e.message, "error");
+            } finally {
+                if (refreshBtn) refreshBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Refresh File Drive';
+            }
+        };
+
+        window.handleDriveSelectChange = function() {
+            const select = document.getElementById('drive-sheets-select');
+            const selOpt = select.options[select.selectedIndex];
+            if (selOpt && selOpt.value) {
+                activeGoogleSheetId = selOpt.value;
+                activeGoogleSheetName = selOpt.dataset.name;
+                activeGoogleSheetUrl = selOpt.dataset.url;
+                updateSheetsUI();
+                window.showToast(`Spreadsheet "${activeGoogleSheetName}" dipilih. Menarik data...`, "info");
+                window.tarikDariGoogleSheet();
+            }
+        };
+
+        window.hubungkanManualSheet = function() {
+            const input = document.getElementById('manual-sheet-id').value.trim();
+            if (!input) return window.showToast("Masukkan ID atau link Google Sheets!", "error");
+            
+            let sheetId = input;
+            if (input.includes('/d/')) {
+                const match = input.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (match && match[1]) sheetId = match[1];
+            }
+            
+            activeGoogleSheetId = sheetId;
+            activeGoogleSheetName = "Google Sheets Manual (" + sheetId.substring(0, 8) + "...)";
+            activeGoogleSheetUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/edit`;
+            updateSheetsUI();
+            window.showToast("Spreadsheet terhubung. Menarik data...", "info");
+            window.tarikDariGoogleSheet();
+        };
+
+        window.buatSpreadsheetBaru = async function() {
+            if (!cachedAccessToken) {
+                window.showToast("Silakan hubungkan akun Google terlebih dahulu.", "info");
+                await window.connectGoogleWorkspace();
+                if (!cachedAccessToken) return;
+            }
+
+            const title = prompt("Nama File Spreadsheet Bank Soal Baru di Google Drive:", "[TKA SMP] Bank Soal & Kontrol Kuis");
+            if (!title) return;
+
+            const btn = document.getElementById('btn-buat-sheet');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> Membuat File di Drive...';
+
+            try {
+                // 1. Buat Spreadsheet via Sheets API v4
+                const createRes = await fetch("https://sheets.googleapis.com/v4/spreadsheets", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${cachedAccessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        properties: { title: title },
+                        sheets: [
+                            { properties: { title: "Bank_Soal", gridProperties: { frozenRowCount: 1 } } },
+                            { properties: { title: "Kontrol_Kuis", gridProperties: { frozenRowCount: 1 } } }
+                        ]
+                    })
+                });
+
+                if (!createRes.ok) throw new Error("Gagal membuat spreadsheet: " + createRes.statusText);
+                const created = await createRes.json();
+                const newSheetId = created.spreadsheetId;
+                const newUrl = created.spreadsheetUrl;
+
+                // 2. Isi Header & Data Awal Bank_Soal
+                const headers = [
+                    ["ID", "Jenjang", "Mapel", "Tingkat", "Stimulus (Wacana Teks)", "URL Gambar (Stimulus)", "Soal / Pertanyaan", "Opsi A", "Opsi B", "Opsi C", "Opsi D", "Kunci Jawaban (A/B/C/D)", "Pembahasan"]
+                ];
+
+                const initialQuestions = (bankSoalCloud.length > 0 ? bankSoalCloud : DEFAULT_QUESTIONS)
+                    .filter(q => q.jenjang === 'SMP');
+                
+                const sampleRows = initialQuestions.slice(0, 50).map((q, i) => {
+                    const letters = ['A', 'B', 'C', 'D', 'E'];
+                    return [
+                        q.id || `smp_${i + 1}`,
+                        q.jenjang || 'SMP',
+                        q.mapel || 'Bahasa Indonesia',
+                        q.tingkat || 'Sedang',
+                        q.stimulus || '',
+                        q.stimulus_img || '',
+                        q.soal || '',
+                        q.pilihan?.[0] || '',
+                        q.pilihan?.[1] || '',
+                        q.pilihan?.[2] || '',
+                        q.pilihan?.[3] || '',
+                        letters[q.jawaban] || 'A',
+                        q.pembahasan || ''
+                    ];
+                });
+
+                await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${newSheetId}/values/Bank_Soal!A1?valueInputOption=USER_ENTERED`, {
+                    method: "PUT",
+                    headers: { Authorization: `Bearer ${cachedAccessToken}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ values: [...headers, ...sampleRows] })
+                });
+
+                // 3. Isi Header & Pengaturan Kontrol_Kuis
+                const controlRows = [
+                    ["Parameter Kontrol", "Nilai", "Keterangan"],
+                    ["Pesan Pengumuman Siswa", "Selamat Datang di Simulasi Resmi TKA SMP Kemendikdasmen RI", "Teks pengumuman yang tampil di dashboard siswa"],
+                    ["Durasi Kuis (Menit)", "90", "Waktu pengerjaan kuis siswa (standar 90 menit)"],
+                    ["Jumlah Soal per Sesi", "30", "Banyak butir soal per sesi kuis"],
+                    ["Status Kontrol Sheets", "AKTIF", "Aplikasi dikendalikan langsung dari Google Sheet ini"]
+                ];
+
+                await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${newSheetId}/values/Kontrol_Kuis!A1?valueInputOption=USER_ENTERED`, {
+                    method: "PUT",
+                    headers: { Authorization: `Bearer ${cachedAccessToken}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ values: controlRows })
+                });
+
+                activeGoogleSheetId = newSheetId;
+                activeGoogleSheetName = title;
+                activeGoogleSheetUrl = newUrl;
+                updateSheetsUI();
+                await window.loadDriveSpreadsheets();
+                await window.tarikDariGoogleSheet();
+
+                window.showToast("Spreadsheet berhasil dibuat di Google Drive Anda!", "success");
+            } catch(err) {
+                console.error("Buat sheet error:", err);
+                window.showToast("Gagal membuat spreadsheet: " + err.message, "error");
+            } finally {
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> Buat Bank Soal Baru di Google Drive';
+            }
+        };
+
+        window.tarikDariGoogleSheet = async function() {
+            if (!activeGoogleSheetId) {
+                return window.showToast("Pilih spreadsheet terlebih dahulu!", "error");
+            }
+            if (!cachedAccessToken) {
+                await window.connectGoogleWorkspace();
+                if (!cachedAccessToken) return;
+            }
+
+            const btn = document.getElementById('btn-pull-sheets');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> Menarik Data Sheets...';
+
+            try {
+                // 1. Ambil metadata spreadsheet untuk memeriksa nama-nama sheet/tab
+                const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${activeGoogleSheetId}`, {
+                    headers: { Authorization: `Bearer ${cachedAccessToken}` }
+                });
+                if (!metaRes.ok) throw new Error("Gagal mengakses spreadsheet: " + metaRes.statusText);
+                const meta = await metaRes.json();
+                const sheetTabs = (meta.sheets || []).map(s => s.properties.title);
+                
+                const bankTabName = sheetTabs.includes("Bank_Soal") ? "Bank_Soal" : sheetTabs[0];
+                
+                // 2. Tarik baris dari tab Bank_Soal
+                const valuesRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${activeGoogleSheetId}/values/${encodeURIComponent(bankTabName)}!A1:Z500`, {
+                    headers: { Authorization: `Bearer ${cachedAccessToken}` }
+                });
+                if (!valuesRes.ok) throw new Error("Gagal mengambil data baris: " + valuesRes.statusText);
+                const valuesData = await valuesRes.json();
+                const rows = valuesData.values || [];
+
+                if (rows.length < 2) {
+                    window.showToast("Spreadsheet kosong atau hanya berisi baris header.", "info");
+                    return;
+                }
+
+                // Petakan header secara cerdas
+                const headerRow = rows[0].map(h => String(h || '').trim().toLowerCase());
+                const colIdx = {
+                    id: headerRow.findIndex(h => h.includes('id')),
+                    jenjang: headerRow.findIndex(h => h.includes('jenjang')),
+                    mapel: headerRow.findIndex(h => h.includes('mapel') || h.includes('pelajaran')),
+                    tingkat: headerRow.findIndex(h => h.includes('tingkat') || h.includes('level') || h.includes('kesulitan')),
+                    stimulus: headerRow.findIndex(h => h.includes('stimulus') || h.includes('wacana') || h.includes('bacaan')),
+                    stimulus_img: headerRow.findIndex(h => h.includes('gambar') || h.includes('image') || h.includes('img')),
+                    soal: headerRow.findIndex(h => h.includes('soal') || h.includes('pertanyaan')),
+                    pilA: headerRow.findIndex(h => h.includes('opsi a') || h === 'a'),
+                    pilB: headerRow.findIndex(h => h.includes('opsi b') || h === 'b'),
+                    pilC: headerRow.findIndex(h => h.includes('opsi c') || h === 'c'),
+                    pilD: headerRow.findIndex(h => h.includes('opsi d') || h === 'd'),
+                    kunci: headerRow.findIndex(h => h.includes('kunci') || h.includes('jawaban')),
+                    pembahasan: headerRow.findIndex(h => h.includes('pembahasan') || h.includes('solusi'))
+                };
+
+                const parsedQuestions = [];
+                for (let i = 1; i < rows.length; i++) {
+                    const r = rows[i];
+                    if (!r || r.length === 0) continue;
+                    
+                    const soalText = (colIdx.soal !== -1 ? r[colIdx.soal] : r[6] || r[0] || '').trim();
+                    if (!soalText) continue;
+
+                    const id = (colIdx.id !== -1 && r[colIdx.id]) ? String(r[colIdx.id]).trim() : `sheet_${activeGoogleSheetId.substring(0,5)}_${i}`;
+                    const jenjang = (colIdx.jenjang !== -1 && r[colIdx.jenjang]) ? String(r[colIdx.jenjang]).trim() : 'SMP';
+                    const mapel = (colIdx.mapel !== -1 && r[colIdx.mapel]) ? String(r[colIdx.mapel]).trim() : 'Bahasa Indonesia';
+                    const tingkat = (colIdx.tingkat !== -1 && r[colIdx.tingkat]) ? String(r[colIdx.tingkat]).trim() : 'Sedang';
+                    const stimulus = (colIdx.stimulus !== -1 && r[colIdx.stimulus]) ? String(r[colIdx.stimulus]).trim() : '';
+                    const stimulus_img = (colIdx.stimulus_img !== -1 && r[colIdx.stimulus_img]) ? String(r[colIdx.stimulus_img]).trim() : '';
+                    const pembahasan = (colIdx.pembahasan !== -1 && r[colIdx.pembahasan]) ? String(r[colIdx.pembahasan]).trim() : 'Pembahasan tersedia pada konsep materi.';
+                    
+                    const pilA = (colIdx.pilA !== -1 && r[colIdx.pilA]) ? String(r[colIdx.pilA]).trim() : (r[7] || 'Opsi A');
+                    const pilB = (colIdx.pilB !== -1 && r[colIdx.pilB]) ? String(r[colIdx.pilB]).trim() : (r[8] || 'Opsi B');
+                    const pilC = (colIdx.pilC !== -1 && r[colIdx.pilC]) ? String(r[colIdx.pilC]).trim() : (r[9] || 'Opsi C');
+                    const pilD = (colIdx.pilD !== -1 && r[colIdx.pilD]) ? String(r[colIdx.pilD]).trim() : (r[10] || 'Opsi D');
+                    const pilihan = [pilA, pilB, pilC, pilD];
+
+                    const rawKunci = (colIdx.kunci !== -1 && r[colIdx.kunci]) ? String(r[colIdx.kunci]).trim().toUpperCase() : 'A';
+                    let jawaban = 0;
+                    if (rawKunci === 'B' || rawKunci === '1') jawaban = 1;
+                    else if (rawKunci === 'C' || rawKunci === '2') jawaban = 2;
+                    else if (rawKunci === 'D' || rawKunci === '3') jawaban = 3;
+                    else if (rawKunci === 'E' || rawKunci === '4') jawaban = 4;
+
+                    parsedQuestions.push({
+                        id,
+                        jenjang,
+                        mapel,
+                        subtes: `TKA ${jenjang} - ${mapel}`,
+                        tingkat,
+                        stimulus,
+                        stimulus_img,
+                        soal: soalText,
+                        pilihan,
+                        jawaban,
+                        pembahasan,
+                        source: 'google_sheets'
+                    });
+                }
+
+                bankSoalSheets = parsedQuestions;
+
+                // 3. Tarik Kontrol_Kuis jika tab tersedia
+                if (sheetTabs.includes("Kontrol_Kuis")) {
+                    try {
+                        const ctrlRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${activeGoogleSheetId}/values/Kontrol_Kuis!A1:C10`, {
+                            headers: { Authorization: `Bearer ${cachedAccessToken}` }
+                        });
+                        if (ctrlRes.ok) {
+                            const ctrlData = await ctrlRes.json();
+                            const ctrlRows = ctrlData.values || [];
+                            ctrlRows.forEach(row => {
+                                const key = (row[0] || '').trim().toLowerCase();
+                                const val = (row[1] || '').trim();
+                                if (key.includes('pengumuman') && val) {
+                                    sheetAnnouncementText = val;
+                                }
+                                if (key.includes('durasi') && val) {
+                                    const parsedDur = parseInt(val);
+                                    if (parsedDur > 0) sheetQuizDurationMinutes = parsedDur;
+                                }
+                            });
+                        }
+                    } catch(err) {
+                        console.warn("Kontrol_Kuis read warning:", err);
+                    }
+                }
+
+                // Update UI Announcement jika ada
+                const announceBanner = document.getElementById('sheets-announcement-banner');
+                const announceText = document.getElementById('sheets-announcement-text');
+                const announceSource = document.getElementById('sheets-announcement-source');
+                if (announceBanner && announceText) {
+                    if (sheetAnnouncementText) {
+                        announceBanner.classList.remove('hidden');
+                        announceText.innerText = sheetAnnouncementText;
+                        if (announceSource) announceSource.innerText = activeGoogleSheetName || "Google Sheets";
+                    }
+                }
+
+                updateSheetsUI();
+                window.renderSheetPreviewTable();
+                window.renderAdminSoalList();
+                window.showToast(`Berhasil menyinkronkan ${parsedQuestions.length} butir soal dari Google Sheets!`, "success");
+            } catch(e) {
+                console.error("Gagal sinkron Sheets:", e);
+                window.showToast("Gagal sinkron: " + e.message, "error");
+            } finally {
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down text-sm"></i> Tarik & Sinkronkan Soal dari Sheets';
+            }
+        };
+
+        window.konfirmasiEksporKeSheets = function() {
+            if (!activeGoogleSheetId) return window.showToast("Pilih spreadsheet tujuan terlebih dahulu!", "error");
+            if (!cachedAccessToken) return window.showToast("Silakan hubungkan akun Google terlebih dahulu.", "info");
+
+            const count = bankSoalCloud.length > 0 ? bankSoalCloud.length : DEFAULT_QUESTIONS.length;
+            if (confirm(`Apakah Anda yakin ingin mengekspor seluruh ${count} soal dari aplikasi ke Google Sheet "${activeGoogleSheetName || 'Aktif'}"? Data tab Bank_Soal akan diperbarui.`)) {
+                window.eksporKeGoogleSheet();
+            }
+        };
+
+        window.eksporKeGoogleSheet = async function() {
+            const btn = document.getElementById('btn-push-sheets');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> Mengekspor ke Sheets...';
+
+            try {
+                const headers = [
+                    ["ID", "Jenjang", "Mapel", "Tingkat", "Stimulus (Wacana Teks)", "URL Gambar (Stimulus)", "Soal / Pertanyaan", "Opsi A", "Opsi B", "Opsi C", "Opsi D", "Kunci Jawaban (A/B/C/D)", "Pembahasan"]
+                ];
+
+                const overriddenIds = new Set(bankSoalCloud.map(q => q.id));
+                const allQuestions = [...bankSoalCloud, ...DEFAULT_QUESTIONS.filter(q => !overriddenIds.has(q.id))];
+                const letters = ['A', 'B', 'C', 'D', 'E'];
+
+                const rows = allQuestions.map((q, idx) => [
+                    q.id || `soal_${idx + 1}`,
+                    q.jenjang || 'SMP',
+                    q.mapel || 'Bahasa Indonesia',
+                    q.tingkat || 'Sedang',
+                    q.stimulus || '',
+                    q.stimulus_img || '',
+                    q.soal || '',
+                    q.pilihan?.[0] || '',
+                    q.pilihan?.[1] || '',
+                    q.pilihan?.[2] || '',
+                    q.pilihan?.[3] || '',
+                    letters[q.jawaban] || 'A',
+                    q.pembahasan || ''
+                ]);
+
+                const updateRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${activeGoogleSheetId}/values/Bank_Soal!A1?valueInputOption=USER_ENTERED`, {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${cachedAccessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ values: [...headers, ...rows] })
+                });
+
+                if (!updateRes.ok) throw new Error("Gagal ekspor: " + updateRes.statusText);
+                window.showToast(`Berhasil mengekspor ${rows.length} soal ke Google Sheets!`, "success");
+            } catch(e) {
+                console.error("Gagal ekspor Sheets:", e);
+                window.showToast("Gagal ekspor: " + e.message, "error");
+            } finally {
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up text-indigo-600 text-sm"></i> Ekspor / Backup Soal ke Sheets';
+            }
+        };
+
+        window.toggleAutoSyncSheets = function(enabled) {
+            autoSyncSheetsEnabled = !!enabled;
+            window.showToast(autoSyncSheetsEnabled ? "Auto-Sync saat Kuis Aktif!" : "Auto-Sync dinonaktifkan.", "info");
+        };
+
+        window.renderSheetPreviewTable = function() {
+            const tbody = document.getElementById('table-body-sheets-preview');
+            const countElem = document.getElementById('count-sheet-preview');
+            if (!tbody) return;
+
+            const filterText = (document.getElementById('filter-sheet-preview')?.value || '').toLowerCase();
+            const filterMapel = document.getElementById('filter-sheet-mapel')?.value || 'ALL';
+
+            const filtered = bankSoalSheets.filter(q => {
+                if (filterMapel !== 'ALL' && q.mapel !== filterMapel) return false;
+                if (filterText && !q.soal.toLowerCase().includes(filterText) && !(q.stimulus || '').toLowerCase().includes(filterText)) return false;
+                return true;
+            });
+
+            if (countElem) countElem.innerText = bankSoalSheets.length;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-400">${bankSoalSheets.length === 0 ? 'Belum ada data yang disinkronkan dari Google Sheets.' : 'Tidak ada soal yang cocok dengan filter pencarian.'}</td></tr>`;
+                return;
+            }
+
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            tbody.innerHTML = filtered.slice(0, 50).map((q, idx) => {
+                const stimulusSnippet = q.stimulus ? `<div class="text-[11px] text-slate-700 font-serif line-clamp-2 italic bg-slate-50 p-1.5 rounded border border-slate-100 mb-1">"${q.stimulus.substring(0, 80)}..."</div>` : '';
+                const imgBadge = q.stimulus_img ? `<span class="inline-flex items-center gap-1 text-[10px] bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded font-bold border border-sky-200"><i class="fa-solid fa-image"></i> Gambar</span>` : '';
+                const keyLetter = letters[q.jawaban] || 'A';
+                
+                return `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="p-3 text-center font-mono font-bold text-slate-400">${idx + 1}</td>
+                        <td class="p-3">
+                            <span class="inline-block bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[11px] font-bold mb-1">${q.mapel}</span>
+                            <span class="block text-[10px] text-slate-500 font-semibold">${q.tingkat}</span>
+                        </td>
+                        <td class="p-3">
+                            ${stimulusSnippet}
+                            ${imgBadge}
+                            ${!stimulusSnippet && !imgBadge ? '<span class="text-slate-300 italic text-[11px]">Tanpa stimulus</span>' : ''}
+                        </td>
+                        <td class="p-3">
+                            <p class="font-bold text-slate-800 line-clamp-2 text-xs mb-1.5">${q.soal}</p>
+                            <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-500">
+                                <span>A: ${(q.pilihan?.[0] || '').substring(0, 20)}</span>
+                                <span>B: ${(q.pilihan?.[1] || '').substring(0, 20)}</span>
+                                <span>C: ${(q.pilihan?.[2] || '').substring(0, 20)}</span>
+                                <span>D: ${(q.pilihan?.[3] || '').substring(0, 20)}</span>
+                            </div>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-black flex items-center justify-center mx-auto text-xs">${keyLetter}</span>
+                        </td>
+                        <td class="p-3">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <i class="fa-solid fa-check text-emerald-600"></i> Sheets Aktif
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        };
+
         
         window.prosesImportSpreadsheet = async function() {
             const rawData = document.getElementById('import-data').value.trim();
@@ -6287,7 +7057,7 @@
 
         function startQuestionTimer() {
             if (timerInterval) clearInterval(timerInterval);
-            timeRemaining = 90; // 90 detik standar TKA per soal
+            timeRemaining = (sheetQuizDurationMinutes && sheetQuizDurationMinutes > 0) ? (sheetQuizDurationMinutes * 60) : 90; // 90 detik standar TKA per soal
             updateTimerDisplay();
 
             timerInterval = setInterval(() => {
@@ -6331,8 +7101,18 @@
             document.getElementById('user-home').classList.add('hidden');
             document.getElementById('loading-section').classList.remove('hidden');
 
-            const overriddenIds = new Set(bankSoalCloud.map(q => q.id));
-            const gabungan = [...bankSoalCloud, ...DEFAULT_QUESTIONS.filter(q => !overriddenIds.has(q.id))];
+            // Auto-Sync dari Google Sheets jika diaktifkan
+            if (autoSyncSheetsEnabled && activeGoogleSheetId && cachedAccessToken) {
+                try {
+                    await window.tarikDariGoogleSheet();
+                } catch(e) {
+                    console.warn("Auto-sync background warning:", e);
+                }
+            }
+
+            const overriddenIds = new Set([...bankSoalCloud.map(q => q.id), ...bankSoalSheets.map(q => q.id)]);
+            // Prioritas tertinggi: Soal dari Google Sheets, disusul Bank Soal Cloud, lalu Default
+            const gabungan = [...bankSoalSheets, ...bankSoalCloud, ...DEFAULT_QUESTIONS.filter(q => !overriddenIds.has(q.id))];
             let cocok = acakArray(gabungan.filter(q => q.mapel === mapel && q.jenjang === jenjang));
             if (cocok.length < jumlahSoal) {
                 try {
@@ -6551,9 +7331,13 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 fastLoginUI(user);
-            } else if (!isGuestMode) {
-                document.getElementById('global-loading').classList.add('hidden');
-                document.getElementById('auth-page').classList.remove('hidden');
+            } else {
+                cachedAccessToken = null;
+                updateSheetsUI();
+                if (!isGuestMode) {
+                    document.getElementById('global-loading').classList.add('hidden');
+                    document.getElementById('auth-page').classList.remove('hidden');
+                }
             }
         });
 

@@ -1,6 +1,6 @@
 {
   "name": "Kuis Cerdas TKA - Cloud & AI",
-  "description": "Aplikasi kuis Tes Kemampuan Akademik (TKA) Kurikulum Merdeka dengan integrasi Cloud Firestore dan AI Gemini untuk pembuatan soal HOTS interaktif.",
+  "description": "Aplikasi kuis Tes Kemampuan Akademik (TKA) Kurikulum Merdeka dengan integrasi Cloud Firestore, Google Sheets, Google Drive, dan AI Gemini untuk pengelolaan dan sinkronisasi bank soal interaktif.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
