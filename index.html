@@ -621,19 +621,19 @@
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Jenjang Pendidikan TKA</label>
                     <select id="u-jenjang" onchange="window.updateMapelOptions('u')" class="w-full p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition-all cursor-pointer">
-                        <option value="SMA" selected>SMA / MA / SMK (Kelas 12/13)</option>
-                        <option value="SMP">SMP / MTs (Kelas 9)</option>
+                        <option value="SMP" selected>SMP / MTs (Kelas 9)</option>
+                        <option value="SMA">SMA / MA / SMK (Kelas 12/13)</option>
                         <option value="SD">SD / MI (Kelas 6)</option>
                     </select>
                 </div>
-                <div id="u-mapel-wrap" class="hidden">
+                <div id="u-mapel-wrap">
                     <label id="u-mapel-label" class="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Mata Pelajaran (Mata Uji)</label>
                     <select id="u-mapel" class="w-full p-3 bg-slate-50/50 hover:bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-100 transition-all cursor-pointer"></select>
                 </div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-                <button onclick="window.mulaiKuis()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
+                <button id="btn-mulai-kuis" onclick="window.mulaiKuis()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl transition shadow-lg text-sm flex items-center justify-center gap-2">
                     <i class="fa-solid fa-play text-amber-300"></i> Mulai Ujian TKA (30 Soal Acak)
                 </button>
             </div>
@@ -745,7 +745,7 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
         import { getAnalytics } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
-        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, getDocFromServer, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCxeoBZfZigelfMbgAZBdh8eUFuZYngYMw",
@@ -754,14 +754,56 @@
             storageBucket: "crypto-banner-tthv3.firebasestorage.app",
             messagingSenderId: "1015315511773",
             appId: "1:1015315511773:web:d08fcfc89d4f6f1e5b9e34",
-            measurementId: ""
+            measurementId: "",
+            firestoreDatabaseId: "ai-studio-quiz-2bc4c10c-f0c1-41a6-a167-c736dab537e7"
         };
         const appId = "2bc4c10c-f0c1-41a6-a167-c736dab537e7";
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+
+        const OperationType = {
+            CREATE: 'create',
+            UPDATE: 'update',
+            DELETE: 'delete',
+            LIST: 'list',
+            GET: 'get',
+            WRITE: 'write',
+        };
+
+        function handleFirestoreError(error, operationType, path) {
+            const errInfo = {
+                error: error instanceof Error ? error.message : String(error),
+                authInfo: {
+                    userId: auth.currentUser?.uid,
+                    email: auth.currentUser?.email,
+                    emailVerified: auth.currentUser?.emailVerified,
+                    isAnonymous: auth.currentUser?.isAnonymous,
+                    tenantId: auth.currentUser?.tenantId,
+                    providerInfo: auth.currentUser?.providerData?.map(provider => ({
+                        providerId: provider.providerId,
+                        email: provider.email,
+                    })) || []
+                },
+                operationType,
+                path
+            };
+            console.error('Firestore Error: ', JSON.stringify(errInfo));
+            return errInfo;
+        }
+
+        async function testConnection() {
+            try {
+                await getDocFromServer(doc(db, 'test', 'connection'));
+            } catch (error) {
+                if (error instanceof Error && error.message.includes('the client is offline')) {
+                    console.error("Please check your Firebase configuration.");
+                }
+            }
+        }
+        testConnection();
         
         const googleProvider = new GoogleAuthProvider();
         const SCOPES = [
@@ -6041,13 +6083,23 @@
 
             const uMapelWrap = document.getElementById('u-mapel-wrap');
             const uFormGrid = document.getElementById('u-form-grid');
-            if (prefix === 'u' && uMapelWrap && uFormGrid) {
-                if (jenjang === 'SMP') {
-                    uMapelWrap.classList.remove('hidden');
-                    uFormGrid.classList.add('sm:grid-cols-2');
-                } else {
-                    uMapelWrap.classList.add('hidden');
-                    uFormGrid.classList.remove('sm:grid-cols-2');
+            const btnStart = document.getElementById('btn-mulai-kuis') || document.querySelector('button[onclick="window.mulaiKuis()"]');
+            if (prefix === 'u') {
+                if (uMapelWrap && uFormGrid) {
+                    if (jenjang === 'SMP') {
+                        uMapelWrap.classList.remove('hidden');
+                        uFormGrid.classList.add('sm:grid-cols-2');
+                    } else {
+                        uMapelWrap.classList.add('hidden');
+                        uFormGrid.classList.remove('sm:grid-cols-2');
+                    }
+                }
+                if (btnStart) {
+                    if (jenjang === 'SMP') {
+                        btnStart.innerHTML = '<i class="fa-solid fa-play text-amber-300"></i> Mulai Ujian TKA (30 Soal Acak)';
+                    } else {
+                        btnStart.innerHTML = '<i class="fa-solid fa-play text-amber-300"></i> Demo';
+                    }
                 }
             }
             if (jenjang === 'SMA') {

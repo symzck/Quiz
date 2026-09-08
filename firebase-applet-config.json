@@ -3,6 +3,7 @@
   "appId": "1:1015315511773:web:d08fcfc89d4f6f1e5b9e34",
   "apiKey": "AIzaSyCxeoBZfZigelfMbgAZBdh8eUFuZYngYMw",
   "authDomain": "crypto-banner-tthv3.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-quiz-2bc4c10c-f0c1-41a6-a167-c736dab537e7",
   "storageBucket": "crypto-banner-tthv3.firebasestorage.app",
   "messagingSenderId": "1015315511773",
   "measurementId": "",
