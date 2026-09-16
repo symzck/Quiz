@@ -11,16 +11,7 @@ app.use(express.json());
 // Server-side Gemini initialization
 let aiClient = null;
 function getAI() {
-      if (req.body.useProceduralOnly) {
-      const fallbackList = generateDynamicQuestions(jenjang, mapel, jurusan, topikTerpilih, riwayat, targetCount);
-      return res.json({ 
-        soal_list: fallbackList,
-        source: 'dynamic_engine',
-        message: `Kuis TKA berhasil dibuat (${fallbackList.length} butir soal penalaran prosedural).`
-      });
-    }
-    
-const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return null;
   }

@@ -12,10 +12,17 @@
   },
   "dependencies": {
     "@google/genai": "*",
-    "express": "^4.21.2"
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
+    "express": "^4.21.2",
+    "firebase": "^12.19.0",
+    "firebase-admin": "^14.4.0",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4.3.3"
   }
 }

@@ -73,7 +73,7 @@
             
             <div class="space-y-4 mb-6">
                 <button onclick="window.loginGoogle()" class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-3.5 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-3 text-sm">
-                    <i class="fa-brands fa-google text-rose-500 text-lg"></i> Lanjutkan dengan Google
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Lanjutkan dengan Google
                 </button>
 
                 <div class="relative flex py-2 items-center">
@@ -149,12 +149,35 @@
                 
                 <div class="mb-3">
                     <label class="text-xs font-bold text-slate-600 block mb-1">URL Sumber Gambar (Wacana/Stimulus) *Opsional</label>
-                    <input type="text" id="edit-stimulus-img" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none" placeholder="https://example.com/image.jpg">
+                    
+                    <div class="border border-dashed border-slate-300 rounded-xl p-2.5 bg-slate-50 relative">
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="edit-stimulus-img" oninput="window.previewImgInput('edit-stimulus')" class="flex-1 text-xs p-2.5 bg-white border border-slate-200 rounded-lg outline-none" placeholder="https://example.com/image.jpg atau Tempel (Ctrl+V)">
+                            <label class="cursor-pointer px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 transition flex items-center gap-1 shrink-0">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                                <input type="file" accept="image/*" class="hidden" onchange="window.handleImgUpload(event, 'edit-stimulus')">
+                            </label>
+                        </div>
+                        <div id="edit-stimulus-preview-wrap" class="hidden mt-2 relative inline-block">
+                            <img id="edit-stimulus-preview" src="" class="max-h-28 rounded-lg border border-slate-200 shadow-sm object-contain bg-white">
+                            <button type="button" onclick="window.clearImgInput('edit-stimulus')" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow hover:bg-rose-700"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
                     <label class="text-xs font-bold text-slate-600 block mb-1">Soal / Pertanyaan *Wajib</label>
                     <textarea id="edit-soal" rows="3" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none" placeholder="Pertanyaan..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-xs font-bold text-slate-600 block mb-1">URL Gambar Tambahan untuk Soal *Opsional</label>
+                    <select id="edit-tipe" onchange="window.updateFormTipe('edit')" class="w-full text-sm p-3 bg-indigo-50 border border-indigo-200 rounded-lg outline-none font-bold text-indigo-700 mb-3">
+                        <option value="PG">Pilihan Ganda</option>
+                        <option value="PGK">Pilihan Ganda Kompleks</option>
+                        <option value="BS">Benar / Salah</option>
+                    </select>
+                    <input type="text" id="edit-soal-img" class="w-full text-sm p-3 bg-slate-50 border border-slate-200 rounded-lg outline-none" placeholder="https://example.com/soal.jpg">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 mb-3">
@@ -183,6 +206,14 @@
                 <div class="grid grid-cols-2 gap-3 mb-4">
                     <div>
                         <label class="text-xs font-bold text-slate-600 block mb-1">Kunci Jawaban</label>
+                        <div id="edit-kunci-pgk" class="hidden flex gap-2 items-center mb-3">
+                            <label class="text-xs font-bold text-slate-600">Kunci Kompleks:</label>
+                            <label><input type="checkbox" value="0" class="edit-kunci-cb"> A</label>
+                            <label><input type="checkbox" value="1" class="edit-kunci-cb"> B</label>
+                            <label><input type="checkbox" value="2" class="edit-kunci-cb"> C</label>
+                            <label><input type="checkbox" value="3" class="edit-kunci-cb"> D</label>
+                            <label><input type="checkbox" value="4" class="edit-kunci-cb"> E</label>
+                        </div>
                         <select id="edit-kunci" class="w-full text-sm p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-lg outline-none">
                             <option value="0">A</option><option value="1">B</option>
                             <option value="2">C</option><option value="3">D</option><option value="4">E</option>
@@ -233,7 +264,12 @@
                         <button type="button" onclick="window.generateDraftSoalAI()" id="btn-admin-ai" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2.5 px-3 rounded-xl border border-indigo-200 transition text-xs flex items-center justify-center gap-2 shadow-sm">
                             <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Buat Draf Soal Otomatis (Gemini AI)
                         </button>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-2">
+                            <select id="f-tipe" onchange="window.updateFormTipe('f')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-indigo-50 outline-none font-bold text-indigo-700">
+                                <option value="PG">Pilihan Ganda</option>
+                                <option value="PGK">Pilihan Ganda Kompleks</option>
+                                <option value="BS">Benar / Salah</option>
+                            </select>
                             <select id="f-jenjang" onchange="window.updateMapelOptions('f')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                                 <option value="SD">SD / MI (Kelas 6)</option>
                                 <option value="SMP">SMP / MTs (Kelas 9)</option>
@@ -249,13 +285,50 @@
                             </select>
                         </div>
                         <select id="f-mapel" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none"></select>
-                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan wacana stimulus dan pertanyaan analitis TKA..."></textarea>
+                        <textarea id="f-stimulus" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan wacana stimulus (opsional)..."></textarea>
+                        
+                        <div class="border border-dashed border-slate-300 rounded-xl p-2.5 bg-slate-50 relative group transition hover:border-indigo-400">
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="f-stimulus-img" oninput="window.previewImgInput('f-stimulus')" placeholder="URL Gambar Wacana atau Tempel / Paste (Ctrl+V)..." class="flex-1 text-xs p-2 border border-slate-200 rounded-lg bg-white outline-none">
+                                <label class="cursor-pointer px-2.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 transition flex items-center gap-1 shrink-0" title="Upload dari File">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                                    <input type="file" accept="image/*" class="hidden" onchange="window.handleImgUpload(event, 'f-stimulus')">
+                                </label>
+                            </div>
+                            <div id="f-stimulus-preview-wrap" class="hidden mt-2 relative inline-block">
+                                <img id="f-stimulus-preview" src="" class="max-h-28 rounded-lg border border-slate-200 shadow-sm object-contain bg-white">
+                                <button type="button" onclick="window.clearImgInput('f-stimulus')" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow hover:bg-rose-700"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                        <textarea id="f-soal" rows="3" class="w-full text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none resize-none" placeholder="Tuliskan pertanyaan analitis TKA (Wajib)..."></textarea>
+                        
+                        <div class="border border-dashed border-slate-300 rounded-xl p-2.5 bg-slate-50 relative group transition hover:border-indigo-400">
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="f-soal-img" oninput="window.previewImgInput('f-soal')" placeholder="URL Gambar Soal atau Tempel / Paste (Ctrl+V)..." class="flex-1 text-xs p-2 border border-slate-200 rounded-lg bg-white outline-none">
+                                <label class="cursor-pointer px-2.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-200 transition flex items-center gap-1 shrink-0" title="Upload dari File">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                                    <input type="file" accept="image/*" class="hidden" onchange="window.handleImgUpload(event, 'f-soal')">
+                                </label>
+                            </div>
+                            <div id="f-soal-preview-wrap" class="hidden mt-2 relative inline-block">
+                                <img id="f-soal-preview" src="" class="max-h-28 rounded-lg border border-slate-200 shadow-sm object-contain bg-white">
+                                <button type="button" onclick="window.clearImgInput('f-soal')" class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow hover:bg-rose-700"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
                         <input type="text" id="f-pil-A" placeholder="Opsi A" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-B" placeholder="Opsi B" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-C" placeholder="Opsi C" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-D" placeholder="Opsi D" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <input type="text" id="f-pil-E" placeholder="Opsi E (Opsional)" class="w-full text-sm p-2 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <div class="grid grid-cols-2 gap-2 items-center">
+                            <div id="f-kunci-pgk" class="hidden flex gap-2 items-center">
+                                <label class="text-xs font-bold text-slate-600">Kunci:</label>
+                                <label><input type="checkbox" value="0" class="f-kunci-cb"> A</label>
+                                <label><input type="checkbox" value="1" class="f-kunci-cb"> B</label>
+                                <label><input type="checkbox" value="2" class="f-kunci-cb"> C</label>
+                                <label><input type="checkbox" value="3" class="f-kunci-cb"> D</label>
+                                <label><input type="checkbox" value="4" class="f-kunci-cb"> E</label>
+                            </div>
                             <select id="f-kunci" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-emerald-50 text-emerald-700 font-bold"><option value="0">Kunci: A</option><option value="1">Kunci: B</option><option value="2">Kunci: C</option><option value="3">Kunci: D</option><option value="4">Kunci: E</option></select>
                             <button onclick="window.simpanSoalCloud()" class="bg-founder-600 hover:bg-founder-700 text-white font-bold py-2.5 rounded-lg shadow-md transition text-sm">Simpan</button>
                         </div>
@@ -464,8 +537,52 @@
             </div>
 
             <div id="admin-view-import" class="hidden glass-card rounded-3xl p-6 mb-6">
-                <h2 class="font-bold text-lg text-slate-800 mb-4"><i class="fa-solid fa-file-excel text-emerald-600"></i> Import Soal dari Spreadsheet</h2>
-                <p class="text-xs text-slate-500 mb-4">Pilih parameter default di bawah, lalu paste data dari Excel atau Google Sheets. Format kolom: <b>Soal [Tab] Opsi A [Tab] Opsi B [Tab] Opsi C [Tab] Opsi D [Tab] Opsi E (Opsional) [Tab] Kunci (A/B/C/D/E) [Tab] Pembahasan</b></p>
+                <h2 class="font-bold text-lg text-slate-800 mb-2"><i class="fa-solid fa-file-excel text-emerald-600"></i> Import Massal Soal & Banyak Gambar Sekaligus</h2>
+                <p class="text-xs text-slate-500 mb-4">Mendukung import puluhan soal sekaligus dari Excel/Google Sheets beserta wacana dan gambar.</p>
+
+                <!-- Panduan 2 Langkah Instan -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Kotak 1: Batch Image Uploader -->
+                    <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-xs font-bold text-indigo-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-images text-indigo-600"></i> 1. Upload Banyak Gambar Sekaligus
+                            </h3>
+                            <span id="batch-img-count" class="text-[11px] font-bold text-indigo-600 bg-white px-2 py-0.5 rounded-full shadow-xs">0 Gambar</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 mb-3">Tarik & lepas puluhan file gambar soal/diagram dari PDF Anda ke sini sekaligus.</p>
+                        <label class="block border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-white rounded-xl p-4 text-center cursor-pointer transition">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-indigo-500 mb-1"></i>
+                            <div class="text-xs font-bold text-slate-700">Pilih / Tarik Banyak File Gambar</div>
+                            <div class="text-[10px] text-slate-400">Bisa memilih 10, 20, 50 file .png / .jpg sekaligus</div>
+                            <input type="file" id="batch-img-files" multiple accept="image/*" class="hidden" onchange="window.handleBatchImages(event)">
+                        </label>
+                        <!-- Grid Thumbnail Galeri Batch -->
+                        <div id="batch-img-gallery" class="hidden mt-3 max-h-36 overflow-y-auto custom-scroll grid grid-cols-3 sm:grid-cols-4 gap-2 bg-white/80 p-2 rounded-xl border border-indigo-100"></div>
+                    </div>
+
+                    <!-- Kotak 2: Download Template & Petunjuk -->
+                    <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-csv text-emerald-600"></i> 2. Format Tabel Soal & Gambar
+                                </h3>
+                                <button type="button" onclick="window.unduhTemplateImportCSV()" class="text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-lg transition shadow-xs flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Unduh Format CSV
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-600 mb-2">Mendukung format standar (7-8 kolom) maupun format lengkap dengan gambar (10-11 kolom):</p>
+                            <div class="text-[10px] font-mono bg-white p-2 rounded-lg border border-emerald-200 text-slate-700 overflow-x-auto whitespace-nowrap">
+                                [Wacana] [Tab] [URL/Nama Gambar] [Tab] [Soal] [Tab] [Opsi A] ... [Tab] [Kunci]
+                            </div>
+                        </div>
+                        <div class="mt-3 text-[11px] text-emerald-800 bg-white/80 p-2 rounded-lg border border-emerald-100 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            <span><b>Tips Praktis:</b> Anda juga bisa mengirimkan file PDF langsung di obrolan chat AI untuk ekstraksi 100% otomatis!</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
                     <select id="import-jenjang" onchange="window.updateMapelOptions('import')" class="text-sm p-2.5 border border-slate-200 rounded-lg bg-slate-50 outline-none">
                         <option value="SD">SD / MI (Kelas 6)</option>
@@ -681,6 +798,7 @@
 
             <!-- Box Pertanyaan -->
             <div class="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 mb-6">
+                <img id="question-img" class="w-full mb-4 rounded-lg object-contain hidden" alt="Gambar Soal">
                 <h3 id="question-text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed whitespace-pre-line"></h3>
             </div>
 
@@ -870,6 +988,977 @@
         };
 
         const DEFAULT_QUESTIONS = [
+    {
+    "id": "tpm2_jogja_indo_a_01",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 Kota Yogyakarta - Bahasa Indonesia Paket A",
+    "tingkat": "Mudah",
+    "topik": "Teks Deskripsi",
+    "tipe": "PG",
+    "stimulus": "Kemegahan Taman Nasional Bromo Tengger Semeru\n\nKalian suka petualangan dan ingin merasakan suasana alam vulkanik yang menakjubkan? Jelajahi dan temukan pesona Bromo Tengger Semeru! Keindahan alamnya siap membuat perjalanan Kalian tak terlupakan.\nTaman Nasional Bromo Tengger Semeru adalah kawasan pegunungan di Jawa Timur yang terkenal sebagai rumah bagi flora dan fauna khas pegunungan. Hal ini disebabkan oleh adanya Gunung Semeru yang memiliki ketinggian 3.676 mdpl. Kawasan ini memiliki suhu udara antara 3—18°C pada malam hari. Selain itu, curah hujan yang tinggi membuat udaranya sejuk dan lembap.\nPemandangan menakjubkan di taman nasional siap memanjakan mata pengunjung. Lautan pasir yang luas di kaki Gunung Bromo, kawah aktif dengan asap putih yang mengepul, dan pemandangan matahari terbit merupakan daya tarik utama kawasan ini. Di beberapa bagian hutan, tumbuh cemara gunung dan pohon akasia. Selain itu, ada bunga edelweiss yang menjadi ikon alam pegunungan Bromo. Satwa seperti kijang, lutung budeng, dan berbagai burung endemik Jawa pun hidup di dalam kawasan hutan tersebut.",
+    "soal": "Objek apakah yang menjadi ikon alam pegunungan Bromo?",
+    "pilihan": [
+        "A. Burung endemik",
+        "B. Bunga edelweiss",
+        "C. Lutung budeng",
+        "D. Cemara gunung"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Berdasarkan teks paragraf ketiga kalimat keempat: 'Selain itu, ada bunga edelweiss yang menjadi ikon alam pegunungan Bromo.' (Kunci Jawaban: B)"
+},
+    {
+    "id": "tpm2_jogja_indo_a_04",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 Kota Yogyakarta - Bahasa Indonesia Paket A",
+    "tingkat": "Mudah",
+    "topik": "Makna Kata / Istilah",
+    "tipe": "PG",
+    "stimulus": "Bagaimana Cara Membuat Eco-Enzyme dari Limbah Kulit Buah?\n\nLimbah organik rumah tangga, terutama kulit buah, sering dibuang begitu saja sehingga menumpuk dan menghasilkan bau tidak sedap. Jika tidak dikelola, limbah ini dapat meningkatkan volume sampah dan mencemari lingkungan. Salah satu solusi ramah lingkungan untuk mengolah limbah kulit buah adalah membuat eco-enzyme. Eco-enzyme merupakan cairan hasil fermentasi limbah organik yang bermanfaat sebagai pembersih alami, penyubur tanaman, dan pengurang bau.",
+    "soal": "Apa makna kata limbah yang terdapat dalam teks tersebut?",
+    "pilihan": [
+        "A. Bahan sisa untuk proses fermentasi.",
+        "B. Barang olahan sampah anorganik.",
+        "C. Bahan yang menghasilkan bau.",
+        "D. Barang yang harus diolah lagi."
+    ],
+    "jawaban": 0,
+    "pembahasan": "Dalam konteks bacaan pembuatan eco-enzyme dari kulit buah sisa rumah tangga, kata limbah bermakna bahan sisa yang dimanfaatkan untuk proses fermentasi. (Kunci Jawaban: A)"
+},
+    {
+    "id": "tpm2_jogja_indo_a_05",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 Kota Yogyakarta - Bahasa Indonesia Paket A",
+    "tingkat": "Sedang",
+    "topik": "Teks Prosedur",
+    "tipe": "PGK",
+    "stimulus": "Langkah-Langkah Pembuatan Eco-Enzyme:\n1. Takar gula, kulit buah, dan air menggunakan timbangan dengan perbandingan 1:3:10.\n2. Potong kulit buah dengan pisau menjadi bagian kecil agar proses fermentasi lebih cepat.\n3. Masukkan gula ke dalam botol plastik lalu tambahkan kulit buah.\n4. Tuang air bersih dengan corong sesuai komposisi dan sisakan sedikit ruang udara di bagian atas.",
+    "soal": "Apa yang akan terjadi jika kulit buah dipotong dalam ukuran besar? (Pilihlah jawaban yang benar lebih dari satu)",
+    "pilihan": [
+        "1. Proses fermentasi membutuhkan waktu yang lama.",
+        "2. Ruang udara dalam botol akan dipenuhi kulit buah.",
+        "3. Bahan-bahan lain sulit tercampur dengan merata.",
+        "4. Sulit memasukkan kulit buah dalam botol plastik."
+    ],
+    "jawaban": [
+        0,
+        3
+    ],
+    "pembahasan": "Langkah ke-2 menyatakan 'Potong kulit buah dengan pisau menjadi bagian kecil agar proses fermentasi lebih cepat.' Jika dipotong besar, fermentasi memakan waktu lebih lama dan lebih sulit dimasukkan melalui mulut botol plastik. (Kunci: 1 dan 4)"
+},
+    {
+    "id": "tpm2_jogja_indo_a_10",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 Kota Yogyakarta - Bahasa Indonesia Paket A",
+    "tingkat": "Sedang",
+    "topik": "Teks Eksplanasi",
+    "tipe": "PG",
+    "stimulus": "Awan Mammatus: Awan Unik Seperti Busa Sabun\nAwan mammatus adalah jenis awan yang memiliki ciri khas menyerupai kantung-kantung berbentuk bulat atau menonjol ke bawah seperti busa sabun. Awan ini terbentuk akibat adanya perbedaan suhu dan tekanan di lapisan udara atas dan bawah. Bentuknya yang unik membedakannya dari awan lainnya.",
+    "soal": "Deretan kata yang menunjukkan karakteristik awan mammatus adalah ....",
+    "pilihan": [
+        "A. angin kencang, kantung-kantung bulat, menyerupai busa sabun",
+        "B. cuaca ekstrem, menyerupai busa sabun, kantung-kantung bulat",
+        "C. kantung-kantung bulat, udara dingin, menyerupai busa sabun",
+        "D. menyerupai busa sabun, bentuk unik, kantung-kantung bulat"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Karakteristik fisik awan mammatus menurut teks meliputi: menyerupai busa sabun, bentuk unik, dan kantung-kantung bulat. (Kunci: D)"
+},
+    {
+    "id": "tpm2_jogja_indo_a_13",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 Kota Yogyakarta - Bahasa Indonesia Paket A",
+    "tingkat": "Mudah",
+    "topik": "Teks Ulasan (Resensi)",
+    "tipe": "PG",
+    "stimulus": "Mengulas Novel Dompet Ayah, Sepatu Ibu\nNovel Dompet Ayah, Sepatu Ibu merupakan karya dari J.S. Khairen yang diterbitkan oleh Grasindo pada tahun 2023. Novel ini terdiri atas 219 halaman dan sudah mencapai cetak ulang ke-38 hingga September 2025 ini. Oleh sebab itu, novel ini termasuk novel best seller.",
+    "soal": "Kalimat fakta yang tepat berdasarkan teks tersebut adalah …",
+    "pilihan": [
+        "A. Novel Dompet Ayah, Sepatu Ibu merupakan karya dari J.S. Khairen yang diterbitkan oleh Grasindo.",
+        "B. Novel ini memiliki alur cerita yang mengalir karena didukung kata-kata mutiara bermakna pada tiap episode.",
+        "C. Novel ini direkomendasikan bagi remaja karena kisahnya inspiratif dan memotivasi untuk tidak menyerah dalam kesulitan.",
+        "D. Novel Dompet Ayah, Sepatu Ibu disajikan dengan bahasa ringan dan mudah dipahami sehingga “renyah” untuk dibaca."
+    ],
+    "jawaban": 0,
+    "pembahasan": "Kalimat A merupakan fakta objektif mengenai pengarang, penerbit, dan tahun terbit yang dapat diverifikasi secara empiris. Opsi B, C, dan D memuat penilaian/opini subjektif. (Kunci: A)"
+},
+    {
+    "id": "tkad_sleman_indo_01",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TKAD SMP Sleman - Bahasa Indonesia",
+    "tingkat": "Mudah",
+    "topik": "Teks Berita & Suasana",
+    "tipe": "PG",
+    "stimulus": "(1) Ratusan mahasiswa dari berbagai perguruan tinggi berbondong-bondong menuju gedung parlemen untuk menyampaikan aspirasi mereka mengenai kebijakan baru pemerintah.\n(2) Aparat keamanan telah bersiaga sejak pagi, mengantisipasi terjadinya aksi anarkis para demonstran. Mereka berjaga dengan sikap siaga penuh waspada.\n(3) Namun, kekhawatiran aparat tidak terjadi. Suasana di depan gedung tampak sangat kondusif. Aksi massa ini berjalan dengan tertib dan terkendali. Tidak ada yel-yel provokatif. Mereka justru melantunkan lagu nasional untuk mengiringi orasi yang disampaikan secara bergantian.\n(4) Bahkan, perwakilan pengunjuk rasa berhasil melakukan dialog terbuka dengan anggota dewan. Mereka berkomitmen untuk menjaga ketenangan agar pesan mereka tersampaikan dengan baik.",
+    "soal": "Bagian teks tersebut yang menggambarkan suasana damai adalah nomor ….",
+    "pilihan": [
+        "A. 1 dan 2",
+        "B. 1 dan 3",
+        "C. 2 dan 4",
+        "D. 3 dan 4"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Kalimat (3) dan (4) menjelaskan suasana sangat kondusif, tertib, terkendali, melantunkan lagu nasional, dan komitmen menjaga ketenangan (suasana damai). (Kunci: D)"
+},
+    {
+    "id": "tkad_sleman_mat_01",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKAD SMP Sleman - Literasi Numerasi",
+    "tingkat": "Mudah",
+    "topik": "Operasi Hitung Campuran",
+    "tipe": "PG",
+    "stimulus": "Operasi hitung: 30 − 2 × 5 + 50 ÷ 5\nLangkah penyelesaian beberapa murid:\n- Murid 1: 30 - 10 + 10 = 30 + 40:5 = 70:5 = 14\n- Murid 2: 30 - 10 + 10 = 30 - 40:5 = 30 - 8 = 22\n- Murid 3: 30 - 10 + 10 = 30 + 40:5 = 30 + 8 = 38\n- Murid 4: 30 - 10 + 10 = 30 - 0 = 30 (atau 30 - 10 = 20 + 10 = 30)",
+    "soal": "Murid yang menjawab dengan tepat urutan operasi hitung matematika adalah ….",
+    "pilihan": [
+        "A. Murid 1",
+        "B. Murid 2",
+        "C. Murid 3",
+        "D. Murid 4"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Prioritas operasi: perkalian dan pembagian dikerjakan lebih dulu.\n2 x 5 = 10\n50 ÷ 5 = 10\nMaka: 30 - 10 + 10 = 20 + 10 = 30. Langkah murid 4 memberikan hasil akhir 30. (Kunci: D)"
+},
+    {
+    "id": "tkad_sleman_mat_02",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKAD SMP Sleman - Literasi Numerasi",
+    "tingkat": "Sedang",
+    "topik": "Bilangan Bulat & Suhu",
+    "tipe": "PG",
+    "stimulus": "Suhu awal freezer:\n- Merek A: -23°C\n- Merek B: -21°C\n- Merek C: -20°C\n- Merek D: -19°C\nListrik padam dari pukul 08.20 hingga 12.00 (total 3 jam 40 menit = 220 menit). Suhu naik 4°C setiap 20 menit. Kenaikan suhu = (220 / 20) x 4°C = 11 x 4°C = 44°C. Suhu normal ruangan = 25°C.",
+    "soal": "Apabila suhu normal ruangan sebesar 25°C, maka lemari es yang akan mencapai suhu normal ruangan selama pemadaman listrik adalah ….",
+    "pilihan": [
+        "A. Lemari es merek A",
+        "B. Lemari es merek B",
+        "C. Lemari es merek C",
+        "D. Lemari es merek D"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Suhu akhir setelah pemadaman:\n- Merek A: -23 + 44 = 21°C\n- Merek B: -21 + 44 = 23°C\n- Merek C: -20 + 44 = 24°C\n- Merek D: -19 + 44 = 25°C (Tepat mencapai suhu normal 25°C). (Kunci: D)"
+},
+    {
+    "id": "tka_kulonprogo_mat_a_01",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 2 Kulon Progo - Paket A",
+    "tingkat": "Mudah",
+    "topik": "Sistem Skor Pertandingan",
+    "tipe": "BS",
+    "stimulus": "Sistem penilaian liga sepak bola: Menang 3 poin, Seri 1 poin, Kalah 0 poin.\n- Klub P: Menang 11, Seri 1, Kalah 3 (Poin = 11x3 + 1 = 34 poin)\n- Klub Q: Menang 9, Seri 5, Kalah 1 (Poin = 9x3 + 5 = 32 poin)\n- Klub R: Menang 10, Seri 1, Kalah 4 (Poin = 10x3 + 1 = 31 poin)",
+    "soal": "Pernyataan: 'Jumlah poin yang tertinggi adalah klub P'. Tentukan Benar atau Salah!",
+    "pilihan": [
+        "Benar",
+        "Salah"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Poin Klub P = 34, Klub Q = 32, Klub R = 31. Poin tertinggi memang diraih oleh klub P (34 poin). Pernyataan Benar."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_01",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Mudah",
+    "topik": "Aritmetika Sosial & Bilangan Bulat",
+    "tipe": "PG",
+    "stimulus": "Tabel Pedoman Penskoran:\n1. Benar: Skor 4 (empat)\n2. Salah: Skor -1 (minus satu)\n3. Tidak dijawab: Skor 0 (nol)",
+    "soal": "Rita mengerjakan tes masuk Klub Olimpiade Matematika dengan total 40 butir soal. Dari 35 soal yang dijawab Rita, diketahui 30 butir soal benar. Skor yang didapat Rita dalam tes tersebut adalah ....",
+    "pilihan": [
+        "140",
+        "130",
+        "120",
+        "115"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Benar = 30 x 4 = 120. Salah = (35 - 30) = 5 x (-1) = -5. Tidak dijawab = 40 - 35 = 5 x 0 = 0. Total skor = 120 + (-5) + 0 = 115."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_02",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Pecahan & Perbandingan",
+    "tipe": "PG",
+    "stimulus": "Resep CUPCAKE (Bahan dasar untuk 6 porsi):\n- Tepung: 0,75 kg\n- Gula pasir: 1/2 kg\n- Mentega: 125 gram",
+    "soal": "Dini akan membuat Cupcake sesuai dengan resep tersebut dengan bahan-bahan yang telah ia beli dari toko yaitu tepung 3 3/4 kg, Gula pasir 2 kg, dan Mentega 1 kg. Banyak Cupcake yang dapat dibuat Dini adalah ....",
+    "pilihan": [
+        "24 porsi",
+        "27 porsi",
+        "30 porsi",
+        "48 porsi"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Kapasitas per bahan:\n- Tepung: 3,75 kg / 0,75 kg = 5 resep (30 porsi)\n- Gula pasir: 2 kg / 0,5 kg = 4 resep (24 porsi)\n- Mentega: 1.000 g / 125 g = 8 resep (48 porsi)\nBahan pembatas adalah gula pasir (maksimal 4 resep = 4 x 6 = 24 porsi)."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_03",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Mudah",
+    "topik": "FPB dan KPK",
+    "tipe": "PG",
+    "soal": "Toko sirup memiliki 42 botol rasa jeruk dan 63 botol rasa stroberi. Botol-botol tersebut akan ditata ke dalam rak sehingga setiap rak berisi jumlah botol jeruk dan stroberi yang sama banyak. Maksimal banyak rak yang dapat dipergunakan adalah ....",
+    "pilihan": [
+        "7 rak",
+        "9 rak",
+        "14 rak",
+        "21 rak"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Maksimal banyak rak merupakan FPB dari 42 dan 63.\n42 = 2 x 3 x 7\n63 = 3² x 7\nFPB = 3 x 7 = 21 rak."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_04",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Geometri Bangun Datar & Pembulatan",
+    "tipe": "PG",
+    "soal": "Pak Deni akan mengecat dinding berbentuk persegi panjang dengan ukuran panjang 4,6 m dan tinggi 2,8 m. Setiap kaleng cat mampu mengecat area seluas 6 3/4 m². Banyak kaleng cat minimal yang harus dibeli Pak Deni untuk menutupi seluruh dinding adalah ....",
+    "pilihan": [
+        "1 kaleng",
+        "2 kaleng",
+        "3 kaleng",
+        "4 kaleng"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Luas dinding = 4,6 m x 2,8 m = 12,88 m².\nDaya sebar cat = 6 3/4 m² = 6,75 m² per kaleng.\nBanyak kaleng yang dibutuhkan = 12,88 / 6,75 ≈ 1,908 kaleng.\nKarena cat harus menutupi seluruh dinding, minimal dibeli 2 kaleng."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_05",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Skala & Geometri Ruang",
+    "tipe": "PGK",
+    "stimulus": "Denah rumah paman digambar dengan skala 1 : 150. Pada denah, Garasi berukuran 4,5 cm x 3 cm; Ruang Tidur I berukuran 3 cm x 3 cm; Ruang Tidur II berukuran 2,75 cm x 3 cm; Halaman berukuran 4,5 cm x 3 cm.",
+    "soal": "Pilihlah lebih dari satu pernyataan yang benar berikut:\n(1) Keliling halaman sebenarnya 50,625 m\n(2) Keliling garasi pada denah 15 cm\n(3) Luas Ruang Tidur 1 sebenarnya 20,25 m²\n(4) Luas Ruang Tidur 2 pada denah 6,25 cm²",
+    "pilihan": [
+        "(1) Keliling halaman sebenarnya 50,625 m",
+        "(2) Keliling garasi pada denah 15 cm",
+        "(3) Luas Ruang Tidur 1 sebenarnya 20,25 m²",
+        "(4) Luas Ruang Tidur 2 pada denah 6,25 cm²"
+    ],
+    "jawaban": [
+        1,
+        2
+    ],
+    "pembahasan": "Pernyataan (2) benar: Keliling garasi pada denah = 2 x (4,5 + 3) = 15 cm.\nPernyataan (3) benar: Ukuran asli Ruang Tidur 1 = (3 x 1,5 m) x (3 x 1,5 m) = 4,5 m x 4,5 m = 20,25 m²."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_06",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Perbandingan Berbalik Nilai",
+    "tipe": "PG",
+    "soal": "Sebuah proyek diselesaikan 12 pekerja dalam 20 hari. Jika proyek ingin diselesaikan dalam 15 hari, maka banyak pekerja tambahan yang diperlukan adalah ....",
+    "pilihan": [
+        "16 orang",
+        "9 orang",
+        "4 orang",
+        "3 orang"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Beban kerja = 12 orang x 20 hari = 240 orang-hari.\nUntuk 15 hari: jumlah pekerja = 240 / 15 = 16 orang.\nPekerja tambahan yang diperlukan = 16 - 12 = 4 orang."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_07",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Bentuk Baku & Notasi Ilmiah",
+    "tipe": "PG",
+    "stimulus": "Dalam sebuah kegiatan donor darah selama 6 hari, setiap hari berhasil memperoleh 5 orang pendonor. Jika setiap orang mendonorkan 0,5 liter darah, dan setiap mililiter darah mengandung 7,5 x 10⁸ sel darah merah. (1 liter = 10³ ml)",
+    "soal": "Total seluruh sel darah merah yang terkumpul adalah ....",
+    "pilihan": [
+        "3,75 x 10¹¹ sel darah",
+        "1,125 x 10¹² sel darah",
+        "1,875 x 10¹² sel darah",
+        "1,125 x 10¹³ sel darah"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Total volume darah = 6 hari x 5 orang x 0,5 L = 15 Liter = 15.000 ml = 1,5 x 10⁴ ml.\nTotal sel darah merah = (1,5 x 10⁴ ml) x (7,5 x 10⁸ sel/ml) = 11,25 x 10¹² = 1,125 x 10¹³ sel darah."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_08",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Bentuk Akar & Geometri",
+    "tipe": "BS",
+    "stimulus": "Diketahui panjang AF = 2√98 cm, AB = 3√18 cm, BC = 3√8 cm, EF = 2√8 cm.",
+    "soal": "Tentukan benar atau salah setiap pernyataan berikut:\n1. Panjang DC = 5√2 cm\n2. Panjang ED = 6√2 cm\n3. Luas BCDG = 60 cm²\n(Pilih Benar jika pernyataan sesuai kunci resmi)",
+    "pilihan": [
+        "Benar",
+        "Salah"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Sederhanakan bentuk akar:\nAF = 2√(49x2) = 14√2 cm\nAB = 3√(9x2) = 9√2 cm\nBC = 3√(4x2) = 6√2 cm\nEF = 2√(4x2) = 4√2 cm.\nMaka panjang DC = AF - BC - EF = 14√2 - 6√2 - 4√2... Kunci lembar resmi: BSB (Benar-Salah-Benar)."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_09",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Aritmetika Sosial & Diskon",
+    "tipe": "PGK",
+    "stimulus": "Penawaran toko awal tahun ajaran baru:\n- Toko A: Harga Rp120.000, Diskon 30%\n- Toko B: Harga Rp125.000, Cashback Rp35.000\n- Toko C: Harga Rp130.000, Diskon 20%+10%\n- Toko D: Harga Rp170.000, Beli 1 Gratis 1",
+    "soal": "Pilihlah lebih dari satu pernyataan yang benar berikut:\n(1) Diskon di toko A sebesar Rp36.000\n(2) Harga bayar sepatu di toko B sebesar Rp100.000\n(3) Harga pembayaran tertinggi di Toko D\n(4) Harga pembayaran terendah di Toko C",
+    "pilihan": [
+        "(1) Diskon di toko A sebesar Rp36.000",
+        "(2) Harga bayar sepatu di toko B sebesar Rp100.000",
+        "(3) Harga pembayaran tertinggi di Toko D",
+        "(4) Harga pembayaran terendah di Toko C"
+    ],
+    "jawaban": [
+        0,
+        2
+    ],
+    "pembahasan": "Toko A: diskon = 30% x 120.000 = Rp36.000 (benar). Toko B: bayar = 125.000 - 35.000 = Rp90.000. Toko C: diskon 20% -> 104.000, diskon 10% -> 93.600. Toko D: bayar Rp170.000 (tertinggi jika beli 1 satuan). Maka pernyataan (1) dan (3) benar."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_10",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Sistem Persamaan Linier & Beban Muatan",
+    "tipe": "PG",
+    "soal": "Hanan memiliki mobil dengan kapasitas muatan maksimal 1 ton untuk mengirimkan dua jenis buah. Ia harus membawa 10 kotak buah naga yang ditempatkan dalam kotak merah seberat 25 kg per kotak, dan buah jeruk yang ditempatkan dalam kotak biru seberat 50 kg per kotak. Banyak total kotak (buah naga dan jeruk) yang dapat dibawa Hanan dalam satu kali adalah ....",
+    "pilihan": [
+        "15 kotak",
+        "20 kotak",
+        "25 kotak",
+        "30 kotak"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Kapasitas 1 ton = 1.000 kg.\nBerat buah naga = 10 kotak x 25 kg = 250 kg.\nSisa kapasitas untuk jeruk = 1.000 kg - 250 kg = 750 kg.\nBanyak kotak jeruk = 750 / 50 = 15 kotak.\nTotal kotak yang dibawa = 10 kotak naga + 15 kotak jeruk = 25 kotak."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_15",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Barisan & Deret Aritmetika",
+    "tipe": "PG",
+    "stimulus": "Tabel setoran tabungan Arya:\n1. Agustus 2024: Rp60.000\n2. September 2024: Rp65.000\n3. Oktober 2024: Rp70.000\n4. November 2024: Rp75.000\n5. Desember 2024: Rp80.000",
+    "soal": "Arya menabung di sebuah bank dimulai setoran pertama pada bulan Agustus 2024 dan untuk bulan berikutnya selalu bertambah Rp5.000. Jumlah tabungan Arya sampai dengan bulan April 2025 adalah ....",
+    "pilihan": [
+        "Rp580.000",
+        "Rp660.000",
+        "Rp720.000",
+        "Rp770.000"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Dari Agustus 2024 sampai April 2025 terdapat 9 bulan (n = 9).\na = 60.000, b = 5.000.\nSn = n/2 [2a + (n-1)b]\nS9 = 9/2 [2(60.000) + 8(5.000)] = 9/2 [120.000 + 40.000] = 9/2 x 160.000 = Rp720.000."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_16",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Mudah",
+    "topik": "Garis dan Sudut",
+    "tipe": "PG",
+    "soal": "Diketahui besar ∠a = 32° dan ∠b = 18° pada dua garis sejajar yang dipotong garis transversal, maka besar ∠c adalah ....",
+    "pilihan": [
+        "32°",
+        "24°",
+        "22°",
+        "14°"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Berdasarkan hubungan sudut luar segitiga dan garis sejajar: ∠c = ∠a - ∠b = 32° - 18° = 14°."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_17",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Teorema Pythagoras",
+    "tipe": "PG",
+    "soal": "Paman berjalan dari titik A dan berakhir di titik D sesuai dengan lintasan. Diketahui panjang lintasan AB = 200 m (ke timur), BC = 240 m (ke utara), dan CD = 120 m (ke timur). Jarak terdekat Paman dari awal keberangkatan ke titik akhir (AD) adalah ....",
+    "pilihan": [
+        "560 meter",
+        "400 meter",
+        "320 meter",
+        "240 meter"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Perpindahan mendatar = AB + CD = 200 m + 120 m = 320 m.\nPerpindahan tegak = BC = 240 m.\nJarak terdekat AD = √(320² + 240²) = √(102.400 + 57.600) = √160.000 = 400 meter."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_19",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Kesebangunan Bangun Datar",
+    "tipe": "PG",
+    "soal": "Lukisan ABCD ditempel pada karton PQRS berukuran panjang 100 cm dan lebar 60 cm. Sisa karton sebelah kiri dan kanan lukisan masing-masing 10 cm. Jika lukisan dan karton sebangun, maka keliling lukisan ABCD adalah ....",
+    "pilihan": [
+        "256 cm",
+        "266 cm",
+        "276 cm",
+        "280 cm"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Panjang lukisan = 100 - (10 + 10) = 80 cm.\nKarena sebangun:\nLebar lukisan / Lebar karton = Panjang lukisan / Panjang karton\nLebar lukisan / 60 = 80 / 100 => Lebar lukisan = 48 cm.\nKeliling lukisan = 2 x (panjang + lebar) = 2 x (80 + 48) = 2 x 128 = 256 cm."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_20",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sedang",
+    "topik": "Kesebangunan Segitiga",
+    "tipe": "PG",
+    "soal": "Adi berdiri di dekat tiang listrik. Jika diketahui BC = 160 cm adalah panjang bayangan Adi, BD = 150 cm adalah tinggi Adi, dan jarak tiang ke Adi AB = 240 cm, maka ketinggian lampu dari tanah (AE) adalah ....",
+    "pilihan": [
+        "750 cm",
+        "400 cm",
+        "375 cm",
+        "240 cm"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Jarak total dari ujung bayangan ke tiang = AC = AB + BC = 240 + 160 = 400 cm.\nKesebangunan:\nAE / BD = AC / BC\nAE / 150 = 400 / 160 = 2,5\nAE = 150 x 2,5 = 375 cm."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_25",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Bangun Ruang Sisi Datar Gabungan",
+    "tipe": "PG",
+    "soal": "Bangun gabungan balok ABCD.EFGH dan limas T.EFGH memiliki ukuran panjang AB = 25 cm, lebar AD = 10 cm, tinggi total TK = 21 cm, dan tinggi balok OK = 12 cm. Volume bangun tersebut adalah ....",
+    "pilihan": [
+        "3.750 cm³",
+        "3.850 cm³",
+        "4.750 cm³",
+        "6.250 cm³"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Tinggi balok = 12 cm. Tinggi limas = TK - OK = 21 - 12 = 9 cm.\nVolume balok = p x l x t = 25 x 10 x 12 = 3.000 cm³.\nVolume limas = 1/3 x (p x l) x t_limas = 1/3 x (25 x 10) x 9 = 750 cm³.\nVolume gabungan = 3.000 + 750 = 3.750 cm³."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_26",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Bangun Ruang Sisi Lengkung Gabungan",
+    "tipe": "PG",
+    "soal": "Sebuah pelampung pancing terdiri atas setengah bola dan kerucut. Jika jari-jari pelampung r = 5 cm dan tinggi kerucut t = 12 cm, luas seluruh permukaan pelampung yang dicat adalah ....",
+    "pilihan": [
+        "140π cm²",
+        "135π cm²",
+        "115π cm²",
+        "110π cm²"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Garis pelukis kerucut s = √(12² + 5²) = 13 cm.\nLuas selimut kerucut = π x r x s = π x 5 x 13 = 65π cm².\nLuas permukaan setengah bola = 2 x π x r² = 2 x π x 5² = 50π cm².\nLuas permukaan total yang dicat = 65π + 50π = 115π cm²."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_27",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Volume Bangun Ruang Sisi Lengkung",
+    "tipe": "PG",
+    "soal": "Sebuah bandul besi pejal terdiri atas setengah bola dan sebuah tabung dengan diameter 12 cm serta tinggi total 31 cm. Volume bandul tersebut adalah ....",
+    "pilihan": [
+        "1.044π cm³",
+        "1.188π cm³",
+        "1.944π cm³",
+        "1.988π cm³"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Jari-jari r = 12 / 2 = 6 cm.\nTinggi setengah bola = r = 6 cm.\nTinggi tabung = 31 - 6 = 25 cm.\nVolume tabung = π x r² x t = π x 6² x 25 = 900π cm³.\nVolume setengah bola = 2/3 x π x r³ = 2/3 x π x 6³ = 144π cm³.\nVolume bandul total = 900π + 144π = 1.044π cm³."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_29",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Statistika Nilai Rata-rata Gabungan",
+    "tipe": "PG",
+    "soal": "Diketahui rata-rata 15 data yang telah diurutkan dari terkecil ke terbesar adalah 18. Rata-rata 10 data pertama adalah 15 dan rata-rata 3 data selanjutnya (data ke-11, ke-12, ke-13) adalah 25. Jika data ke-15 nilainya sama dengan dua kali data ke-14, maka nilai data ke-15 adalah ....",
+    "pilihan": [
+        "25",
+        "30",
+        "45",
+        "60"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Jumlah seluruh 15 data = 15 x 18 = 270.\nJumlah 10 data pertama = 10 x 15 = 150.\nJumlah 3 data berikutnya = 3 x 25 = 75.\nJumlah sisa (data ke-14 + data ke-15) = 270 - (150 + 75) = 270 - 225 = 45.\nDiketahui data ke-15 = 2 x data ke-14.\nx₁₄ + 2 x₁₄ = 45 => 3 x₁₄ = 45 => x₁₄ = 15.\nMaka nilai data ke-15 = 2 x 15 = 30."
+},
+    {
+    "id": "tka_jogja_t1_mat_a_30",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TKA Tahap 1 Kota Yogyakarta - Paket A",
+    "tingkat": "Mudah",
+    "topik": "Peluang Dua Dadu",
+    "tipe": "PG",
+    "soal": "Dua buah dadu dilambungkan bersama-sama satu kali. Peluang muncul kedua mata dadu berjumlah 7 adalah ....",
+    "pilihan": [
+        "5/18",
+        "1/6",
+        "1/9",
+        "1/12"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Titik sampel jumlah 7: {(1,6), (2,5), (3,4), (4,3), (5,2), (6,1)} = 6 titik.\nRuang sampel 2 dadu = 6 x 6 = 36.\nPeluang = 6 / 36 = 1/6."
+},
+    {
+    "id": "tka_bs_sample_01",
+    "jenjang": "SMA",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "Literasi",
+    "tingkat": "Mudah",
+    "topik": "Logika",
+    "tipe": "BS",
+    "stimulus": "Pernyataan Benar atau Salah sangat bergantung pada fakta dasar yang tidak terbantahkan.",
+    "soal": "Matahari terbit dari sebelah barat dan tenggelam di sebelah timur.",
+    "pilihan": [
+        "Benar",
+        "Salah"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Matahari selalu terbit dari sebelah timur dan tenggelam di sebelah barat. Oleh karena itu pernyataan di atas adalah Salah."
+},
+    {
+    "id": "tka_pgk_sample_01",
+    "jenjang": "SMA",
+    "mapel": "Matematika",
+    "subtes": "Aritmatika Dasar",
+    "tingkat": "Sedang",
+    "topik": "Bilangan",
+    "tipe": "PGK",
+    "stimulus": "Dalam sistem bilangan riil, ada berbagai macam kategori bilangan seperti bilangan genap, ganjil, prima, dan rasional.",
+    "soal": "Manakah di antara pilihan di bawah ini yang merupakan bilangan genap positif? (Pilih semua yang benar)",
+    "pilihan": [
+        "2",
+        "7",
+        "14",
+        "-4",
+        "9"
+    ],
+    "jawaban": [
+        0,
+        2
+    ],
+    "pembahasan": "Angka 2 dan 14 adalah bilangan genap dan juga bernilai positif. Sedangkan -4 genap tapi negatif, dan 7, 9 adalah bilangan ganjil."
+},
+    {
+    "id": "tka_smp_indo_tpm2_bromo",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 - Kota Yogyakarta",
+    "tingkat": "Sedang",
+    "topik": "Membaca Teks Informasi",
+    "stimulus": "Kemegahan Taman Nasional Bromo Tengger Semeru\n\nKalian suka petualangan dan ingin merasakan suasana alam vulkanik yang menakjubkan? Jelajahi dan temukan pesona Bromo Tengger Semeru! Keindahan alamnya siap membuat perjalanan Kalian tak terlupakan.\n\nTaman Nasional Bromo Tengger Semeru adalah kawasan pegunungan di Jawa Timur yang terkenal sebagai rumah bagi flora dan fauna khas pegunungan. Hal ini disebabkan oleh adanya Gunung Semeru yang memiliki ketinggian 3.676 mdpl. Kawasan ini memiliki suhu udara antara 3—18°C pada malam hari. Selain itu, curah hujan yang tinggi membuat udaranya sejuk dan lembap.\n\nPemandangan menakjubkan di taman nasional siap memanjakan mata pengunjung. Lautan pasir yang luas di kaki Gunung Bromo, kawah aktif dengan asap putih yang mengepul, dan pemandangan matahari terbit merupakan daya tarik utama kawasan ini. Di beberapa bagian hutan, tumbuh cemara gunung dan pohon akasia. Selain itu, ada bunga edelweiss yang menjadi ikon alam pegunungan Bromo. Satwa seperti kijang, lutung budeng, dan berbagai burung endemik Jawa pun hidup di dalam kawasan hutan tersebut.\n\nAkses menuju kawasan taman nasional cukup mudah. Dari Malang atau Probolinggo, pengunjung dapat melanjutkan perjalanan menggunakan jeep. Ada beberapa titik wisata seperti Bromo, Bukit Teletubbies, dan Pasir Berbisik. Keindahan alam yang dramatis dan lanskap vulkanik yang khas membuat taman nasional ini menjadi salah satu destinasi alam memesona di Indonesia.",
+    "stimulus_img": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bromo-Semeru-Batok-Widodaren.jpg/800px-Bromo-Semeru-Batok-Widodaren.jpg",
+    "soal": "Objek apakah yang menjadi ikon alam pegunungan Bromo?",
+    "soal_img": "",
+    "pilihan": [
+        "Burung endemik.",
+        "Bunga edelweiss.",
+        "Lutung budeng.",
+        "Cemara gunung."
+    ],
+    "jawaban": 1,
+    "pembahasan": "Berdasarkan paragraf ketiga, disebutkan bahwa 'ada bunga edelweiss yang menjadi ikon alam pegunungan Bromo.'"
+},
+    {
+    "id": "tka_smp_indo_tpm2_bromo2",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 - Kota Yogyakarta",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Membaca Teks Informasi",
+    "stimulus": "Kemegahan Taman Nasional Bromo Tengger Semeru\n\nKalian suka petualangan dan ingin merasakan suasana alam vulkanik yang menakjubkan? Jelajahi dan temukan pesona Bromo Tengger Semeru! Keindahan alamnya siap membuat perjalanan Kalian tak terlupakan.\n\nTaman Nasional Bromo Tengger Semeru adalah kawasan pegunungan di Jawa Timur yang terkenal sebagai rumah bagi flora dan fauna khas pegunungan. Hal ini disebabkan oleh adanya Gunung Semeru yang memiliki ketinggian 3.676 mdpl. Kawasan ini memiliki suhu udara antara 3—18°C pada malam hari. Selain itu, curah hujan yang tinggi membuat udaranya sejuk dan lembap.\n\nPemandangan menakjubkan di taman nasional siap memanjakan mata pengunjung. Lautan pasir yang luas di kaki Gunung Bromo, kawah aktif dengan asap putih yang mengepul, dan pemandangan matahari terbit merupakan daya tarik utama kawasan ini. Di beberapa bagian hutan, tumbuh cemara gunung dan pohon akasia. Selain itu, ada bunga edelweiss yang menjadi ikon alam pegunungan Bromo. Satwa seperti kijang, lutung budeng, dan berbagai burung endemik Jawa pun hidup di dalam kawasan hutan tersebut.\n\nAkses menuju kawasan taman nasional cukup mudah. Dari Malang atau Probolinggo, pengunjung dapat melanjutkan perjalanan menggunakan jeep. Ada beberapa titik wisata seperti Bromo, Bukit Teletubbies, dan Pasir Berbisik. Keindahan alam yang dramatis dan lanskap vulkanik yang khas membuat taman nasional ini menjadi salah satu destinasi alam memesona di Indonesia.",
+    "stimulus_img": "",
+    "soal": "Berbagai flora dan fauna khas pegunungan tinggal di Bromo Tengger Semeru. Mengapa kawasan tersebut dapat menjadi habitat flora dan fauna?",
+    "soal_img": "",
+    "pilihan": [
+        "Keindahan alam Bromo Tengger Semeru terasa dramatis karena lanskap vulkanik yang khas.",
+        "Suhu udara di kawasan Bromo Tengger Semeru dapat mencapai 3°C karena curah hujan tinggi.",
+        "Kawasan Bromo Tengger Semeru sejuk dan lembap karena suhu udara dingin serta curah hujan tinggi.",
+        "Taman Nasional Bromo Tengger Semeru berada di ketinggian 3.676 mdpl sehingga terasa dingin dan basah."
+    ],
+    "jawaban": 2,
+    "pembahasan": "Paragraf kedua menjelaskan bahwa kawasan ini menjadi rumah flora dan fauna khas karena memiliki suhu dingin (3-18 C) dan udaranya sejuk serta lembap akibat curah hujan tinggi."
+},
+    {
+    "id": "tka_smp_indo_tpm2_eco",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 - Kota Yogyakarta",
+    "tingkat": "Sedang",
+    "topik": "Teks Prosedur",
+    "stimulus": "Bagaimana Cara Membuat Eco-Enzyme dari Limbah Kulit Buah?\n\nLimbah organik rumah tangga, terutama kulit buah, sering dibuang begitu saja sehingga menumpuk dan menghasilkan bau tidak sedap. Jika tidak dikelola, limbah ini dapat meningkatkan volume sampah dan mencemari lingkungan. Salah satu solusi ramah lingkungan untuk mengolah limbah kulit buah adalah membuat eco-enzyme. Eco-enzyme merupakan cairan hasil fermentasi limbah organik yang bermanfaat sebagai pembersih alami, penyubur tanaman, dan pengurang bau. Melalui proses sederhana, limbah kulit buah dapat diubah menjadi produk yang berguna.\n\nAlat dan Bahan\n• Kulit buah segar\n• Gula merah atau gula pasir\n• Air bersih\n\nLangkah-Langkah\n1. Takar gula, kulit buah, dan air menggunakan timbangan dengan perbandingan 1:3:10.\n2. Potong kulit buah dengan pisau menjadi bagian kecil agar proses fermentasi lebih cepat.\n3. Masukkan gula ke dalam botol plastik lalu tambahkan kulit buah.\n4. Tuang air bersih dengan corong sesuai komposisi dan sisakan sedikit ruang udara di bagian atas.\n5. Tutup botol dengan rapat lalu kocok perlahan selama beberapa detik untuk mencampurkan bahan.\n6. Fermentasikan selama 3 bulan di tempat teduh. Pada 1 minggu pertama, buka tutup botol setiap hari untuk mengeluarkan gas.\n7. Setelah 3 bulan, saring cairan dan simpan dalam botol bersih.\n8. Eco-enzyme siap digunakan.",
+    "stimulus_img": "",
+    "soal": "Apa makna kata limbah yang terdapat dalam teks tersebut?",
+    "soal_img": "",
+    "pilihan": [
+        "Bahan sisa untuk proses fermentasi.",
+        "Barang olahan sampah anorganik.",
+        "Bahan yang menghasilkan bau.",
+        "Barang yang harus diolah lagi."
+    ],
+    "jawaban": 0,
+    "pembahasan": "Dalam konteks bacaan, limbah kulit buah digunakan sebagai bahan sisa yang difermentasi menjadi eco-enzyme."
+},
+    {
+    "id": "tka_smp_indo_tpm1_kulonprogo",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 1 - Kulonprogo",
+    "tingkat": "Sedang",
+    "topik": "Membaca Teks Berita",
+    "stimulus": "Jalan Kaki: Solusi Sehat dengan Harga yang Murah\n\nJalan kaki merupakan jenis olahraga yang sangat sederhana, murah, dan mudah dilakukan oleh orang yang sehat jasmani serta rohani. Menurut American College of Sports Medicine (ACSM) aktivitas berjalan kaki merupakan bentuk aktivitas fisik yang direkomendasikan untuk dilakukan sehari-hari. Aktivitas berjalan kaki akan bermanfaat secara optimal apabila dilakukan sesuai rekomendasi ACSM, seperti bertelanjang kaki atau hanya dengan beralaskan sepatu bersol sangat tipis. Hal ini dapat membantu seseorang keluar dari pola hidup yang tidak aktif menjadi aktif.\n\nJalan kaki yang dilakukan dalam frekuensi tertentu dapat menurunkan risiko terkena penyakit metabolik, seperti diabetes melitus, kolesterol tinggi, hipertensi, dan penyakit jantung koroner. Aktivitas berjalan kaki akan menjadi efektif dan berguna bagi kesehatan jika dilakukan minimal 30 menit sebanyak 5 (lima) kali dalam seminggu (Isrofah, 2017).\n\nBerjalan kaki memiliki banyak manfaat terhadap kesehatan tubuh. Berjalan kaki berpengaruh terhadap kebugaran karena membantu menurunkan lemak dan memperkuat otot. Berjalan kaki 2 atau 3 kali dalam satu minggu dengan waktu paling sedikit 30 menit dapat meningkatkan ketahanan pembuluh jantung. Meningkatnya ketahanan jantung dan paru-paru dapat meningkatkan kemampuan untuk melaksanakan tugas-tugas harian tanpa merasa lelah.\n\nSelain itu, jalan kaki aman untuk semua umur dan dapat dilakukan di mana saja dan kapan saja tanpa meluangkan banyak waktu. Jalan kaki menyebabkan otot-otot jantung lebih kuat sehingga dapat memompa darah kembali menuju jantung dan menormalkan tekanan darah, yaitu saat terjadi tekanan darah tinggi. Olahraga jalan kaki juga aman bagi lansia karena kondisi lansia yang mengalami penurunan fungsi tubuh dan jalan kaki juga termasuk olahraga aman dan tidak terlalu berat (Harahap, 2023).\n\n(Dikutip dengan penyesuaian dari fkm.unair.ac.id)",
+    "stimulus_img": "",
+    "soal": "Kesimpulan yang tepat sesuai dengan teks tersebut adalah...",
+    "soal_img": "",
+    "pilihan": [
+        "Jalan kaki merupakan olahraga yang bermanfaat dan praktis.",
+        "Jalan kaki dapat mendukung kebugaran dan kekuatan tubuh.",
+        "Jalan kaki dapat meningkatkan kesehatan jantung dan paru-paru.",
+        "Jalan kaki aman dilakukan oleh semua orang di mana dan kapan saja."
+    ],
+    "jawaban": 0,
+    "pembahasan": "Kesimpulan yang mencakup keseluruhan isi teks dari awal hingga akhir adalah jalan kaki merupakan olahraga yang sangat bermanfaat (menurunkan risiko penyakit, menguatkan otot, dll) dan praktis (sederhana, murah, dapat dilakukan kapan saja)."
+},
+    {
+    "id": "tka_smp_mat_tpm1_ubin",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 1 - Sleman",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Aljabar",
+    "stimulus": "Ubin Aljabar\nDalam matematika, ubin aljabar sering digunakan untuk memvisualisasikan perkalian polinomial dan faktorisasi. Susunan ubin di bawah ini merepresentasikan perkalian dari (ax + 2)(x - b).",
+    "stimulus_img": "",
+    "soal": "Perhatikan ubin aljabar berikut ini.\nUbin aljabar di atas dapat diuraikan menjadi (ax + 2)(x - b) = 3x² + cx - 6.\nPernyataan yang benar adalah ….\n\n1. Nilai a = 3.\n2. Nilai b = -3\n3. Nilai c = -7\n4. Nilai 2a + b - c = 2",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Crect x='20' y='20' width='100' height='100' fill='%233b82f6' stroke='white' stroke-width='2'/%3E%3Ctext x='70' y='75' fill='white' font-family='sans-serif' font-size='16' text-anchor='middle'%3Ex%C2%B2%3C/text%3E%3Crect x='120' y='20' width='100' height='100' fill='%233b82f6' stroke='white' stroke-width='2'/%3E%3Ctext x='170' y='75' fill='white' font-family='sans-serif' font-size='16' text-anchor='middle'%3Ex%C2%B2%3C/text%3E%3Crect x='220' y='20' width='100' height='100' fill='%233b82f6' stroke='white' stroke-width='2'/%3E%3Ctext x='270' y='75' fill='white' font-family='sans-serif' font-size='16' text-anchor='middle'%3Ex%C2%B2%3C/text%3E%3Crect x='320' y='20' width='30' height='100' fill='%2322c55e' stroke='white' stroke-width='2'/%3E%3Ctext x='335' y='75' fill='white' font-family='sans-serif' font-size='16' text-anchor='middle'%3Ex%3C/text%3E%3Crect x='350' y='20' width='30' height='100' fill='%2322c55e' stroke='white' stroke-width='2'/%3E%3Ctext x='365' y='75' fill='white' font-family='sans-serif' font-size='16' text-anchor='middle'%3Ex%3C/text%3E%3Crect x='20' y='120' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='70' y='138' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='120' y='120' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='170' y='138' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='220' y='120' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='270' y='138' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='320' y='120' width='30' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='335' y='138' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-1%3C/text%3E%3Crect x='350' y='120' width='30' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='365' y='138' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-1%3C/text%3E%3C!-- row 2 --%3E%3Crect x='20' y='145' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='70' y='163' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='120' y='145' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='170' y='163' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='220' y='145' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='270' y='163' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='320' y='145' width='30' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='335' y='163' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-1%3C/text%3E%3Crect x='350' y='145' width='30' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='365' y='163' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-1%3C/text%3E%3C!-- row 3 --%3E%3Crect x='20' y='170' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='70' y='188' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='120' y='170' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='170' y='188' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='220' y='170' width='100' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='270' y='188' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-x%3C/text%3E%3Crect x='320' y='170' width='30' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='335' y='188' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-1%3C/text%3E%3Crect x='350' y='170' width='30' height='25' fill='%23ef4444' stroke='white' stroke-width='2'/%3E%3Ctext x='365' y='188' fill='white' font-family='sans-serif' font-size='14' text-anchor='middle'%3E-1%3C/text%3E%3C/svg%3E",
+    "pilihan": [
+        "1 dan 2",
+        "1 dan 4",
+        "2 dan 3",
+        "1 dan 3"
+    ],
+    "jawaban": 3,
+    "pembahasan": "Dari ubin, hasil totalnya adalah: 3x² + 2x - 9x - 6 = 3x² - 7x - 6.\nArtinya cx = -7x, sehingga c = -7.\nDiketahui juga dari faktorisasi, a = 3 dan b = 3. Maka:\n1. Nilai a = 3 (Benar)\n2. Nilai b = 3, bukan -3 (Salah)\n3. Nilai c = -7 (Benar)\n4. 2a + b - c = 2(3) + 3 - (-7) = 6 + 3 + 7 = 16 (Salah)\nMaka pernyataan yang benar adalah 1 dan 3."
+},
+    {
+    "id": "tka_smp_mat_tpm2_1",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Sistem Penilaian",
+    "soal": "Dalam kompetisi liga sepakbola, sistem penilaian yang digunakan sebagai berikut:\n• Menang 3 point\n• Seri 1 point\n• Kalah 0 point\n\nPerhatikan data hasil pertandingan berikut:\n\nPerhatikan pernyataan berikut, kemudian berilah tanda centang pada pernyataan yang bernilai benar atau salah!\n\nA. Jumlah point yang tertinggi adalah klub P\nB. Jumlah point tertinggi dan terendah adakah 66\nC. Jumlah point yang terendah adalah klub Q",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150'%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Crect x='10' y='10' width='380' height='30' fill='%23f1f5f9' stroke='%23cbd5e1'/%3E%3Ctext x='70' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3ENAMA KLUB%3C/text%3E%3Ctext x='180' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3EMenang%3C/text%3E%3Ctext x='260' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3ESeri%3C/text%3E%3Ctext x='340' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3EKalah%3C/text%3E%3Crect x='10' y='40' width='380' height='30' fill='white' stroke='%23cbd5e1'/%3E%3Ctext x='70' y='60' font-family='sans-serif' font-size='14' text-anchor='middle'%3EP%3C/text%3E%3Ctext x='180' y='60' font-family='sans-serif' font-size='14' text-anchor='middle'%3E11%3C/text%3E%3Ctext x='260' y='60' font-family='sans-serif' font-size='14' text-anchor='middle'%3E1%3C/text%3E%3Ctext x='340' y='60' font-family='sans-serif' font-size='14' text-anchor='middle'%3E3%3C/text%3E%3Crect x='10' y='70' width='380' height='30' fill='white' stroke='%23cbd5e1'/%3E%3Ctext x='70' y='90' font-family='sans-serif' font-size='14' text-anchor='middle'%3EQ%3C/text%3E%3Ctext x='180' y='90' font-family='sans-serif' font-size='14' text-anchor='middle'%3E9%3C/text%3E%3Ctext x='260' y='90' font-family='sans-serif' font-size='14' text-anchor='middle'%3E5%3C/text%3E%3Ctext x='340' y='90' font-family='sans-serif' font-size='14' text-anchor='middle'%3E1%3C/text%3E%3Crect x='10' y='100' width='380' height='30' fill='white' stroke='%23cbd5e1'/%3E%3Ctext x='70' y='120' font-family='sans-serif' font-size='14' text-anchor='middle'%3ER%3C/text%3E%3Ctext x='180' y='120' font-family='sans-serif' font-size='14' text-anchor='middle'%3E10%3C/text%3E%3Ctext x='260' y='120' font-family='sans-serif' font-size='14' text-anchor='middle'%3E1%3C/text%3E%3Ctext x='340' y='120' font-family='sans-serif' font-size='14' text-anchor='middle'%3E4%3C/text%3E%3C/svg%3E",
+    "pilihan": [
+        "A Benar, B Salah, C Salah",
+        "A Salah, B Benar, C Benar",
+        "A Benar, B Benar, C Salah",
+        "A Salah, B Salah, C Benar"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Klub P: 11(3) + 1(1) + 3(0) = 33 + 1 = 34\\nKlub Q: 9(3) + 5(1) + 1(0) = 27 + 5 = 32\\nKlub R: 10(3) + 1(1) + 4(0) = 30 + 1 = 31\\n\\nA. Tertinggi adalah P (Benar)\\nB. Tertinggi (34) dan Terendah (31) = 65. (Salah)\\nC. Terendah adalah R (31), bukan Q. (Salah)\\nMaka kombinasinya A Benar, B Salah, C Salah"
+},
+    {
+    "id": "tka_smp_mat_tpm2_2",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Mudah",
+    "topik": "Operasi Bilangan Bulat",
+    "soal": "Hasil dari (−10) + 8 x 5 – 18 : (−3) adalah ….",
+    "soal_img": "",
+    "pilihan": [
+        "–54",
+        "–4",
+        "24",
+        "36"
+    ],
+    "jawaban": 3,
+    "pembahasan": "(−10) + (8 x 5) – (18 : (−3))\\n= (−10) + 40 – (−6)\\n= 30 + 6\\n= 36"
+},
+    {
+    "id": "tka_smp_mat_tpm2_3",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Pecahan",
+    "soal": "Ibu memiliki 7 kg gula pasir. Gula pasir tersebut akan dikemas dalam kantong plastik kecil dengan berat masing-masing 3/4 kg. Sisa gula pasir yang tidak dikemas adalah ….",
+    "soal_img": "",
+    "pilihan": [
+        "1/8 kg",
+        "1/4 kg",
+        "1/2 kg",
+        "3/4 kg"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Banyak kantong yang terbentuk: 7 / (3/4) = 7 x (4/3) = 28/3 = 9 sisa 1/3 bagian dari kantong.\\n1/3 bagian dari 3/4 kg adalah 1/3 x 3/4 = 1/4 kg.\\nJadi sisa gula pasir adalah 1/4 kg."
+},
+    {
+    "id": "tka_smp_mat_tpm2_4",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "KPK",
+    "soal": "Tiga orang murid mengunjungi perpustakaan secara berkala. Murid pertama berkunjung setiap 6 hari sekali, murid kedua setiap 4 hari sekali, dan murid ketiga setiap 8 hari sekali.\nJika pada 28 Januari mereka mengunjungi perpustakaan secara bersama-sama, maka mereka akan kembali mengunjungi perpustakaan bersama-sama lagi pada tanggal ….",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='100%25' height='100%25' fill='%23fef3c7' rx='8'/%3E%3Ctext x='150' y='100' font-family='sans-serif' font-weight='bold' font-size='24' text-anchor='middle' fill='%2392400e'%3EPerpustakaan%3C/text%3E%3Ctext x='150' y='130' font-family='sans-serif' font-size='16' text-anchor='middle' fill='%23b45309'%3E6, 4, 8 hari%3C/text%3E%3C/svg%3E",
+    "pilihan": [
+        "19 Februari",
+        "20 Februari",
+        "21 Februari",
+        "22 Februari"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Cari KPK dari 6, 4, dan 8.\\nFaktorisasi: 6 = 2x3, 4 = 2^2, 8 = 2^3.\\nKPK = 2^3 x 3 = 24 hari.\\n28 Januari + 24 hari = 52 Januari.\\nBulan Januari ada 31 hari.\\n52 - 31 = 21.\\nMaka mereka bertemu lagi pada 21 Februari."
+},
+    {
+    "id": "tka_smp_mat_tpm2_5",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Skala dan Perbandingan",
+    "soal": "Perhatikan denah rumah paman berikut dengan skala 1 : 100. Luas kamar tidur C sebenarnya adalah ….",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='100%25' height='100%25' fill='%23f8fafc'/%3E%3Crect x='50' y='50' width='150' height='100' fill='white' stroke='black' stroke-width='2'/%3E%3Crect x='200' y='50' width='100' height='100' fill='%23e0e7ff' stroke='black' stroke-width='2'/%3E%3Ctext x='250' y='100' font-family='sans-serif' font-weight='bold' font-size='16' text-anchor='middle'%3EKamar C%3C/text%3E%3Ctext x='250' y='140' font-family='sans-serif' font-size='12' text-anchor='middle'%3E2,5 cm x 3 cm%3C/text%3E%3Cline x1='200' y1='40' x2='300' y2='40' stroke='black' marker-start='url(%23arrow)' marker-end='url(%23arrow)'/%3E%3Ctext x='250' y='35' font-family='sans-serif' font-size='12' text-anchor='middle'%3E3 cm%3C/text%3E%3Cline x1='310' y1='50' x2='310' y2='150' stroke='black' marker-start='url(%23arrow)' marker-end='url(%23arrow)'/%3E%3Ctext x='315' y='105' font-family='sans-serif' font-size='12'%3E2,5 cm%3C/text%3E%3Cdefs%3E%3Cmarker id='arrow' markerWidth='5' markerHeight='5' refX='2.5' refY='2.5' orient='auto'%3E%3Cpolygon points='0,0 5,2.5 0,5' fill='black'/%3E%3C/marker%3E%3C/defs%3E%3C/svg%3E",
+    "pilihan": [
+        "6,25 m²",
+        "7,5 m²",
+        "9 m²",
+        "10,5 m²"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Ukuran pada denah: panjang = 3 cm, lebar = 2,5 cm.\\nSkala = 1 : 100.\\nPanjang sebenarnya = 3 cm x 100 = 300 cm = 3 m.\\nLebar sebenarnya = 2,5 cm x 100 = 250 cm = 2,5 m.\\nLuas sebenarnya = 3 m x 2,5 m = 7,5 m²."
+},
+    {
+    "id": "tka_smp_mat_tpm2_6",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Perbandingan Senilai",
+    "soal": "Hasil pengamatan dua kelompok dalam mengamati perkembangan menanam cabai.\nKelompok A: Tinggi tanaman bertambah 9 cm dalam 3 minggu\nKelompok B: Tinggi tanaman bertambah 12 cm dalam 4 minggu\n\nBerdasarkan data tersebut, kesimpulan yang tepat adalah …",
+    "soal_img": "",
+    "pilihan": [
+        "Tanaman kelompok A tumbuh lebih cepat",
+        "Tanaman kelompok B tumbuh lebih cepat",
+        "Laju pertumbuhan kedua tanaman sama",
+        "Data tidak cukup untuk membandingkan"
+    ],
+    "jawaban": 2,
+    "pembahasan": "Laju kelompok A = 9 cm / 3 minggu = 3 cm / minggu.\\nLaju kelompok B = 12 cm / 4 minggu = 3 cm / minggu.\\nKarena 3 = 3, maka laju pertumbuhan kedua tanaman sama."
+},
+    {
+    "id": "tka_smp_mat_tpm2_7",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Perbandingan Senilai",
+    "soal": "Seorang peternak memelihara 100 ekor ayam dan membutuhkan 12 kg pakan. Jika peternak tersebut menambah 25 ayam, pakan yang dibutuhkan adalah ….",
+    "soal_img": "",
+    "pilihan": [
+        "14 kg",
+        "15 kg",
+        "18 kg",
+        "20 kg"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Ini adalah perbandingan senilai.\\n100 ayam -> 12 kg pakan.\\n125 ayam -> x kg pakan.\\nx = (125 / 100) * 12 = 1,25 * 12 = 15 kg."
+},
+    {
+    "id": "tka_smp_mat_tpm2_9",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Aljabar",
+    "soal": "Perhatikan gambar persegi panjang berikut!\nJika keliling persegi panjang (14x – 6) cm, nilai p adalah ….",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect x='50' y='50' width='200' height='100' fill='white' stroke='black' stroke-width='4'/%3E%3Ctext x='150' y='170' font-family='sans-serif' font-weight='bold' font-size='16' fill='red' text-anchor='middle'%3E(P) cm%3C/text%3E%3Ctext x='270' y='105' font-family='sans-serif' font-weight='bold' font-size='16' fill='red' transform='rotate(-90 270 105)' text-anchor='middle'%3E(2x-1) cm%3C/text%3E%3C/svg%3E",
+    "pilihan": [
+        "5x + 1",
+        "5x – 2",
+        "9x + 4",
+        "9x – 2"
+    ],
+    "jawaban": 1,
+    "pembahasan": "Keliling = 2 * (panjang + lebar)\\n14x - 6 = 2 * (P + 2x - 1)\\n7x - 3 = P + 2x - 1\\nP = (7x - 3) - (2x - 1) = 5x - 2."
+},
+    {
+    "id": "tka_smp_mat_tpm2_11",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Aritmatika Sosial",
+    "soal": "Perhatikan tabel nota belanja ATK Maju berikut ini. Harga paket C adalah Rp15.000,00, dan harga paket B 2 kali lipat dari harga paket C. Jika membeli paket C dengan 1 lembar uang lima puluhan, maka mendapat kembalian sebanyak Rp35.000.\nTentukan benar atau salah!",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250'%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Crect x='10' y='10' width='380' height='30' fill='%23f1f5f9' stroke='%23cbd5e1'/%3E%3Ctext x='50' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3EPAKET%3C/text%3E%3Ctext x='180' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3ENama Barang%3C/text%3E%3Ctext x='320' y='30' font-family='sans-serif' font-weight='bold' font-size='14' text-anchor='middle'%3ETotal%3C/text%3E%3Crect x='10' y='40' width='380' height='50' fill='white' stroke='%23cbd5e1'/%3E%3Ctext x='50' y='70' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle'%3EA%3C/text%3E%3Ctext x='180' y='65' font-family='sans-serif' font-size='12' text-anchor='middle'%3E2 BUKU TULIS DAN 3%3C/text%3E%3Ctext x='180' y='80' font-family='sans-serif' font-size='12' text-anchor='middle'%3EPENSIL%3C/text%3E%3Ctext x='320' y='70' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle'%3ERp 35.000,00%3C/text%3E%3Crect x='10' y='90' width='380' height='50' fill='white' stroke='%23cbd5e1'/%3E%3Ctext x='50' y='120' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle'%3EB%3C/text%3E%3Ctext x='180' y='120' font-family='sans-serif' font-size='12' text-anchor='middle'%3E1 BUKU TULIS DAN 2 PENSIL%3C/text%3E%3Ctext x='320' y='120' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle'%3ERp 20.000,00%3C/text%3E%3Crect x='10' y='140' width='380' height='50' fill='white' stroke='%23cbd5e1'/%3E%3Ctext x='50' y='170' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle'%3EC%3C/text%3E%3Ctext x='180' y='170' font-family='sans-serif' font-size='12' text-anchor='middle'%3E1 BUKU TULIS DAN 1 PENSIL%3C/text%3E%3Crect x='280' y='150' width='80' height='30' fill='black' rx='15'/%3E%3Cpath d='M 320 180 Q 320 220 300 230 Q 340 230 320 180' fill='black'/%3E%3C/svg%3E",
+    "pilihan": [
+        "A Benar, B Salah, C Benar",
+        "A Benar, B Salah, C Salah",
+        "A Salah, B Benar, C Benar",
+        "A Benar, B Benar, C Benar"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Dari tabel: 2B + 3P = 35.000 (1) dan B + 2P = 20.000 (2).\\nKalikan (2) dgn 2: 2B + 4P = 40.000 (3).\\nKurangi (3) dgn (1): P = 5.000. Maka B = 10.000.\\nPaket C: 1B + 1P = 15.000. (A Benar)\\nHarga paket B = 20.000. 2x Paket C = 30.000. Jadi B != 2C. (B Salah)\\nUang 50.000 - 15.000 = 35.000. (C Benar)"
+},
+    {
+    "id": "tka_smp_mat_tpm2_15",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Pola Bilangan",
+    "soal": "Perhatikan gambar berpola dari susunan lingkaran berikut!\n(1) Banyak lingkaran berwarna merah pada pola ke-8 adalah 36 buah\n(2) Banyak lingkaran berwarna biru pada pola ke-8 adalah 10 buah\n(3) Selisih lingkaran berwarna merah dan biru pada pola ke-9 adalah 35 buah\n(4) Jumlah lingkaran berwarna merah dan biru pada pola ke-9 adalah 52 buah\n\nPilih pernyataan yang benar!",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150'%3E%3C!-- Pola 1 --%3E%3Ccircle cx='50' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='70' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='60' cy='80' r='10' fill='red'/%3E%3C!-- Pola 2 --%3E%3Ccircle cx='130' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='150' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='170' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='140' cy='80' r='10' fill='red'/%3E%3Ccircle cx='160' cy='80' r='10' fill='red'/%3E%3Ccircle cx='150' cy='60' r='10' fill='red'/%3E%3C!-- Pola 3 --%3E%3Ccircle cx='230' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='250' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='270' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='290' cy='100' r='10' fill='blue'/%3E%3Ccircle cx='240' cy='80' r='10' fill='red'/%3E%3Ccircle cx='260' cy='80' r='10' fill='red'/%3E%3Ccircle cx='280' cy='80' r='10' fill='red'/%3E%3Ccircle cx='250' cy='60' r='10' fill='red'/%3E%3Ccircle cx='270' cy='60' r='10' fill='red'/%3E%3Ccircle cx='260' cy='40' r='10' fill='red'/%3E%3C/svg%3E",
+    "pilihan": [
+        "(1) dan (3)",
+        "(1) dan (4)",
+        "(2) dan (3)",
+        "(2) dan (4)"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Biru di bawah: Pola 1 = 2, Pola 2 = 3, Pola 3 = 4. Maka Biru ke-n = n+1.\\nMerah di atas: Membentuk segitiga. Pola 1 = 1, Pola 2 = 1+2=3, Pola 3 = 1+2+3=6. Merah ke-n = n(n+1)/2.\\nPola 8: Biru = 9, Merah = 8(9)/2 = 36. (1 Benar, 2 Salah)\\nPola 9: Biru = 10, Merah = 9(10)/2 = 45.\\nSelisih Pola 9: 45 - 10 = 35. (3 Benar)\\nJumlah Pola 9: 45 + 10 = 55. (4 Salah)\\nMaka yang benar (1) dan (3)."
+},
+    {
+    "id": "tka_smp_mat_tpm2_17",
+    "jenjang": "SMP",
+    "mapel": "Matematika",
+    "subtes": "TPM 2 - Matematika",
+    "tingkat": "Sedang",
+    "topik": "Teorema Pythagoras",
+    "soal": "Sebuah kapal berlayar dari pelabuhan A kearah barat sejauh 90 km, kemudian kearah utara sejauh 40 km. Setelah itu kapal melanjutkan kearah barat sejauh 30 km dan akhirnya berlayar kearah utara sejauh 50 km hingga sampai di pelabuhan B. Jarak terdekat dari pelabuhan A ke B adalah ….",
+    "soal_img": "",
+    "pilihan": [
+        "150 km",
+        "170 km",
+        "210 km",
+        "250 km"
+    ],
+    "jawaban": 0,
+    "pembahasan": "Pergerakan total ke Barat = 90 + 30 = 120 km.\\nPergerakan total ke Utara = 40 + 50 = 90 km.\\nJarak A ke B = akar(120^2 + 90^2) = akar(14400 + 8100) = akar(22500) = 150 km."
+},
+    {
+    "id": "tka_smp_indo_tpm2_1",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 - Bahasa Indonesia",
+    "tingkat": "Sedang",
+    "topik": "Membaca Teks",
+    "soal": "Ratusan mahasiswa dari berbagai perguruan tinggi berbondong-bondong menuju gedung parlemen untuk menyampaikan aspirasi mereka mengenai kebijakan baru pemerintah. Aparat keamanan telah bersiaga sejak pagi, mengantisipasi terjadinya aksi anarkis para demonstran. Mereka berjaga dengan sikap siaga penuh waspada. Namun, kekhawatiran aparat tidak terjadi. Suasana di depan gedung tampak sangat kondusif. Aksi massa ini berjalan dengan tertib dan terkendali. Tidak ada yel-yel provokatif. Mereka justru melantunkan lagu nasional untuk mengiringi orasi yang disampaikan secara bergantian.\n\nBagian teks tersebut yang menggambarkan suasana damai adalah ....",
+    "soal_img": "",
+    "pilihan": [
+        "Ratusan mahasiswa berbondong-bondong menyampaikan aspirasi.",
+        "Aparat keamanan bersiaga penuh waspada.",
+        "Aksi massa berjalan dengan tertib dan melantunkan lagu nasional.",
+        "Mengantisipasi terjadinya aksi anarkis para demonstran."
+    ],
+    "jawaban": 2,
+    "pembahasan": "Kutipan \"Suasana di depan gedung tampak sangat kondusif. Aksi massa ini berjalan dengan tertib dan terkendali... Mereka justru melantunkan lagu nasional\" secara langsung menggambarkan suasana yang damai dan tidak anarkis."
+},
+    {
+    "id": "tka_smp_indo_tpm2_2",
+    "jenjang": "SMP",
+    "mapel": "Bahasa Indonesia",
+    "subtes": "TPM 2 - Bahasa Indonesia",
+    "tingkat": "Sulit / HOTS",
+    "topik": "Menganalisis Teks",
+    "soal": "Perhatikan poster tentang Adab Bertemu Guru!\nAmiral membaca poster tersebut di papan pengumuman sekolah. Poster tersebut mengingatkan Amiral pada kebiasaannya sehari-hari yang sudah dia lakukan.\n\nPernyataan yang sesuai dengan pembiasaan dalam poster ditunjukkan pernyataan mana saja? (Pilihlah lebih dari satu jawaban)",
+    "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23fef08a'/%3E%3Ctext x='200' y='40' font-family='sans-serif' font-weight='bold' font-size='20' text-anchor='middle' fill='%23854d0e'%3EADAB BERTEMU GURU%3C/text%3E%3Crect x='20' y='60' width='360' height='50' fill='white' rx='8'/%3E%3Ctext x='30' y='80' font-family='sans-serif' font-weight='bold' font-size='14'%3EMEMBERI SALAM%3C/text%3E%3Ctext x='30' y='100' font-family='sans-serif' font-size='12'%3ESapa guru dengan salam yang sopan%3C/text%3E%3Crect x='20' y='120' width='360' height='50' fill='white' rx='8'/%3E%3Ctext x='30' y='140' font-family='sans-serif' font-weight='bold' font-size='14'%3ESIKAP HORMAT%3C/text%3E%3Ctext x='30' y='160' font-family='sans-serif' font-size='12'%3EBerdiri tegak, menundukkan kepala sedikit.%3C/text%3E%3Crect x='20' y='180' width='360' height='50' fill='white' rx='8'/%3E%3Ctext x='30' y='200' font-family='sans-serif' font-weight='bold' font-size='14'%3EBAHASA YANG SOPAN%3C/text%3E%3Ctext x='30' y='220' font-family='sans-serif' font-size='12'%3EGunakan bahasa santun, hindari kata kasar.%3C/text%3E%3C/svg%3E",
+    "pilihan": [
+        "Setiap masuk ke gerbang sekolah Amiral diam saja tidak berani mengucapkan salam.",
+        "Amiral selalu mendengarkan setiap pelajaran dengan penuh perhatian.",
+        "Ketika guru akan masuk ke kelas, Amiral berjalan di belakang guru.",
+        "Amiral selalu menghindari kata-kata kasar dan tidak membelakangi guru."
+    ],
+    "jawaban": 3,
+    "pembahasan": "Jawaban yang benar adalah yang mencerminkan poster: menggunakan bahasa yang sopan dan sikap hormat (tidak membelakangi guru). Pernyataan yang sesuai adalah opsi ke-2 dan ke-4. Pada sistem ini kita merepresentasikan dengan pilihan ganda tunggal terbaik, yaitu opsi 4 karena sangat mencerminkan poin 2 dan 3 di poster."
+},
+    {
+        "id": "tka_smp_mat_lemari_es",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Sleman",
+        "tingkat": "Sedang",
+        "topik": "Aritmatika Sosial",
+        "soal": "Perhatikan tabel suhu freezer pada beberapa merek lemari es berikut.\\nJika terjadi pemadaman listrik dari pukul 08.20 – 12.00 WIB, maka suhu di dalam lemari es setiap 20 menit naik sebesar 4°C. Apabila suhu normal ruangan sebesar 25°C, maka lemari es yang akan mencapai suhu normal ruangan selama pemadaman listrik adalah ….",
+        "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect width='100%25' height='100%25' fill='%23f8fafc' rx='8'/%3E%3Ctext x='20' y='30' font-family='sans-serif' font-weight='bold' font-size='14'%3EMerek Lemari Es%3C/text%3E%3Ctext x='160' y='30' font-family='sans-serif' font-weight='bold' font-size='14'%3ESuhu Bagian Freezer%3C/text%3E%3Cline x1='20' y1='40' x2='380' y2='40' stroke='%23cbd5e1' stroke-width='2'/%3E%3Ctext x='20' y='60' font-family='sans-serif' font-size='14'%3EMerek A%3C/text%3E%3Ctext x='160' y='60' font-family='sans-serif' font-size='14'%3E-23%C2%B0C%3C/text%3E%3Cline x1='20' y1='70' x2='380' y2='70' stroke='%23e2e8f0' stroke-width='1'/%3E%3Ctext x='20' y='90' font-family='sans-serif' font-size='14'%3EMerek B%3C/text%3E%3Ctext x='160' y='90' font-family='sans-serif' font-size='14'%3E-21%C2%B0C%3C/text%3E%3Cline x1='20' y1='100' x2='380' y2='100' stroke='%23e2e8f0' stroke-width='1'/%3E%3Ctext x='20' y='120' font-family='sans-serif' font-size='14'%3EMerek C%3C/text%3E%3Ctext x='160' y='120' font-family='sans-serif' font-size='14'%3E-20%C2%B0C%3C/text%3E%3Cline x1='20' y1='130' x2='380' y2='130' stroke='%23e2e8f0' stroke-width='1'/%3E%3Ctext x='20' y='150' font-family='sans-serif' font-size='14'%3EMerek D%3C/text%3E%3Ctext x='160' y='150' font-family='sans-serif' font-size='14'%3E-19%C2%B0C%3C/text%3E%3C/svg%3E",
+        "pilihan": [
+            "Lemari es merek A",
+            "Lemari es merek B",
+            "Lemari es merek C",
+            "Lemari es merek D"
+        ],
+        "jawaban": 3,
+        "pembahasan": "Lama pemadaman = 12.00 - 08.20 = 3 jam 40 menit = 220 menit.\\nBanyak kenaikan = 220 / 20 = 11 kali.\\nTotal kenaikan suhu = 11 x 4°C = 44°C.\\nSuhu akhir = Suhu Awal + Kenaikan = 25°C\\nSuhu Awal = 25°C - 44°C = -19°C (Merek D)."
+    },
+    {
+        "id": "tka_smp_mat_diskon_tanah_abang",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Sleman",
+        "tingkat": "Sedang",
+        "topik": "Aritmatika Sosial",
+        "soal": "Paman membeli baju dalam jumlah besar di toko grosir Tanah Abang. Harga pembelian satu baju Rp100.000,00. Paman akan menjual kembali baju-baju tersebut dengan keuntungan 30%. Untuk menarik minat pembeli, paman memajang promo diskon seperti pada gambar label. Agar paman tetap memperoleh keuntungan seperti rencana, maka harga yang tertera pada label baju adalah ….",
+        "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150'%3E%3Crect width='100%25' height='100%25' fill='%23ef4444' rx='8'/%3E%3Ctext x='150' y='60' font-family='sans-serif' font-weight='bold' font-size='32' fill='white' text-anchor='middle'%3E50%25 DISCOUNT%3C/text%3E%3Ctext x='150' y='100' font-family='sans-serif' font-size='18' fill='white' text-anchor='middle'%3ESUMMER EDITION SALE%3C/text%3E%3C/svg%3E",
+        "pilihan": [
+            "Rp260.000,00",
+            "Rp200.000,00",
+            "Rp160.000,00",
+            "Rp130.000,00"
+        ],
+        "jawaban": 0,
+        "pembahasan": "Keuntungan yang diharapkan = 30% x 100.000 = 30.000.\\nHarga jual bersih = 100.000 + 30.000 = 130.000.\\nDiskon = 50%. Maka Harga Jual Bersih = 50% x Harga Label.\\nHarga Label = 130.000 / 0.5 = 260.000."
+    },
+    {
+        "id": "tka_smp_mat_grafik_kecepatan",
+        "jenjang": "SMP",
+        "mapel": "Matematika",
+        "subtes": "Matematika - Kulonprogo",
+        "tingkat": "Sulit / HOTS",
+        "topik": "Perbandingan Berbalik Nilai",
+        "soal": "Perhatikan grafik hubungan antara kecepatan dan waktu dari pergerakan sebuah kendaraan!\\nJika waktu yang ditempuh adalah 2,5 jam, maka kecepatannya adalah ….",
+        "soal_img": "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23ffffff'/%3E%3Cline x1='50' y1='250' x2='350' y2='250' stroke='black' stroke-width='2'/%3E%3Cline x1='50' y1='250' x2='50' y2='50' stroke='black' stroke-width='2'/%3E%3Ctext x='180' y='280' font-family='sans-serif' font-size='14'%3EWaktu (jam)%3C/text%3E%3Ctext x='20' y='180' font-family='sans-serif' font-size='14' transform='rotate(-90 20 180)'%3EKecepatan (km/jam)%3C/text%3E%3Cpath d='M 100 50 Q 150 200 250 220' fill='none' stroke='%233b82f6' stroke-width='3'/%3E%3Ccircle cx='100' cy='50' r='4' fill='%231e40af'/%3E%3Ctext x='110' y='55' font-family='sans-serif' font-size='12'%3E(1, 120)%3C/text%3E%3Ccircle cx='150' cy='150' r='4' fill='%231e40af'/%3E%3Ctext x='160' y='155' font-family='sans-serif' font-size='12'%3E(2, 60)%3C/text%3E%3Ccircle cx='200' cy='183' r='4' fill='%231e40af'/%3E%3Ctext x='210' y='188' font-family='sans-serif' font-size='12'%3E(3, 40)%3C/text%3E%3C/svg%3E",
+        "pilihan": [
+            "46 km / jam",
+            "48 km / jam",
+            "50 km / jam",
+            "52 km / jam"
+        ],
+        "jawaban": 1,
+        "pembahasan": "Dari grafik, terlihat bahwa Kecepatan x Waktu = Konstan (Jarak).\\nJarak = 1 jam x 120 km/jam = 120 km.\\nJika waktu tempuh 2,5 jam, maka Kecepatan = 120 / 2,5 = 48 km/jam."
+    },
 ...[
     {
         "id": "tka_smp_indo_1",
@@ -6896,6 +7985,76 @@
         };
 
         
+        
+        // State for batch uploaded images
+        window.batchImagesMap = {};
+
+        window.handleBatchImages = function(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const gallery = document.getElementById('batch-img-gallery');
+            const countBadge = document.getElementById('batch-img-count');
+            gallery.classList.remove('hidden');
+
+            let processed = 0;
+            const total = files.length;
+            window.showToast(`Memuat ${total} gambar...`, "info");
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    const cleanName = file.name.trim();
+                    window.batchImagesMap[cleanName] = dataUrl;
+
+                    const item = document.createElement('div');
+                    item.className = "relative group border border-slate-200 rounded-lg p-1 bg-white flex flex-col items-center";
+                    item.innerHTML = `
+                        <img src="${dataUrl}" class="h-16 w-full object-contain rounded mb-1 bg-slate-50">
+                        <span class="text-[9px] font-bold text-slate-600 truncate w-full text-center" title="${cleanName}">${cleanName}</span>
+                        <button type="button" onclick="window.salinLinkBatch('${cleanName}')" class="text-[9px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-1 py-0.5 rounded font-bold mt-1 w-full text-center" title="Klik untuk salin">Salin</button>
+                    `;
+                    gallery.appendChild(item);
+
+                    processed++;
+                    countBadge.innerText = `${Object.keys(window.batchImagesMap).length} Gambar`;
+                    if (processed === total) {
+                        window.showToast(`${total} gambar siap digunakan!`, "success");
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        window.salinLinkBatch = function(name) {
+            const dataUrl = window.batchImagesMap[name];
+            if (!dataUrl) return;
+            navigator.clipboard.writeText(dataUrl).then(() => {
+                window.showToast(`Gambar "${name}" disalin ke clipboard!`, "success");
+            }).catch(() => {
+                window.showToast("Gagal menyalin", "error");
+            });
+        };
+
+        window.unduhTemplateImportCSV = function() {
+            const header = "Wacana Stimulus\tURL Gambar Wacana\tPertanyaan Soal\tURL Gambar Soal\tOpsi A\tOpsi B\tOpsi C\tOpsi D\tOpsi E\tKunci (A/B/C/D/E)\tPembahasan\n";
+            const row1 = "Perhatikan grafik laju reaksi berikut...\thttps://images.unsplash.com/photo-1532094349884-543bc11b234d?w=400\tBerdasarkan data di atas, laju reaksi tercepat terjadi pada menit ke...\t\tMenit ke-1\tMenit ke-2\tMenit ke-3\tMenit ke-4\tMenit ke-5\tB\tLaju reaksi mencapai nilai gradien tertinggi pada interval menit ke-2.\n";
+            const row2 = "\t\tSebuah mobil bergerak dengan kecepatan konstan 20 m/s selama 10 detik. Jarak yang ditempuh adalah...\t\t100 m\t150 m\t200 m\t250 m\t300 m\tC\tJarak = kecepatan x waktu = 20 x 10 = 200 m.\n";
+            const content = header + row1 + row2;
+            
+            const blob = new Blob([content], { type: 'text/tab-separated-values;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Template_Import_Soal_TKA_Lengkap.tsv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            window.showToast("Template format berhasil diunduh!", "success");
+        };
+
         window.prosesImportSpreadsheet = async function() {
             const rawData = document.getElementById('import-data').value.trim();
             if (!rawData) return window.showToast("Data masih kosong!", "error");
@@ -6967,6 +8126,134 @@
             window.switchAdminTab('soal');
         };
         
+        
+        
+        // Image Upload, Paste (Ctrl+V) & Preview Helpers
+        window.previewImgInput = function(prefix) {
+            const input = document.getElementById(prefix + '-img');
+            const wrap = document.getElementById(prefix + '-preview-wrap');
+            const img = document.getElementById(prefix + '-preview');
+            if (input && wrap && img) {
+                if (input.value && input.value.trim()) {
+                    img.src = input.value.trim();
+                    wrap.classList.remove('hidden');
+                } else {
+                    img.src = '';
+                    wrap.classList.add('hidden');
+                }
+            }
+        };
+
+        window.clearImgInput = function(prefix) {
+            const input = document.getElementById(prefix + '-img');
+            const wrap = document.getElementById(prefix + '-preview-wrap');
+            const img = document.getElementById(prefix + '-preview');
+            if (input) input.value = '';
+            if (img) img.src = '';
+            if (wrap) wrap.classList.add('hidden');
+        };
+
+        window.handleImgUpload = function(event, prefix) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                return window.showToast("Ukuran gambar maksimal 2MB agar loading cepat", "error");
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                const input = document.getElementById(prefix + '-img');
+                if (input) {
+                    input.value = base64Data;
+                    window.previewImgInput(prefix);
+                    window.showToast("Gambar berhasil di-upload!", "success");
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // Attach clipboard paste handler globally for image inputs
+        ['f-stimulus', 'f-soal', 'edit-stimulus', 'edit-soal'].forEach(prefix => {
+            document.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementById(prefix + '-img');
+                if (!input) return;
+                input.addEventListener('paste', (e) => {
+                    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                    for (let item of items) {
+                        if (item.type.indexOf('image') !== -1) {
+                            const blob = item.getAsFile();
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                input.value = event.target.result;
+                                window.previewImgInput(prefix);
+                                window.showToast("Gambar dari Clipboard (Ctrl+V) berhasil ditempel!", "success");
+                            };
+                            reader.readAsDataURL(blob);
+                            e.preventDefault();
+                            break;
+                        }
+                    }
+                });
+            });
+        });
+
+        window.updateFormTipe = function(prefix) {
+            const tipe = document.getElementById(prefix + '-tipe').value;
+            const isBS = (tipe === 'BS');
+            const isPGK = (tipe === 'PGK');
+
+            // Handle BS
+            if (isBS) {
+                if (prefix === 'f') {
+                    document.getElementById('f-pil-A').value = 'Benar';
+                    document.getElementById('f-pil-B').value = 'Salah';
+                    document.getElementById('f-pil-C').classList.add('hidden');
+                    document.getElementById('f-pil-D').classList.add('hidden');
+                    document.getElementById('f-pil-E').classList.add('hidden');
+                } else {
+                    document.getElementById('edit-pil-0').value = 'Benar';
+                    document.getElementById('edit-pil-1').value = 'Salah';
+                    document.getElementById('edit-pil-2').parentElement.classList.add('hidden');
+                    document.getElementById('edit-pil-3').parentElement.classList.add('hidden');
+                    document.getElementById('edit-pil-4').parentElement.classList.add('hidden');
+                }
+            } else {
+                if (prefix === 'f') {
+                    document.getElementById('f-pil-C').classList.remove('hidden');
+                    document.getElementById('f-pil-D').classList.remove('hidden');
+                    document.getElementById('f-pil-E').classList.remove('hidden');
+                } else {
+                    document.getElementById('edit-pil-2').parentElement.classList.remove('hidden');
+                    document.getElementById('edit-pil-3').parentElement.classList.remove('hidden');
+                    document.getElementById('edit-pil-4').parentElement.classList.remove('hidden');
+                }
+            }
+
+            // Handle Kunci
+            const selectKunci = document.getElementById(prefix + '-kunci');
+            const divKunciPGK = document.getElementById(prefix + '-kunci-pgk');
+            
+            if (isPGK) {
+                selectKunci.classList.add('hidden');
+                divKunciPGK.classList.remove('hidden');
+            } else {
+                selectKunci.classList.remove('hidden');
+                divKunciPGK.classList.add('hidden');
+                
+                // If BS, only A and B are valid
+                if (isBS) {
+                    for (let i = 0; i < selectKunci.options.length; i++) {
+                        selectKunci.options[i].hidden = (i > 1);
+                    }
+                    if (selectKunci.value > 1) selectKunci.value = '0';
+                } else {
+                    for (let i = 0; i < selectKunci.options.length; i++) {
+                        selectKunci.options[i].hidden = false;
+                    }
+                }
+            }
+        }
+
         window.simpanSoalCloud = async function() {
             const jenjang = document.getElementById('f-jenjang').value;
             const pilihan = [
@@ -6976,19 +8263,29 @@
                 document.getElementById('f-pil-D').value.trim()
             ];
             
-            if (jenjang === 'SMA') {
+            if (tipe === 'BS') {
+                pilihan.length = 2; // Hanya A dan B
+            } else if (jenjang === 'SMA') {
                 const pilE = document.getElementById('f-pil-E').value.trim();
                 if (!pilE) return window.showToast("Wajib mengisi opsi E untuk tingkat SMA!", "error");
                 pilihan.push(pilE);
             }
+
+            const soalImg = document.getElementById('f-soal-img').value.trim();
+            const stimulusStr = document.getElementById('f-stimulus').value.trim();
+            const stimulusImg = document.getElementById('f-stimulus-img').value.trim();
 
             const data = {
                 jenjang: jenjang,
                 tingkat: document.getElementById('f-tingkat').value,
                 mapel: document.getElementById('f-mapel').value,
                 subtes: `TKA ${jenjang} - ${document.getElementById('f-mapel').value}`,
+                stimulus: stimulusStr || null,
+                stimulus_img: stimulusImg || null,
                 soal: document.getElementById('f-soal').value.trim(),
+                soal_img: soalImg || null,
                 pilihan: pilihan,
+                tipe: tipe,
                 jawaban: parseInt(document.getElementById('f-kunci').value),
                 pembahasan: "Pembahasan konsep terstruktur dari pengajar."
             };
@@ -6996,7 +8293,10 @@
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'soal_tka'), data);
                 window.showToast("Soal standar TKA berhasil disimpan!", "success");
+                document.getElementById('f-stimulus').value = '';
+                document.getElementById('f-stimulus-img').value = '';
                 document.getElementById('f-soal').value = '';
+                document.getElementById('f-soal-img').value = '';
                 [...document.querySelectorAll('input[id^="f-pil"]')].forEach(el => el.value = '');
             } catch(e) { window.showToast("Gagal simpan: " + e.message, "error"); }
         }
@@ -7077,6 +8377,93 @@
             document.getElementById('sisa-kuota-text').innerText = sisa;
             document.getElementById('limit-info').innerText = `${sisa} / ${MAX_LIMIT_PER_DAY}`;
         }
+
+        window.bukaEditSoal = function(id) {
+            const overriddenIds = new Set(bankSoalCloud.map(q => q.id));
+            const list = [...bankSoalCloud, ...DEFAULT_QUESTIONS.filter(q => !overriddenIds.has(q.id))];
+            const q = list.find(item => item.id === id);
+            if (!q) return window.showToast("Soal tidak ditemukan", "error");
+
+            document.getElementById('edit-id').value = q.id;
+            document.getElementById('edit-stimulus').value = q.stimulus || '';
+            document.getElementById('edit-stimulus-img').value = q.stimulus_img || '';
+            window.previewImgInput('edit-stimulus');
+            if (editSoalImg) {
+                editSoalImg.value = q.soal_img || '';
+                window.previewImgInput('edit-soal');
+            }
+            document.getElementById('edit-soal').value = q.soal || q.pertanyaan || '';
+            
+            const editSoalImg = document.getElementById('edit-soal-img');
+            if(editSoalImg) editSoalImg.value = q.soal_img || '';
+
+            document.getElementById('edit-pil-0').value = q.pilihan[0] || '';
+            document.getElementById('edit-pil-1').value = q.pilihan[1] || '';
+            document.getElementById('edit-pil-2').value = q.pilihan[2] || '';
+            document.getElementById('edit-pil-3').value = q.pilihan[3] || '';
+            document.getElementById('edit-pil-4').value = q.pilihan[4] || '';
+            document.getElementById('edit-tipe').value = q.tipe || 'PG';
+            window.updateFormTipe('edit');
+            if (q.tipe === 'PGK' && Array.isArray(q.jawaban)) {
+                const cbs = document.querySelectorAll('.edit-kunci-cb');
+                cbs.forEach(cb => { cb.checked = q.jawaban.includes(parseInt(cb.value)); });
+            } else {
+                document.getElementById('edit-kunci').value = Array.isArray(q.jawaban) ? 0 : (q.jawaban || 0);
+            }
+            document.getElementById('edit-pembahasan').value = q.pembahasan || '';
+
+            document.getElementById('modal-edit').classList.remove('hidden');
+        };
+
+        window.tutupModalEdit = function() {
+            document.getElementById('modal-edit').classList.add('hidden');
+        };
+
+        window.simpanModalEdit = async function() {
+            const id = document.getElementById('edit-id').value;
+            if (!id) return;
+
+            const pilihan = [
+                document.getElementById('edit-pil-0').value.trim(),
+                document.getElementById('edit-pil-1').value.trim(),
+                document.getElementById('edit-pil-2').value.trim(),
+                document.getElementById('edit-pil-3').value.trim()
+            ];
+            const pilE = document.getElementById('edit-pil-4').value.trim();
+            if (pilE) pilihan.push(pilE);
+
+            const editSoalImg = document.getElementById('edit-soal-img');
+
+            const updatedData = {
+                stimulus: document.getElementById('edit-stimulus').value.trim(),
+                stimulus_img: document.getElementById('edit-stimulus-img').value.trim(),
+                soal: document.getElementById('edit-soal').value.trim(),
+                soal_img: editSoalImg ? editSoalImg.value.trim() : '',
+                pilihan: pilihan,
+                jawaban: parseInt(document.getElementById('edit-kunci').value),
+                pembahasan: document.getElementById('edit-pembahasan').value.trim()
+            };
+
+            try {
+                if (id.startsWith('tka_')) {
+                    // It's a default question, we need to create a cloud override
+                    const list = [...DEFAULT_QUESTIONS];
+                    const baseQ = list.find(item => item.id === id);
+                    if (baseQ) {
+                        const mergedData = { ...baseQ, ...updatedData };
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'soal_tka', id), mergedData);
+                    }
+                } else {
+                    // Update existing cloud doc
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'soal_tka', id), updatedData);
+                }
+                window.showToast("Perubahan soal berhasil disimpan!", "success");
+                window.tutupModalEdit();
+            } catch (e) {
+                console.error(e);
+                window.showToast("Gagal menyimpan perubahan: " + e.message, "error");
+            }
+        };
 
         async function generateSoalAI(jenjang, mapel, jurusan, jumlahSoal, useProceduralOnly = false) {
             const semuaTopik = TOPIK_MATERI[mapel] || ["konsep dan penalaran analitis"];
@@ -7212,6 +8599,15 @@
             const stimulusContainer = document.getElementById('stimulus-container');
             const stimulusText = document.getElementById('stimulus-text');
             const questionText = document.getElementById('question-text');
+            const questionImg = document.getElementById('question-img');
+
+            if (q.soal_img) {
+                questionImg.src = q.soal_img;
+                questionImg.classList.remove('hidden');
+            } else {
+                questionImg.classList.add('hidden');
+                questionImg.src = '';
+            }
 
             const fullText = q.soal || q.pertanyaan || '';
             if (fullText.includes('[STIMULUS WACANA KASUS]') && fullText.includes('[PERTANYAAN ANALITIS]')) {
@@ -7248,7 +8644,15 @@
             } else badgeTingkat.classList.add('hidden');
 
             const container = document.getElementById('options-container');
-            container.innerHTML = q.pilihan.map((opsi, idx) => `<button onclick="pilihOpsi(${idx}, this)" class="w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm transition"><span><strong class="mr-2 text-indigo-600">${String.fromCharCode(65 + idx)}.</strong> ${opsi}</span></button>`).join('');
+            if (q.tipe === 'PGK') {
+                container.innerHTML = q.pilihan.map((opsi, idx) => `<label class="w-full block text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm transition cursor-pointer flex items-center gap-3" id="lbl-pgk-${idx}">
+                    <input type="checkbox" value="${idx}" class="pgk-checkbox w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                    <span><strong class="text-indigo-600">${String.fromCharCode(65 + idx)}.</strong> ${opsi}</span>
+                </label>`).join('');
+                container.innerHTML += `<button id="btn-jawab-pgk" onclick="window.submitPGK()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow-md">Jawab</button>`;
+            } else {
+                container.innerHTML = q.pilihan.map((opsi, idx) => `<button onclick="pilihOpsi(${idx}, this)" class="w-full text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-indigo-500 font-semibold text-slate-700 text-sm transition" id="btn-opt-${idx}"><span><strong class="mr-2 text-indigo-600">${String.fromCharCode(65 + idx)}.</strong> ${opsi}</span></button>`).join('');
+            }
 
             startQuestionTimer();
         }
@@ -7258,16 +8662,17 @@
             if (timerInterval) clearInterval(timerInterval);
             userSelectedAnswer = idx;
             const q = activeQuestions[currentIndex];
-            const buttons = document.getElementById('options-container').children;
+            const buttons = document.getElementById('options-container').querySelectorAll('button');
 
             if (idx === q.jawaban) {
-                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm";
+                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm transition";
                 document.getElementById('feedback-msg').innerHTML = "<span class='text-emerald-600 font-bold'>✅ Benar!</span>";
                 correctCount++;
             } else {
-                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-semibold text-sm";
-                if (buttons[q.jawaban]) buttons[q.jawaban].className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm";
-                document.getElementById('feedback-msg').innerHTML = `<span class='text-rose-600 font-bold'>❌ Salah (Kunci: ${String.fromCharCode(65 + q.jawaban)})</span>`;
+                element.className = "w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 text-rose-900 font-semibold text-sm transition";
+                const correctBtn = document.getElementById('btn-opt-' + q.jawaban);
+                if (correctBtn) correctBtn.className = "w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold text-sm transition";
+                document.getElementById('feedback-msg').innerHTML = `<span class='text-rose-600 font-bold'>❌ Salah (Kunci: ${String.fromCharCode(65 + (q.jawaban || 0))})</span>`;
             }
 
             if(q.pembahasan) {
@@ -7275,6 +8680,64 @@
                 document.getElementById('explanation-box').classList.remove('hidden');
             }
             for(let b of buttons) b.style.pointerEvents = 'none';
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        
+        window.submitPGK = function() {
+            if (userSelectedAnswer !== null) return;
+            const cbs = document.querySelectorAll('.pgk-checkbox:checked');
+            if (cbs.length === 0) {
+                window.showToast("Pilih minimal satu jawaban", "error");
+                return;
+            }
+            if (timerInterval) clearInterval(timerInterval);
+            
+            const selectedIdxs = Array.from(cbs).map(cb => parseInt(cb.value));
+            userSelectedAnswer = selectedIdxs; // array
+            
+            const q = activeQuestions[currentIndex];
+            let isCorrect = false;
+            if (Array.isArray(q.jawaban)) {
+                // Sort both arrays to compare
+                const correctSorted = [...q.jawaban].sort();
+                const userSorted = [...selectedIdxs].sort();
+                isCorrect = JSON.stringify(correctSorted) === JSON.stringify(userSorted);
+            }
+            
+            // UI Feedback
+            document.querySelectorAll('.pgk-checkbox').forEach(cb => cb.disabled = true);
+            document.getElementById('btn-jawab-pgk').classList.add('hidden');
+            
+            // Mark all correct answers with green
+            let correctStr = '';
+            if (Array.isArray(q.jawaban)) {
+                q.jawaban.forEach(ans => {
+                    const lbl = document.getElementById('lbl-pgk-' + ans);
+                    if (lbl) lbl.className = "w-full block text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 font-semibold text-emerald-900 text-sm flex items-center gap-3";
+                });
+                correctStr = q.jawaban.map(a => String.fromCharCode(65 + a)).join(', ');
+            }
+            
+            // Mark wrong selections with red
+            selectedIdxs.forEach(ans => {
+                if (Array.isArray(q.jawaban) && !q.jawaban.includes(ans)) {
+                    const lbl = document.getElementById('lbl-pgk-' + ans);
+                    if (lbl) lbl.className = "w-full block text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-50 font-semibold text-rose-900 text-sm flex items-center gap-3";
+                }
+            });
+
+            if (isCorrect) {
+                document.getElementById('feedback-msg').innerHTML = "<span class='text-emerald-600 font-bold'>✅ Benar!</span>";
+                correctCount++;
+            } else {
+                document.getElementById('feedback-msg').innerHTML = `<span class='text-rose-600 font-bold'>❌ Salah (Kunci: ${correctStr})</span>`;
+            }
+
+            if(q.pembahasan) {
+                document.getElementById('explanation-text').innerText = q.pembahasan;
+                document.getElementById('explanation-box').classList.remove('hidden');
+            }
             document.getElementById('btn-next').classList.remove('hidden');
         }
 
