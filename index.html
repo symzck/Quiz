@@ -866,21 +866,21 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, getDocFromServer, setDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCxeoBZfZigelfMbgAZBdh8eUFuZYngYMw",
-            authDomain: "crypto-banner-tthv3.firebaseapp.com",
-            projectId: "crypto-banner-tthv3",
-            storageBucket: "crypto-banner-tthv3.firebasestorage.app",
-            messagingSenderId: "1015315511773",
-            appId: "1:1015315511773:web:d08fcfc89d4f6f1e5b9e34",
-            measurementId: "",
-            firestoreDatabaseId: "ai-studio-quiz-2bc4c10c-f0c1-41a6-a167-c736dab537e7"
+            apiKey: "AIzaSyAOHslpDrbf7dubS6MiX4Qcj2Nbr4W3CkY",
+            authDomain: "quiz-tka.firebaseapp.com",
+            databaseURL: "https://quiz-tka-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quiz-tka",
+            storageBucket: "quiz-tka.firebasestorage.app",
+            messagingSenderId: "1032541943520",
+            appId: "1:1032541943520:web:1c85ca43ba7171636bc285",
+            measurementId: "G-QFB5TDMBFC"
         };
         const appId = "2bc4c10c-f0c1-41a6-a167-c736dab537e7";
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
-        const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+        const db = getFirestore(app);
 
         const OperationType = {
             CREATE: 'create',
