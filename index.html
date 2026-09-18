@@ -8831,15 +8831,18 @@
             }
         };
 
-        // Fetch status sistem & user config saat inisialisasi
+        // Fetch status sistem & user config saat inisialisasi (opsional jika ada backend)
         fetch('/api/user-status')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) return null;
+                return res.json();
+            })
             .then(data => {
                 serverUserData = data;
                 isLoading = false;
             })
-            .catch(error => {
-                console.error("Gagal memuat status user:", error);
+            .catch(() => {
+                serverUserData = null;
                 isLoading = false;
             });
 
